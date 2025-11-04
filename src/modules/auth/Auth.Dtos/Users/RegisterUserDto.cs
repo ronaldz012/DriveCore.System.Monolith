@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Auth.Dtos.Users;
 
@@ -16,5 +17,6 @@ public class RegisterUserDto
 
 public class RegisterUserByAdminDto : RegisterUserDto
 {
-    public IEnumerable<int> RoleIds { get; set; } = Enumerable.Empty<int>(); 
+        public IEnumerable<int> RoleIds { get; set; } = Enumerable.Empty<int>();
 }
+

@@ -10,10 +10,10 @@ namespace System.Api.Controllers.Auth
     [ApiController]
     public class AuthController(UserUseCases userUseCases) : ControllerBase
     {
-        [HttpPost("Register")]
-        public async Task<IActionResult> Register([FromBody] RegisterUserByAdminDto dto)
+        [HttpPost("Register/User")]
+        public async Task<IActionResult> Register([FromBody] RegisterUserDto dto)
         {
-            return await userUseCases.RegisterUser.Execute(dto, dto.RoleIds)
+            return await userUseCases.RegisterDefaultUser.Execute(dto)
                                                     .ToValueOrProblemDetails();
         }
         [HttpPost("Login")]
