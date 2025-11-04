@@ -42,12 +42,7 @@ public class MappingConfig: IRegister
              CanDelete = rmp.CanDelete
          }).ToList());
 
-        config.NewConfig<RegisterUserDto, User>()
-        .Map(dest => dest.UserRoles,
-         src => src.RoleIds.Select(roleId => new UserRole
-         {
-             RoleId = roleId
-         }).ToList());
+        config.NewConfig<RegisterUserDto, User>();
 
         config.NewConfig<User, UserDetailsDto>();
     }

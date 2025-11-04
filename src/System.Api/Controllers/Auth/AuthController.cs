@@ -11,9 +11,9 @@ namespace System.Api.Controllers.Auth
     public class AuthController(UserUseCases userUseCases) : ControllerBase
     {
         [HttpPost("Register")]
-        public async Task<IActionResult> Register([FromBody] RegisterUserDto dto)
+        public async Task<IActionResult> Register([FromBody] RegisterUserByAdminDto dto)
         {
-            return await userUseCases.RegisterUser.Execute(dto)
+            return await userUseCases.RegisterUser.Execute(dto, dto.RoleIds)
                                                     .ToValueOrProblemDetails();
         }
         [HttpPost("Login")]

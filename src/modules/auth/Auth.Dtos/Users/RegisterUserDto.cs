@@ -11,5 +11,10 @@ public class RegisterUserDto
         public string Name { get; set; } = string.Empty;
         public string FatherLastName { get; set; } = string.Empty;
         public string MotherLastName { get; set; } = string.Empty;
-        public IEnumerable<int> RoleIds { get; set; } = Enumerable.Empty<int>(); 
+        
+}
+
+public class RegisterUserByAdminDto : RegisterUserDto
+{
+    public IEnumerable<int> RoleIds { get; set; } = Enumerable.Empty<int>(); 
 }
