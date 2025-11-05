@@ -18,7 +18,7 @@ public class VerifyUser(AuthDbContext dbContext )
                                                                                             && c.Purpose == VerificationCodePurpose.AccountVerification);
         if (code == null)
             return new Error("NOT_FOUND", "Verification Code not found");
-        if (code.ExpiresAt > DateTime.UtcNow)
+        if (code.ExpiresAt < DateTime.UtcNow)
             return new Error("INVALID_OPERATION", "Verification code Expired");
         code.IsUsed = true;
         code.User.Status = UserStatus.Active;
