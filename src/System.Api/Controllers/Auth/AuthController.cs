@@ -1,6 +1,7 @@
 using System.Api.Result;
 using Auth.Dtos.Users;
 using Auth.UseCases.Users;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,8 +35,9 @@ namespace System.Api.Controllers.Auth
                                                         .ToValueOrProblemDetails();
         }
 
-    
-        [HttpPost]
+
+        [HttpPost("CompleteUser")]
+        [Authorize]
         public async Task<IActionResult> CompleteUserRole([FromBody] CompleteUserRoleDto dto)
         {
             return await userUseCases.CompletePublicRegister.Execute(dto).ToValueOrProblemDetails();

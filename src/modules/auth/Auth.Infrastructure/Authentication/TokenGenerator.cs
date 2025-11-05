@@ -3,6 +3,7 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;
 using System.Security.Cryptography;
+using System.Security.Claims;
 
 namespace Auth.Infrastructure.Authentication;
 
@@ -23,8 +24,14 @@ public class TokenGenerator : ITokenGenerator
         var securityKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(_tokenSettings.SecretKey));
         var credentials = new SigningCredentials(
-            securityKey, SecurityAlgorithms.HmacSha256);        
+            securityKey, SecurityAlgorithms.HmacSha256);
+
+        var claims = new List<Claim> {
+                    new Claim (ClaimTypes.NameIdentifier, userId.ToString()),
+                };
+          
         var token = new JwtSecurityToken(
+            claims:claims,
             issuer: _tokenSettings.Issuer,
             audience: _tokenSettings.Audience,
             expires: DateTime.UtcNow.AddMinutes(_tokenSettings.ExpirationMinutes),
