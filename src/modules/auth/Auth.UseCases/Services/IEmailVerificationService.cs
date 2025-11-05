@@ -50,7 +50,7 @@ public class EmailVerificationService(AuthDbContext dbContext,
             await dbContext.AddAsync(newVerificationCode);
             await dbContext.SaveChangesAsync();
         
-            string userName = user.Name + user.FatherLastName; 
+            string userName = user.FirstName + user.LastName; 
 
             string emailSubject;
             string emailBody;

@@ -55,16 +55,18 @@ public class RegisterUser(AuthDbContext dbContext,IEmailVerificationService emai
             throw;
         }
     }
-    
-    public async Task<Result<int>> GetDefaultUserRole ()
+
+    public async Task<Result<int>> GetDefaultUserRole()
     {
         var roleName = config["Roles:DefaultUserRole"] ?? "User";
         var role = await dbContext.Roles.FirstOrDefaultAsync(r => r.Name == roleName);
-        if(role == null)
+        if (role == null)
             return new Error("NOT_FOUND", "El rol por defecto no está configurado en el sistema.");
 
         return role.Id;
     } 
+    
+
 
 
 

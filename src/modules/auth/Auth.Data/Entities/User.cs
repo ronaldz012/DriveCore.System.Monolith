@@ -13,22 +13,16 @@ public class User : ICreatedAt, ICreatedBy, IUpdatedAt, ISoftDelete, IUpdatedBy
     public byte[] PasswordSalt { get; set; } = default!;
     [StringLength(100)]
     public string Email { get; set; } = string.Empty;
-    public bool IsEmailConfirmed { get; set; } = false;
+    public string FirstName { get; set; } = string.Empty;
     [StringLength(100)]
-    public string Name { get; set; } = string.Empty;
-    [StringLength(100)]
-    public string FatherLastName { get; set; } = string.Empty;
-    [StringLength(100)]
-    public string MotherLastName { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
     [StringLength(15)]
     public string Ci { get; set; } = string.Empty;
     public string Nationality { get; set; } = string.Empty;
     public DateTime BirthDate { get; set; } = DateTime.MinValue;
     public UserStatus Status { get; set; } 
-    public string GoogleId { get; set; } = string.Empty;
-    public bool IsGoogleAuthenticated { get; set; } = false;
+    public string? GoogleId { get; set; } 
     public DateTime LastActive { get; set; }
-    //Audit fields
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
     public DateTime? DeletedAt { get; set; }
@@ -46,7 +40,8 @@ public enum UserStatus
     PendingVerification = 0,
     Active = 1,
     Suspended = 2,
-    Inactive = 3
+    Inactive = 3,
+    PendingRoleSelecting =4
 }
 
 public enum AuthProvider
