@@ -22,6 +22,17 @@ namespace System.Api.Controllers.Auth
             return await userUseCases.Login.Execute(dto)
                                                     .ToValueOrProblemDetails();
         }
+        /// <summary>
+        /// this will Active the user
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        [HttpPost("VerifyAcount")]
+        public async Task<IActionResult> VerifyAccount(string code)
+        {
+            return await userUseCases.VerifyUser.Execute(code)
+                                                        .ToValueOrProblemDetails();
+        }
     }
 }
  

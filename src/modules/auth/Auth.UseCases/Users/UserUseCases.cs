@@ -2,5 +2,7 @@ using System;
 
 namespace Auth.UseCases.Users;
 
-public record UserUseCases(RegisterDefaultUser RegisterDefaultUser,RegisterUser RegisterUser,
-                             Login Login);
+public record UserUseCases(RegisterDefaultUser RegisterDefaultUser,
+                            RegisterUser RegisterUser,
+                             Login Login,
+                             VerifyUser VerifyUser);
