@@ -25,7 +25,8 @@ public static class UseCasesDependencyInjection
     => services.AddScoped<UserUseCases>()
                 .AddScoped<RegisterUser>()
                 .AddScoped<RegisterDefaultUser>()
-                .AddScoped<Login>();
+                .AddScoped<Login>()
+                .AddScoped<VerifyUser>();
     public static IServiceCollection AddMenuUseCases(this IServiceCollection services)
     => services.AddScoped<MenuUseCases>()
                 .AddScoped<AddMenu>()
