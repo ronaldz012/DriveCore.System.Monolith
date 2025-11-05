@@ -4,14 +4,15 @@ using Auth.Data.Persistence;
 using Auth.Dtos.Users;
 using Microsoft.EntityFrameworkCore;
 using Shared.Result;
+using Shared.Services;
 
 namespace Auth.UseCases.Users;
 
-public class CompletePublicRegister(AuthDbContext dbContext )
+public class CompletePublicRegister(AuthDbContext dbContext, ICurrentUser currentUser)
 {
-    public async Task<Result<bool>> Execute(CompleteUserRoleDto dto, int userId) // update with I Currente User Service
+    public async Task<Result<bool>> Execute(CompleteUserRoleDto dto) // update with I Currente User Service
     {
-        User? user = await dbContext.Users.Include(u => u.UserRoles).FirstOrDefaultAsync(u => u.Id == userId);
+        User? user = await dbContext.Users.Include(u => u.UserRoles).FirstOrDefaultAsync(u => u.Id == currentUser.UserId);
         if (user == null)
             return new Error("NOT_FOUND", "User not found");
 
@@ -27,7 +28,7 @@ public class CompletePublicRegister(AuthDbContext dbContext )
             return new Error("NOT_FOUND", "role not found");
 
         user.UserRoles.Clear();
-        user.UserRoles.Add(new UserRole { RoleId = roleId, UserId = userId });  //test id UserId implicit is neccesary
+        user.UserRoles.Add(new UserRole { RoleId = roleId, UserId = currentUser.UserId });  //test id UserId implicit is neccesary
 
         user.FirstName = dto.FirstName;
         user.LastName = dto.LastName;

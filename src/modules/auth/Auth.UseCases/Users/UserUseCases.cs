@@ -5,4 +5,5 @@ namespace Auth.UseCases.Users;
 public record UserUseCases(RegisterDefaultUser RegisterDefaultUser,
                             RegisterUser RegisterUser,
                              Login Login,
-                             VerifyUser VerifyUser);
+                             VerifyUser VerifyUser,
+                             CompletePublicRegister CompletePublicRegister);

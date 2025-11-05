@@ -27,11 +27,18 @@ namespace System.Api.Controllers.Auth
         /// </summary>
         /// <param name="code"></param>
         /// <returns></returns>
-        [HttpPost("VerifyAcount")]
-        public async Task<IActionResult> VerifyAccount(string code)
+        [HttpPost("VerifyAccount")]
+        public async Task<IActionResult> VerifyAccount([FromBody] string code)
         {
             return await userUseCases.VerifyUser.Execute(code)
                                                         .ToValueOrProblemDetails();
+        }
+
+    
+        [HttpPost]
+        public async Task<IActionResult> CompleteUserRole([FromBody] CompleteUserRoleDto dto)
+        {
+            return await userUseCases.CompletePublicRegister.Execute(dto).ToValueOrProblemDetails();
         }
     }
 }
