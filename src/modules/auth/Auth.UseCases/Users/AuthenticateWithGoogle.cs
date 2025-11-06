@@ -9,7 +9,7 @@ using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Shared.Result;
 
-namespace Auth.UseCases.Services;
+namespace Auth.UseCases.Users;
 
 public class AuthenticateWithGoogle(AuthDbContext dbContext,  RegisterUser registerUser, IMapper mapper, IGoogleTokenValidator googleTokenValidator, ITokenGenerator tokenGenerator)
 {

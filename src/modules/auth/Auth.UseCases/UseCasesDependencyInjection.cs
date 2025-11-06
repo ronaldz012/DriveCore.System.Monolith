@@ -27,7 +27,8 @@ public static class UseCasesDependencyInjection
                 .AddScoped<RegisterDefaultUser>()
                 .AddScoped<Login>()
                 .AddScoped<CompletePublicRegister>()
-                .AddScoped<VerifyUser>();
+                .AddScoped<VerifyUser>()
+                .AddScoped<AuthenticateWithGoogle>();
     public static IServiceCollection AddMenuUseCases(this IServiceCollection services)
     => services.AddScoped<MenuUseCases>()
                 .AddScoped<AddMenu>()

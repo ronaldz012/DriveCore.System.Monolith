@@ -6,4 +6,5 @@ public record UserUseCases(RegisterDefaultUser RegisterDefaultUser,
                             RegisterUser RegisterUser,
                              Login Login,
                              VerifyUser VerifyUser,
-                             CompletePublicRegister CompletePublicRegister);
+                             CompletePublicRegister CompletePublicRegister,
+                             AuthenticateWithGoogle AuthenticateWithGoogle);

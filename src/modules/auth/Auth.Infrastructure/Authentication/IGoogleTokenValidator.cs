@@ -1,6 +1,7 @@
 using System;
 using Google.Apis.Auth;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Shared.Result;
 
 namespace Auth.Infrastructure.Authentication;
@@ -9,15 +10,16 @@ public interface IGoogleTokenValidator
 {
     Task<Result<GoogleUserInfo>> ValidateTokenAsync(string idToken);
 }
-public class GoogleTokenValidator(IConfiguration configuration) : IGoogleTokenValidator
+public class GoogleTokenValidator(IOptions<AuthenticationSettings> AuthSettings) : IGoogleTokenValidator
 {
+    private readonly Google googleConfig = AuthSettings.Value.Google;
     public async Task<Result<GoogleUserInfo>> ValidateTokenAsync(string idToken)
     {
         try
         {
             var settings = new GoogleJsonWebSignature.ValidationSettings
             {
-                Audience = new[] { configuration["Authentication:Google:ClientId"] }
+                Audience = new[] { googleConfig.ClientId}
             };
 
             var payload = await GoogleJsonWebSignature.ValidateAsync(idToken, settings);

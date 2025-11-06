@@ -23,6 +23,7 @@ public static class InfrastructureDependencyInjection
         services.Configure<ProjectInfo>(projectInfoSection);
 
         services.AddSingleton<ITokenGenerator, TokenGenerator>();
+        services.AddScoped<IGoogleTokenValidator, GoogleTokenValidator>();
 
         services.AddSingleton<EmailTemplateRenderer>();
         return services;
