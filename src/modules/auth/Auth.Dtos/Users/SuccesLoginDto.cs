@@ -11,6 +11,7 @@ public class SuccesLoginDto
     public string TokenType { get; set; } = "Bearer";
     public int ExpiresIn { get; set; }
     public string Status { get; set; } = string.Empty;
+    public string AuthProvider = string.Empty;
     public UserDetailsDto User { get; set; } = default!;
     public List<string> Roles { get; set; } = new();
     public List<ModulePermissionsDeductedDto> Modules { get; set; } = new();

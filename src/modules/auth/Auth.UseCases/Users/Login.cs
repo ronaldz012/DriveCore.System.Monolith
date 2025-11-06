@@ -55,6 +55,7 @@ public class Login(AuthDbContext dbContext, ITokenGenerator tokenGenerator, IMap
         var succesLoginDto = new SuccesLoginDto
         {
             Status = user.Status.ToString(),
+            AuthProvider = user.AuthProvider.ToString(),
             AccessToken = accessToken,
             RefreshToken = refreshToken,
             ExpiresIn = tokenGenerator.GetAccessTokenExpirationMinutes() * 60,

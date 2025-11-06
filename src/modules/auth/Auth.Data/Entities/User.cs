@@ -30,6 +30,9 @@ public class User : ICreatedAt, ICreatedBy, IUpdatedAt, ISoftDelete, IUpdatedBy
     public int? DeletedBy { get; set; }
     public int CreatedBy { get; set; }
 
+    public AuthProvider AuthProvider { get; set; }
+    public string? ExternalAuthId { get; set; } 
+
     // Navigation property
     public ICollection<UserRole> UserRoles { get; set; } = default!;
     public ICollection<EmailVerificationCode> EmailVerificationCodes { get; set; } = default!;

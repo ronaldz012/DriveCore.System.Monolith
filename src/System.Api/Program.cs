@@ -49,28 +49,38 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-builder.Services.AddHttpContextAccessor(); 
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthentication(options =>
 {
-    // The default scheme for authenticating API requests (JWT)
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+  // The default scheme for authenticating API requests (JWT)
+  options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
 
-    // The default scheme for challenging unauthenticated users (JWT)
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+  // The default scheme for challenging unauthenticated users (JWT)
+  options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
+.AddGoogle(options =>
+{
+    options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
+    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
+    // Solo para desarrollo - callback URL
+    options.CallbackPath = "/api/auth/google-callback";
+}
+  
+)
 .AddJwtBearer(options =>
 {
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["TokenSettings:Issuer"]!,
-        ValidAudience = builder.Configuration["TokenSettings:Audience"]!,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["TokenSettings:SecretKey"]!))
-    };
+  options.TokenValidationParameters = new TokenValidationParameters
+  {
+    ValidateIssuer = true,
+    ValidateAudience = true,
+    ValidateLifetime = true,
+    ValidateIssuerSigningKey = true,
+    ValidIssuer = builder.Configuration["TokenSettings:Issuer"]!,
+    ValidAudience = builder.Configuration["TokenSettings:Audience"]!,
+    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["TokenSettings:SecretKey"]!))
+  };
 });
+
 // Add DbContext configuration
 builder.Services.AddDbContext<AuthDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("AuthConnection")));
