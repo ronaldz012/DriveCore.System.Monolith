@@ -63,7 +63,7 @@ builder.Services.AddAuthentication(options =>
     options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
     options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
     // Solo para desarrollo - callback URL
-    options.CallbackPath = "/api/auth/google-callback";
+    options.CallbackPath = "/api/ExternalAuth/google-login-complete";
 }
   
 )

@@ -42,6 +42,12 @@ namespace System.Api.Controllers.Auth
         {
             return await userUseCases.CompletePublicRegister.Execute(dto).ToValueOrProblemDetails();
         }
+        [HttpPost("Google")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GoogleAuth([FromBody] string token)
+        {
+            return await userUseCases.AuthenticateWithGoogle.Execute(token).ToValueOrProblemDetails();
+        }
     }
 }
  

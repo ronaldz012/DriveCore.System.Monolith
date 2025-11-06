@@ -37,6 +37,11 @@ public class GoogleTokenValidator(IOptions<AuthenticationSettings> AuthSettings)
 
             return userInfo;
         }
+        catch (InvalidJwtException ex) 
+        {
+            // El token no es auténtico, expiró o no es para esta app.
+            return new Error("GOOGLE_TOKEN_INVALID", $"El ID Token de Google no es válido: {ex.Message}");
+        }
         catch (Exception ex)
         {
             return new Error("INVALID_TOKEN", $"Token de Google inválido: {ex.Message}"); // check if this is ok

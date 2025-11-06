@@ -484,3 +484,4 @@ $RECYCLE.BIN/
 *.swp
 src/System.Api/appsettings.json
 src/System.Api/appsettings.Development.json
+Common/GooglePopUp/google.html

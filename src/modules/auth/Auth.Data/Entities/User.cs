@@ -9,8 +9,8 @@ public class User : ICreatedAt, ICreatedBy, IUpdatedAt, ISoftDelete, IUpdatedBy
     [StringLength(100)]
     public string Username { get; set; } = string.Empty;
 
-    public byte[] PasswordHash { get; set; } = default!;
-    public byte[] PasswordSalt { get; set; } = default!;
+    public byte[] PasswordHash { get; set; } = [];
+    public byte[] PasswordSalt { get; set; } = [];
     [StringLength(100)]
     public string Email { get; set; } = string.Empty;
     public string FirstName { get; set; } = string.Empty;

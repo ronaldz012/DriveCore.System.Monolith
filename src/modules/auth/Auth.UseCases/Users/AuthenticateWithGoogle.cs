@@ -18,14 +18,18 @@ public class AuthenticateWithGoogle(AuthDbContext dbContext,  RegisterUser regis
         // Validar token de Google
         var googleUserResult = await googleTokenValidator.ValidateTokenAsync(idToken);
         if (!googleUserResult.IsSuccess)
-            return new Error("Error","Error"); // fix after mvp
+            return googleUserResult.Error!; // fix after mvp
 
         var googleUser = googleUserResult.Value;
 
         // Buscar si el usuario ya existe
         var existingUser = await dbContext.Users
+        .AsSplitQuery()
             .Include(u => u.UserRoles)
             .ThenInclude(ur => ur.Role)
+                .ThenInclude(r => r.RoleModulePermissions)
+                    .ThenInclude(mp => mp.Module)
+                        .ThenInclude(m => m.Menus)
             .FirstOrDefaultAsync(u => u.Email == googleUser!.Email);
 
         if (existingUser == null)
