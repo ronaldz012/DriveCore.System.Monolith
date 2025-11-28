@@ -16,7 +16,7 @@ public class AddModule(AuthDbContext dbContext, IMapper mapper)
             .AnyAsync(m => m.Name == dto.Name);
         if (exists) return new Error("DUPLICATE", "Ya existe un módulo con ese nombre");
 
-        Module module = mapper.Map<Module>(dto);
+        var module = mapper.Map<Module>(dto);
         dbContext.Modules.Add(module);
         await dbContext.SaveChangesAsync();
         return module.Id;
