@@ -63,6 +63,6 @@ public readonly record struct Result<TValue>
 /// <summary>
 /// Representa un error con un código identificador y un mensaje descriptivo.
 /// </summary>
-/// <param name="Code">Código único del error (ej: "VALIDATION_ERROR", "NOT_FOUND")</param>
+/// <param name="Code">Código único del error (ejemplo: "VALIDATION_ERROR", "NOT_FOUND")</param>
 /// <param name="Message">Mensaje descriptivo del error para el usuario o logs</param>
 public record Error(string Code, string Message);

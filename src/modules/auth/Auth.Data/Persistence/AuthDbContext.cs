@@ -4,12 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Auth.Data.Persistence;
 
-public class AuthDbContext : DbContext
+public class AuthDbContext(DbContextOptions<AuthDbContext> options) : DbContext(options)
 {
-    
-public AuthDbContext(DbContextOptions<AuthDbContext> options) : base(options){      }
-
-        // DbSets
+    // DbSets
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
