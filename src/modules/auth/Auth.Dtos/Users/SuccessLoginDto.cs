@@ -4,7 +4,7 @@ using Auth.Dtos.Roles;
 
 namespace Auth.Dtos.Users;
 
-public class SuccesLoginDto
+public class SuccessLoginDto
 {
     public string AccessToken { get; set; } = default!;
     public string RefreshToken { get; set; } = default!;

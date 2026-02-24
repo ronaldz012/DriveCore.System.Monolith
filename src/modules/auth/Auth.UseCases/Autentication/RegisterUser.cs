@@ -1,15 +1,13 @@
 using Auth.Data.Entities;
 using Auth.Data.Persistence;
-using Auth.Dtos.Users;
 using Auth.Infrastructure.Authentication;
 using Auth.UseCases.Email;
-using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
-using Org.BouncyCastle.Math.EC.Rfc7748;
 using Shared.Result;
-namespace Auth.UseCases.Users;
+
+namespace Auth.UseCases.Autentication;
 
 public class RegisterUser(AuthDbContext dbContext,IEmailVerificationService emailVerificationService, IOptions<AuthenticationSettings> authSettings, IConfiguration config)
 {

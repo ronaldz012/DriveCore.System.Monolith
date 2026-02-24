@@ -1,3 +1,4 @@
+using Auth.UseCases.Autentication;
 using Auth.UseCases.Email;
 using Auth.UseCases.mapper;
 using Auth.UseCases.Menus;
@@ -16,16 +17,22 @@ public static class UseCasesDependencyInjection
         => services.AddMenuUseCases()
                     .AddModulesUseCases()
                     .AddRolesUseCases()
-                    .AddUserUseCases()
+                    .AddAutenticationUseCases()
+                    .AddUsersUseCases()
                    .AddMapper()
                    .AddServices();
     public static IServiceCollection AddServices(this IServiceCollection services)
     => services.AddScoped<IEmailVerificationService, EmailVerificationService>();
-    public static IServiceCollection AddUserUseCases(this IServiceCollection services)
-    => services.AddScoped<UserUseCases>()
+
+    public static IServiceCollection AddUsersUseCases(this IServiceCollection services)
+        => services.AddScoped<UserUserCases>()
+            .AddScoped<GetAllUsers>();
+    public static IServiceCollection AddAutenticationUseCases(this IServiceCollection services)
+    => services.AddScoped<AutenticationUseCases>()
                 .AddScoped<RegisterUser>()
                 .AddScoped<RegisterDefaultUser>()
                 .AddScoped<Login>()
+                .AddScoped<AutenticateMe>()
                 .AddScoped<CompletePublicRegister>()
                 .AddScoped<VerifyUser>()
                 .AddScoped<AuthenticateWithGoogle>();

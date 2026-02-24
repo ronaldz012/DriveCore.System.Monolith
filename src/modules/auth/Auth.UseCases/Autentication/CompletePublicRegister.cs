@@ -1,4 +1,3 @@
-using System;
 using Auth.Data.Entities;
 using Auth.Data.Persistence;
 using Auth.Dtos.Users;
@@ -6,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Shared.Result;
 using Shared.Services;
 
-namespace Auth.UseCases.Users;
+namespace Auth.UseCases.Autentication;
 
 public class CompletePublicRegister(AuthDbContext dbContext, ICurrentUser currentUser)
 {

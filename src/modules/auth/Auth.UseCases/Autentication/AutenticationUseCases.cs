@@ -1,10 +1,9 @@
-using System;
+namespace Auth.UseCases.Autentication;
 
-namespace Auth.UseCases.Users;
-
-public record UserUseCases(RegisterDefaultUser RegisterDefaultUser,
+public record AutenticationUseCases(RegisterDefaultUser RegisterDefaultUser,
                             RegisterUser RegisterUser,
                              Login Login,
+                            AutenticateMe AutenticateMe,
                              VerifyUser VerifyUser,
                              CompletePublicRegister CompletePublicRegister,
                              AuthenticateWithGoogle AuthenticateWithGoogle);

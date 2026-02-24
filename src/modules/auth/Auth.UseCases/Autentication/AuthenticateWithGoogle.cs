@@ -1,19 +1,17 @@
-using System;
 using Auth.Data.Entities;
 using Auth.Data.Persistence;
 using Auth.Dtos.Modules;
 using Auth.Dtos.Users;
 using Auth.Infrastructure.Authentication;
-using Auth.UseCases.Users;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Shared.Result;
 
-namespace Auth.UseCases.Users;
+namespace Auth.UseCases.Autentication;
 
 public class AuthenticateWithGoogle(AuthDbContext dbContext,  RegisterUser registerUser, IMapper mapper, IGoogleTokenValidator googleTokenValidator, ITokenGenerator tokenGenerator)
 {
-    public async Task<Result<SuccesLoginDto>> Execute(string idToken)
+    public async Task<Result<SuccessLoginDto>> Execute(string idToken)
     {
         // Validar token de Google
         var googleUserResult = await googleTokenValidator.ValidateTokenAsync(idToken);
@@ -52,7 +50,7 @@ public class AuthenticateWithGoogle(AuthDbContext dbContext,  RegisterUser regis
             .ToList();
 
 
-        var response = new SuccesLoginDto
+        var response = new SuccessLoginDto
         {
             AccessToken = token,
             RefreshToken = refreshToken,

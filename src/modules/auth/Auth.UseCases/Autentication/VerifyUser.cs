@@ -1,13 +1,9 @@
-using System;
-using System.Runtime.Loader;
 using Auth.Data.Entities;
-using Auth.Data.Migrations;
 using Auth.Data.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Org.BouncyCastle.Asn1;
 using Shared.Result;
 
-namespace Auth.UseCases.Users;
+namespace Auth.UseCases.Autentication;
 
 public class VerifyUser(AuthDbContext dbContext )
 {

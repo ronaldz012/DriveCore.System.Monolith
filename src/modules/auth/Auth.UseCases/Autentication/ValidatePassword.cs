@@ -1,6 +1,4 @@
-using System;
-
-namespace Auth.UseCases.Users;
+namespace Auth.UseCases.Autentication;
 
 public  static class ValidatePassword
     {

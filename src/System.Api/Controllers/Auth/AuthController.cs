@@ -1,6 +1,6 @@
 using System.Api.Result;
 using Auth.Dtos.Users;
-using Auth.UseCases.Users;
+using Auth.UseCases.Autentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,19 +9,28 @@ namespace System.Api.Controllers.Auth
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController(UserUseCases userUseCases) : ControllerBase
+    public class AuthController(AutenticationUseCases autenticationUseCases) : ControllerBase
     {
         [HttpPost("Register/User")]
         public async Task<IActionResult> Register([FromBody] RegisterUserDto dto)
         {
-            return await userUseCases.RegisterDefaultUser.Execute(dto)
+            return await autenticationUseCases.RegisterDefaultUser.Execute(dto)
                                                     .ToValueOrProblemDetails();
         }
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
-            return await userUseCases.Login.Execute(dto)
+            return await autenticationUseCases.Login.Execute(dto)
                                                     .ToValueOrProblemDetails();
+        }
+
+        [Authorize]
+        [HttpGet("me")]
+        public async Task<IActionResult> Me()
+        {
+            return await autenticationUseCases.AutenticateMe.Execute()
+                .ToValueOrProblemDetails();
+            
         }
         /// <summary>
         /// this will Active the user
@@ -31,7 +40,7 @@ namespace System.Api.Controllers.Auth
         [HttpPost("VerifyAccount")]
         public async Task<IActionResult> VerifyAccount([FromBody] string code)
         {
-            return await userUseCases.VerifyUser.Execute(code)
+            return await autenticationUseCases.VerifyUser.Execute(code)
                                                         .ToValueOrProblemDetails();
         }
 
@@ -40,13 +49,13 @@ namespace System.Api.Controllers.Auth
         [Authorize]
         public async Task<IActionResult> CompleteUserRole([FromBody] CompleteUserRoleDto dto)
         {
-            return await userUseCases.CompletePublicRegister.Execute(dto).ToValueOrProblemDetails();
+            return await autenticationUseCases.CompletePublicRegister.Execute(dto).ToValueOrProblemDetails();
         }
         [HttpPost("Google")]
         [AllowAnonymous]
         public async Task<IActionResult> GoogleAuth([FromBody] string token)
         {
-            return await userUseCases.AuthenticateWithGoogle.Execute(token).ToValueOrProblemDetails();
+            return await autenticationUseCases.AuthenticateWithGoogle.Execute(token).ToValueOrProblemDetails();
         }
     }
 }

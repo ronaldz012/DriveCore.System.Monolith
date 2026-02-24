@@ -1,11 +1,9 @@
-using System;
 using Auth.Data.Entities;
 using Auth.Dtos.Users;
 using MapsterMapper;
-using Microsoft.VisualBasic;
 using Shared.Result;
 
-namespace Auth.UseCases.Users;
+namespace Auth.UseCases.Autentication;
 
 public class RegisterDefaultUser(IMapper mapper, RegisterUser registerUser)
 {
