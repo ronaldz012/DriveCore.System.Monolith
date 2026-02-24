@@ -19,18 +19,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Sales API", Version = "v1" });
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Description = @"JWT Authorization header using the Bearer scheme. <br /> <br />
+  c.SwaggerDoc("v1", new OpenApiInfo { Title = "Sales API", Version = "v1" });
+  c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+  {
+    Description = @"JWT Authorization header using the Bearer scheme. <br /> <br />
                       Enter 'Bearer' [space] and then your token in the text input below.<br /> <br />
                       Example: 'Bearer 12345abcdef'<br /> <br />",
-        Name = "Authorization",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
-    });
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+    Name = "Authorization",
+    In = ParameterLocation.Header,
+    Type = SecuritySchemeType.ApiKey,
+    Scheme = "Bearer"
+  });
+  c.AddSecurityRequirement(new OpenApiSecurityRequirement()
       {
         {
           new OpenApiSecurityScheme
@@ -60,12 +60,12 @@ builder.Services.AddAuthentication(options =>
 })
 .AddGoogle(options =>
 {
-    options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
-    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
-    // Solo para desarrollo - callback URL
-    options.CallbackPath = "/api/ExternalAuth/google-login-complete";
+  options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
+  options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
+  // Solo para desarrollo - callback URL
+  options.CallbackPath = "/api/ExternalAuth/google-login-complete";
 }
-  
+
 )
 .AddJwtBearer(options =>
 {
@@ -88,25 +88,38 @@ builder.Services.AddDbContext<AuthDbContext>(options =>
 
 builder.Services.AddControllers(options =>
 {
-    options.Filters.Add<ValidationFilter>();
+  options.Filters.Add<ValidationFilter>();
 });
 // Desactivar el comportamiento automático de [ApiController]
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
-    options.SuppressModelStateInvalidFilter = true;
+  options.SuppressModelStateInvalidFilter = true;
 });
 builder.Services.AddAuthData()
                 .AddUseCases()
                 .AddInfrastructure(builder.Configuration)
                 .AddShared(builder.Configuration);
 
+
+builder.Services.AddCors(options =>
+{
+  options.AddPolicy("AngularApp", policy =>
+  {
+    policy.WithOrigins("http://localhost:4200") // El puerto de tu Angular
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials(); // Importante para leer cookies si fuera necesario
+  });
+});
+
 var app = builder.Build();
+app.UseCors("AngularApp");
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+  app.UseSwagger();
+  app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
