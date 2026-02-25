@@ -8,9 +8,9 @@ namespace System.Api.Controllers.Auth
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class MenuControllers(MenuUseCases menuUseCases) : ControllerBase
+    public class MenuController(MenuUseCases menuUseCases) : ControllerBase
     {
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> Get(int id)
         {
             return await menuUseCases.GetMenu.Execute(id)
