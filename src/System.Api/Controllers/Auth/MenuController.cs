@@ -35,7 +35,7 @@ namespace System.Api.Controllers.Auth
             return await menuUseCases.UpdateMenu.Execute(dto)
                                             .ToValueOrProblemDetails();
         }
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
             return await menuUseCases.DeleteMenu.Execute(id)

@@ -10,9 +10,9 @@ public static class UserMappingUtils
     public static List<ModulePermissionsDeductedDto> BuildUserModulesWithMenus(User user)
     {
         var modulePermissions = user.UserRoles
-            .SelectMany(ur => ur.Role.RoleModulePermissions)
-            .GroupBy(rmp => rmp.ModuleId)
-            .Select(g => new
+            .SelectMany(ur => ur.Role.RoleModulePermissions)//aplanador [[1,2,3],[4,5,6]]-> [1,2,3,4,5,6]
+            .GroupBy(rmp => rmp.ModuleId)//los que tegann module ID igual que vengan de diferentes roles se agrupan y trabajamos con eso
+            .Select(g => new//para cad grupo de repetidos buscamos si, tien permiso minimo en alguna de las isntancias ya se da permiso
             {
                 Module = g.First().Module,
                 CanRead = g.Any(rmp => rmp.CanRead),
