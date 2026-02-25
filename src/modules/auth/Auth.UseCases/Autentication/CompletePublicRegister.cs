@@ -17,6 +17,9 @@ public class CompletePublicRegister(AuthDbContext dbContext, ICurrentUser curren
 
         if (user.Status == UserStatus.PendingVerification)
             return new Error("VALIDATION_ERROR", "verified email");
+        if(user.Status != UserStatus.PendingRoleSelecting)
+            return new Error("VALIDATION_ERROR", "role not pending");
+        
 
         var roleId = await dbContext.Roles
                 .Where(r => r.Public && r.Name == dto.RoleType)
@@ -32,6 +35,7 @@ public class CompletePublicRegister(AuthDbContext dbContext, ICurrentUser curren
         user.FirstName = dto.FirstName;
         user.LastName = dto.LastName;
         //other properties, use mapper if it get complex
+        user.Status = UserStatus.Active;
 
         await dbContext.SaveChangesAsync();
         return true;
