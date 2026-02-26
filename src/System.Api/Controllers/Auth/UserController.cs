@@ -16,6 +16,12 @@ namespace System.Api.Controllers.Auth
         {
             return await userUserCases.GetAllUsers.execute(request).ToValueOrProblemDetails();
         }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateUser([FromBody] CreateUserDto request)
+        {
+            return await userUserCases.CreateUser.Execute(request).ToValueOrProblemDetails();
+        }
     }
 }
  

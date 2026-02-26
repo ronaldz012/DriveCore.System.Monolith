@@ -1,6 +1,6 @@
 namespace Auth.UseCases.Autentication;
 
-public  static class ValidatePassword
+public  static class ValidatePassword//////////MOVER A UN LUGAR PARA EVITAR DDEPENDENCIA,. Users esta usando esto
     {
         public static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
