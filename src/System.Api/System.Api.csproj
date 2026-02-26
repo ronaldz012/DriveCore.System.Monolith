@@ -23,6 +23,8 @@
     <ProjectReference Include="../modules/auth/Auth.Infrastructure/Auth.Infrastructure.csproj" />
     <ProjectReference Include="../modules/auth/Auth.UseCases/Auth.UseCases.csproj" />
     <ProjectReference Include="../Shared/Shared.csproj" />
+    <ProjectReference Include="..\modules\branches\Branches.Contracts\Branches.Contracts.csproj" />
+    <ProjectReference Include="..\modules\branches\Branches.module\Branches.module.csproj" />
   </ItemGroup>
 
 </Project>

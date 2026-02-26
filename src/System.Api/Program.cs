@@ -6,6 +6,7 @@ using Auth.Data.Persistence;
 using Auth.Infrastructure;
 using Auth.Infrastructure.Authentication;
 using Auth.UseCases;
+using Branches.module.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -85,7 +86,8 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddDbContext<AuthDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("AuthConnection")));
 
-
+builder.Services.AddDbContext<BranchDbContext>(options =>
+  options.UseNpgsql(builder.Configuration.GetConnectionString("BranchConnection")));
 builder.Services.AddControllers(options =>
 {
   options.Filters.Add<ValidationFilter>();
