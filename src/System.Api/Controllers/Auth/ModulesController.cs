@@ -8,6 +8,7 @@ namespace System.Api.Controllers.Auth
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Tags("Authentication | Modules")]
     public class ModulesController(ModulesUseCases modulesUseCases) : ControllerBase
     {
         [HttpPost]

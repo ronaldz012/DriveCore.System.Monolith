@@ -8,6 +8,7 @@ namespace System.Api.Controllers.Auth
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Tags("Authentication | Roles")]
     public class RoleController(RoleUseCases roleUseCases) : ControllerBase
     {
 

@@ -8,6 +8,7 @@ namespace System.Api.Controllers.Auth
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Tags("Authentication | Menus")]
     public class MenuController(MenuUseCases menuUseCases) : ControllerBase
     {
         [HttpGet("{id:int}")]

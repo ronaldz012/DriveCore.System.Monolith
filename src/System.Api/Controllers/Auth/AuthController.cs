@@ -9,6 +9,7 @@ namespace System.Api.Controllers.Auth
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Tags("Authentication | Authorization")]
     public class AuthController(AutenticationUseCases autenticationUseCases) : ControllerBase
     {
         [HttpPost("Register/User")]
