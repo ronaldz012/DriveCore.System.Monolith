@@ -29,9 +29,15 @@ public class BranchService(BranchDbContext context) : IBranchService
         return branches;
     }
 
-    public Task<Result<List<BranchDto>>> GetBranches()
+    public async Task<Result<List<BranchDto>>> GetBranches()
     {
-        throw new NotImplementedException();
+        return await context.Branches.AsNoTracking().Select( x => new BranchDto()
+        {
+            Id = x.Id,
+            Name = x.Name,
+            BranchCode =  x.BranchCode,
+            Status =  x.Status,
+        }).ToListAsync();
     }
 
 
@@ -46,6 +52,7 @@ public class BranchService(BranchDbContext context) : IBranchService
             BranchCode = request.BranchCode,
         };
         await context.Branches.AddAsync(newBranch);
+        await context.SaveChangesAsync();
         return true;
     }
 }

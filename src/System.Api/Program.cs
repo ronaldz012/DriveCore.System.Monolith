@@ -6,6 +6,7 @@ using Auth.Data.Persistence;
 using Auth.Infrastructure;
 using Auth.Infrastructure.Authentication;
 using Auth.UseCases;
+using Branches.module;
 using Branches.module.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
@@ -100,7 +101,8 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 builder.Services.AddAuthData()
                 .AddUseCases()
                 .AddInfrastructure(builder.Configuration)
-                .AddShared(builder.Configuration);
+                .AddShared(builder.Configuration)
+                .AddBranch(builder.Configuration);
 
 
 builder.Services.AddCors(options =>
