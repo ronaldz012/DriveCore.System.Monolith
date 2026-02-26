@@ -26,7 +26,8 @@ public static class UseCasesDependencyInjection
 
     public static IServiceCollection AddUsersUseCases(this IServiceCollection services)
         => services.AddScoped<UserUserCases>()
-            .AddScoped<GetAllUsers>();
+            .AddScoped<GetAllUsers>()
+            .AddScoped<CreateUser>();
     public static IServiceCollection AddAutenticationUseCases(this IServiceCollection services)
     => services.AddScoped<AutenticationUseCases>()
                 .AddScoped<RegisterUser>()

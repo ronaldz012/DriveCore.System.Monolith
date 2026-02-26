@@ -11,16 +11,21 @@ public class BranchService(BranchDbContext context) : IBranchService
 {
     public async Task<Result<List<BranchDto>>> GetBranchesByIds(List<int> ids)
     {
-        var branches = await context.Branches.Where(b => ids.Contains(b.Id) && b.Status)
+        var branches = await context.Branches
+            .Where(b => ids.Contains(b.Id) && b.Status)
             .Select(b => new BranchDto
             {
                 Id = b.Id,
                 Name = b.Name,
                 Status = b.Status,
             }).ToListAsync();
-        if(!branches.Any())
-            return new Error("NOT_FOUND", $"Branch not found with id {ids}");
-        
+
+        var foundIds = branches.Select(b => b.Id).ToList();
+        var missingIds = ids.Except(foundIds).ToList();
+
+        if (missingIds.Any())
+            return new Error("NOT_FOUND", $"Branches not found: {string.Join(", ", missingIds)}");
+
         return branches;
     }
 

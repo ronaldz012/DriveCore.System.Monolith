@@ -34,8 +34,9 @@ public class User : ICreatedAt, ICreatedBy, IUpdatedAt, ISoftDelete, IUpdatedBy
     public string? ExternalAuthId { get; set; } 
 
     // Navigation property
-    public ICollection<UserRole> UserRoles { get; set; } = default!;
-    public ICollection<EmailVerificationCode> EmailVerificationCodes { get; set; } = default!;
+    public ICollection<UserRole> UserRoles { get; set; } = [];
+    public ICollection<UserBranch> UserBranches { get; set; } = [];
+    public ICollection<EmailVerificationCode> EmailVerificationCodes { get; set; } = [];
 }
 
 public enum UserStatus

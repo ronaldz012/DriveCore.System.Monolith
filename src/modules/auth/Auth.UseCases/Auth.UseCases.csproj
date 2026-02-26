@@ -11,6 +11,7 @@
     <ProjectReference Include="../Auth.Data/Auth.Data.csproj" />
     <ProjectReference Include="../Auth.Dtos/Auth.Dtos.csproj" />
     <ProjectReference Include="../Auth.Infrastructure/Auth.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\branches\Branches.Contracts\Branches.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>

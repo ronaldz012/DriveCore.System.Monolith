@@ -1,3 +1,3 @@
 namespace Auth.UseCases.Users;
 
-public record UserUserCases(GetAllUsers  GetAllUsers);
+public record UserUserCases(GetAllUsers  GetAllUsers, CreateUser CreateUser);

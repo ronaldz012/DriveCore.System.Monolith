@@ -45,5 +45,7 @@ public class MappingConfig: IRegister
         config.NewConfig<RegisterUserDto, User>();
 
         config.NewConfig<User, UserDetailsDto>();
+
+        config.NewConfig<CreateUserDto, User>();
     }
 }
