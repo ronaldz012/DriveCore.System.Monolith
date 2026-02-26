@@ -3,34 +3,42 @@ using Auth.Data.Persistence;
 using Auth.Dtos.Users;
 using Auth.Infrastructure.Authentication;
 using Auth.UseCases.Autentication.functions;
+using Branches.Contracts;
+using Branches.Contracts.Dtos;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Shared.Result;
 
 namespace Auth.UseCases.Autentication;
 
-public class Login(AuthDbContext dbContext, ITokenGenerator tokenGenerator, IMapper mapper)
+public class Login(AuthDbContext dbContext, ITokenGenerator tokenGenerator, IMapper mapper, IBranchService branchService)
 {
     public async Task<Result<SuccessLoginDto>> Execute(LoginDto request)
     {
         var user = await dbContext.Users
             .AsSplitQuery()  
+            .Include(u => u.UserBranches)
             .Include(u => u.UserRoles.Where(ur => ur.DeletedAt == null))
                 .ThenInclude(ur => ur.Role)
                     .ThenInclude(r => r.RoleModulePermissions)
                         .ThenInclude(rmp => rmp.Module)
                             .ThenInclude(m => m.Menus)
             .FirstOrDefaultAsync(u => u.Email == request.Email);
+        
 
         if (user == null)
         {
             return new Error("VALIDATION_ERROR", "Correo electrónico o contraseña incorrectos.");
         }
+        
+        Result<List<BranchDto>> branches = await branchService.GetBranchesByIds(user.UserBranches.Select(b => b.BranchId).ToList());
+        if(!branches.IsSuccess) return new Error("NOT_FOUND", branches.Error.Message);
 
         if (!ValidatePassword.VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
         {
             return new Error("VALIDATION_ERROR", "Correo electrónico o contraseña incorrectos.");
         }
+        //DEVOLVIENDO SI FALTA VERIFICACION SOLO DATOS BASICOS Y STATUS
         if(user.Status == UserStatus.PendingVerification)
         {
             return new SuccessLoginDto
@@ -50,7 +58,7 @@ public class Login(AuthDbContext dbContext, ITokenGenerator tokenGenerator, IMap
 
         var modules = UserMappingUtils.BuildUserModulesWithMenus(user);
 
-        var succesLoginDto = new SuccessLoginDto
+        var successLoginDto = new SuccessLoginDto
         {
             Status = user.Status.ToString(),
             AuthProvider = user.AuthProvider.ToString(),
@@ -59,10 +67,11 @@ public class Login(AuthDbContext dbContext, ITokenGenerator tokenGenerator, IMap
             ExpiresIn = tokenGenerator.GetAccessTokenExpirationMinutes() * 60,
             Roles = roles,
             Modules = modules,
-            User = mapper.Map<UserDetailsDto>(user)
+            User = mapper.Map<UserDetailsDto>(user),
+            Branches = mapper.Map<List<AvailableBranchesDto>>(branches.Value) // not null, we ask above
         };
 
-        return succesLoginDto;
+        return successLoginDto;
     }
     
 }

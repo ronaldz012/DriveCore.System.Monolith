@@ -14,9 +14,15 @@ public class SuccessLoginDto
     public string AuthProvider { get; set; } = string.Empty;
     public UserDetailsDto User { get; set; } = default!;
     public List<string> Roles { get; set; } = new();
+    public List<AvailableBranchesDto> Branches { get; set; } = [];
     public List<ModulePermissionsDeductedDto> Modules { get; set; } = new();
 }
 
+public class AvailableBranchesDto
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+}
 public class ModulePermissionsDeductedDto
 {
     public int Id { get; set; }

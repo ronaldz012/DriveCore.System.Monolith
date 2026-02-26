@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Shared.Result;
 /// <summary>
@@ -21,6 +22,8 @@ public readonly record struct Result<TValue>
     /// <summary>
     /// Indica si la operación fue exitosa (true) o falló (false).
     /// </summary>
+    [MemberNotNullWhen(true, nameof(Value))]
+    [MemberNotNullWhen(false, nameof(Error))]
     public bool IsSuccess { get; }
 
     /// <summary>

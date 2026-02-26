@@ -3,6 +3,7 @@ using Auth.Data.Entities;
 using Auth.Dtos.Modules;
 using Auth.Dtos.Roles;
 using Auth.Dtos.Users;
+using Branches.Contracts.Dtos;
 using Mapster;
 
 namespace Auth.UseCases.mapper;
@@ -47,5 +48,9 @@ public class MappingConfig: IRegister
         config.NewConfig<User, UserDetailsDto>();
 
         config.NewConfig<CreateUserDto, User>();
+        
+        
+        //EXTERNAL MAPPING/////////////////////////
+        config.NewConfig<BranchDto, AvailableBranchesDto>(); //BranchDto es de otro modulo
     }
 }
