@@ -1,6 +1,6 @@
 using System;
+using Auth.Contracts.Dtos.Modules;
 using Auth.Data.Persistence;
-using Auth.Dtos.Modules;
 using MapsterMapper;
 using Shared.Result;
 

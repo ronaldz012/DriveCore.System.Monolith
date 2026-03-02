@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
+using Auth.Contracts.Dtos.Modules;
 using Auth.Data.Persistence;
-using Auth.Dtos.Modules;
 using Mapster;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;

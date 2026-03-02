@@ -1,5 +1,5 @@
 using System.Api.Result;
-using Auth.Dtos.Roles;
+using Auth.Contracts.Dtos.Roles;
 using Auth.UseCases.Roles;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

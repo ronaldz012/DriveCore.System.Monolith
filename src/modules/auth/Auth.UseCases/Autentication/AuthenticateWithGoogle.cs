@@ -1,7 +1,7 @@
+using Auth.Contracts.Dtos.Modules;
+using Auth.Contracts.Dtos.Users;
 using Auth.Data.Entities;
 using Auth.Data.Persistence;
-using Auth.Dtos.Modules;
-using Auth.Dtos.Users;
 using Auth.Infrastructure.Authentication;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;

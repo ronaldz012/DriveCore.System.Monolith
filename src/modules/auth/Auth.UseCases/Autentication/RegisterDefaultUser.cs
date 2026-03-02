@@ -1,5 +1,5 @@
+using Auth.Contracts.Dtos.Users;
 using Auth.Data.Entities;
-using Auth.Dtos.Users;
 using MapsterMapper;
 using Shared.Result;
 

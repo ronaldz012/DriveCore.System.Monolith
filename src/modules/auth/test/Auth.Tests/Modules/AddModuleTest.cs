@@ -1,6 +1,6 @@
 using System;
+using Auth.Contracts.Dtos.Modules;
 using Auth.Data.Persistence;
-using Auth.Dtos.Modules;
 using Auth.UseCases.mapper;
 using Auth.UseCases.Modules;
 using Mapster;

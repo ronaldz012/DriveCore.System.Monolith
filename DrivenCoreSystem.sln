@@ -11,7 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "auth", "auth", "{B3D0B042-2
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Data", "src\modules\auth\Auth.Data\Auth.Data.csproj", "{2C7E9DCD-F1AA-47A2-9871-707503D6E593}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Dtos", "src\modules\auth\Auth.Dtos\Auth.Dtos.csproj", "{DF6904C5-EB44-4DBF-BA28-0063E1867B97}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Contracts", "src\modules\auth\Auth.Contracts\Auth.Contracts.csproj", "{DF6904C5-EB44-4DBF-BA28-0063E1867B97}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Infrastructure", "src\modules\auth\Auth.Infrastructure\Auth.Infrastructure.csproj", "{A5210280-C874-4502-8965-4C6E4054554E}"
 EndProject
@@ -31,7 +31,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "inventory", "inventory", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventory.Data", "src\modules\inventory\Inventory.Data\Inventory.Data.csproj", "{3C474DA5-A9C6-4290-B640-E696A6D33240}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventory.Dtos", "src\modules\inventory\Inventory.Dtos\Inventory.Dtos.csproj", "{464FFDB1-1527-4B36-9BB9-6BF831E255B7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventory.Contracts", "src\modules\inventory\Inventory.Contracts\Inventory.Contracts.csproj", "{464FFDB1-1527-4B36-9BB9-6BF831E255B7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventory.Infrastructure", "src\modules\inventory\Inventory.Infrastructure\Inventory.Infrastructure.csproj", "{ACF9AE01-9F86-4F43-8FBA-B2BD2E5A2FA6}"
 EndProject

@@ -7,9 +7,14 @@ public class ProductVariant: Params
 {
     public int Id { get; set; }
     public int ProductId { get; set; }
-    public string Description { get; set; } = string.Empty; // Descripcion del producto
-    public string Barcode { get; set; } = string.Empty; // Codigo de barras del producto
+    public string Description { get; set; } = string.Empty; 
+    public string Size { get; set; } = string.Empty;
+    public string Color { get; set; } = string.Empty;
+    public decimal Price { get; set; }
+
+    
     public Product Product { get; set; } = default!;
-    public ICollection<ProductPricing> ProductPricings { get; set; } = new List<ProductPricing>();
+    public ICollection<BranchInventory> BranchInventories { get; set; } = new List<BranchInventory>();
+    
 
 }

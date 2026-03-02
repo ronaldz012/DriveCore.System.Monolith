@@ -1,5 +1,5 @@
 using System.Api.Result;
-using Auth.Dtos.Modules;
+using Auth.Contracts.Dtos.Modules;
 using Auth.UseCases;
 using Microsoft.AspNetCore.Mvc;
 

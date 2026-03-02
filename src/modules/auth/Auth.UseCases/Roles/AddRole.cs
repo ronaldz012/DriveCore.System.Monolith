@@ -1,7 +1,7 @@
 using System;
+using Auth.Contracts.Dtos.Roles;
 using Auth.Data.Entities;
 using Auth.Data.Persistence;
-using Auth.Dtos.Roles;
 using MapsterMapper;
 using Shared.Result;
 

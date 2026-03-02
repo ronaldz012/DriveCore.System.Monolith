@@ -1,6 +1,4 @@
-using System;
-
-namespace Auth.Dtos.Modules;
+namespace Auth.Contracts.Dtos.Modules;
 
 public class CreateModuleDto
 {

@@ -1,8 +1,6 @@
-using System;
-using Auth.Dtos.Modules;
-using Auth.Dtos.Roles;
+using Auth.Contracts.Dtos.Modules;
 
-namespace Auth.Dtos.Users;
+namespace Auth.Contracts.Dtos.Users;
 
 public class SuccessLoginDto
 {

@@ -8,6 +8,7 @@ using Auth.Infrastructure.Authentication;
 using Auth.UseCases;
 using Branches.module;
 using Branches.module.Data;
+using Inventory.Data.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -89,6 +90,9 @@ builder.Services.AddDbContext<AuthDbContext>(options =>
 
 builder.Services.AddDbContext<BranchDbContext>(options =>
   options.UseNpgsql(builder.Configuration.GetConnectionString("BranchConnection")));
+builder.Services.AddDbContext<InvDbContext>(options =>
+  options.UseNpgsql(builder.Configuration.GetConnectionString("InventoryConnection")));
+
 builder.Services.AddControllers(options =>
 {
   options.Filters.Add<ValidationFilter>();

@@ -1,6 +1,4 @@
-using System;
-
-namespace Auth.Dtos.Roles;
+namespace Auth.Contracts.Dtos.Roles;
 
 public class CreateRoleDto
 {

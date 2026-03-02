@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Auth.Dtos.Users;
+namespace Auth.Contracts.Dtos.Users;
 
 public class CreateUserDto
 {

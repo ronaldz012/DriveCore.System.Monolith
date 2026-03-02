@@ -1,6 +1,6 @@
+using Auth.Contracts.Dtos.Modules;
 using Auth.Data.Entities;
 using Auth.Data.Persistence;
-using Auth.Dtos.Modules;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Shared.Result;

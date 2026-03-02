@@ -1,6 +1,4 @@
-using System;
-
-namespace Auth.Dtos.Users;
+namespace Auth.Contracts.Dtos.Users;
 
 public class CompleteUserRoleDto
 {

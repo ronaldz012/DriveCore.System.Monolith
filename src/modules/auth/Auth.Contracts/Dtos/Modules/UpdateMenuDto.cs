@@ -1,9 +1,8 @@
-using System;
+namespace Auth.Contracts.Dtos.Modules;
 
-namespace Auth.Dtos.Modules;
-
-public class CreateMenuDto
+public class UpdateMenuDto
 {
+    public int Id { get; set; }
     public int ParentMenuId { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Route { get; set; } = string.Empty;

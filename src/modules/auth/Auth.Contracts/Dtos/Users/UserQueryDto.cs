@@ -1,6 +1,6 @@
 using Shared.Extensions;
 
-namespace Auth.Dtos.Users;
+namespace Auth.Contracts.Dtos.Users;
 
 public class UserQueryDto :GenericPaginationQueryDto
 {

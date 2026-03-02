@@ -1,7 +1,6 @@
-using System;
 using Shared.Extensions;
 
-namespace Auth.Dtos.Modules;
+namespace Auth.Contracts.Dtos.Modules;
 
 public class ModuleDto
 {

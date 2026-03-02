@@ -1,5 +1,5 @@
 using System.Api.Result;
-using Auth.Dtos.Users;
+using Auth.Contracts.Dtos.Users;
 using Auth.UseCases.Autentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;

@@ -1,6 +1,6 @@
 
 using System.Api.Result;
-using Auth.Dtos.Users;
+using Auth.Contracts.Dtos.Users;
 using Auth.UseCases.Users;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,5 +1,5 @@
+using Auth.Contracts.Dtos.Users;
 using Auth.Data.Persistence;
-using Auth.Dtos.Users;
 using Auth.UseCases.Autentication.functions;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;

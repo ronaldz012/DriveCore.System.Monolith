@@ -1,6 +1,6 @@
+using Auth.Contracts.Dtos.Users;
 using Auth.Data.Entities;
 using Auth.Data.Persistence;
-using Auth.Dtos.Users;
 using Auth.UseCases.Autentication;
 using Branches.Contracts;
 using MapsterMapper;

@@ -1,7 +1,4 @@
-using System;
-using System.ComponentModel.DataAnnotations;
-
-namespace Auth.Dtos.Users;
+namespace Auth.Contracts.Dtos.Users;
 
 /// <summary>
 /// Quick Register :D
