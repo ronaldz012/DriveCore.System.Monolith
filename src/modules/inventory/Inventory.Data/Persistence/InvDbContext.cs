@@ -17,6 +17,14 @@ public class InvDbContext(DbContextOptions<InvDbContext> options) : DbContext(op
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        //SEEDER
+        modelBuilder.Entity<Category>(entity =>
+        {
+            entity.HasData(
+                new Category { Id = 1, Name = "Sin categoria" }
+            );
+        });
+        //
         modelBuilder.Entity<Product>(entity =>
             {
                 entity.HasMany(product => product.ProductVariants)
@@ -26,6 +34,9 @@ public class InvDbContext(DbContextOptions<InvDbContext> options) : DbContext(op
                 entity.HasOne(p => p.Category)
                     .WithMany(c => c.Products)
                     .HasForeignKey(p => p.CategoryId);
+                entity.Property(p => p.CategoryId)
+                    .IsRequired()
+                    .HasDefaultValue(1); 
                 
             }
         );
@@ -35,6 +46,8 @@ public class InvDbContext(DbContextOptions<InvDbContext> options) : DbContext(op
                 .WithOne(inv => inv.ProductVariant)
                 .HasForeignKey(inv => inv.ProductVariantId);
         });
-        
+
+       
+
     }
 }

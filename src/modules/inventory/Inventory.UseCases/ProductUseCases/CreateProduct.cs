@@ -1,6 +1,8 @@
+using Inventory.Data.Persistence;
+
 namespace Inventory.UseCases.ProductUseCases;
 
-public class CreateProduct
+public class CreateProduct(InvDbContext  context)
 {
-    // Task<string> CreateProduct(request) 
+    //
 }
