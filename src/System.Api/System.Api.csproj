@@ -26,7 +26,13 @@
     <ProjectReference Include="../Shared/Shared.csproj" />
     <ProjectReference Include="..\modules\branches\Branches.Contracts\Branches.Contracts.csproj" />
     <ProjectReference Include="..\modules\branches\Branches.module\Branches.module.csproj" />
+    <ProjectReference Include="..\modules\inventory\Inventory.Contracts\Inventory.Contracts.csproj" />
     <ProjectReference Include="..\modules\inventory\Inventory.Data\Inventory.Data.csproj" />
+    <ProjectReference Include="..\modules\inventory\Inventory.UseCases\Inventory.UseCases.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\Inventory\" />
   </ItemGroup>
 
 </Project>

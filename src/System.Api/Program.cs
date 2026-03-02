@@ -9,6 +9,7 @@ using Auth.UseCases;
 using Branches.module;
 using Branches.module.Data;
 using Inventory.Data.Persistence;
+using Inventory.UseCases;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -106,7 +107,8 @@ builder.Services.AddAuthData()
                 .AddUseCases()
                 .AddInfrastructure(builder.Configuration)
                 .AddShared(builder.Configuration)
-                .AddBranch(builder.Configuration);
+                .AddBranch(builder.Configuration)
+                .AddInventory();
 
 
 builder.Services.AddCors(options =>
