@@ -28,6 +28,7 @@
     <ProjectReference Include="..\modules\branches\Branches.module\Branches.module.csproj" />
     <ProjectReference Include="..\modules\inventory\Inventory.Contracts\Inventory.Contracts.csproj" />
     <ProjectReference Include="..\modules\inventory\Inventory.Data\Inventory.Data.csproj" />
+    <ProjectReference Include="..\modules\inventory\Inventory.Infrastructure\Inventory.Infrastructure.csproj" />
     <ProjectReference Include="..\modules\inventory\Inventory.UseCases\Inventory.UseCases.csproj" />
   </ItemGroup>
 

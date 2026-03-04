@@ -9,6 +9,8 @@ using Auth.UseCases;
 using Branches.module;
 using Branches.module.Data;
 using Inventory.Data.Persistence;
+using Inventory.Infrastructure;
+using Inventory.Infrastructure.Notifications;
 using Inventory.UseCases;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
@@ -109,29 +111,32 @@ builder.Services.AddAuthData()
                 .AddShared(builder.Configuration)
                 .AddBranch(builder.Configuration)
                 .AddInventory();
-
-
+//EXTRAER en un DI
+builder.Services.AddSignalR();
+builder.Services.AddScoped<InventorySignalRStockNotifier>();   // tu notifier
+//
 builder.Services.AddCors(options =>
 {
-  options.AddPolicy("AngularApp", policy =>
+  options.AddPolicy("AllowAll", policy =>
   {
-    policy.WithOrigins("http://localhost:4200") // El puerto de tu Angular
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials(); // Importante para leer cookies si fuera necesario
+    policy.AllowAnyOrigin()   // Permite solicitudes desde cualquier origen
+      .AllowAnyHeader()   // Permite cualquier encabezado
+      .AllowAnyMethod();  // Permite cualquier método HTTP
   });
 });
 
+
 var app = builder.Build();
-app.UseCors("AngularApp");
+app.UseCors("AllowAll");
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
   app.UseSwagger();
   app.UseSwaggerUI();
 }
-
+app.MapHub<NotificationHub>("/hubs/notifications");
 app.UseHttpsRedirection();
 app.MapControllers();
 app.Run();

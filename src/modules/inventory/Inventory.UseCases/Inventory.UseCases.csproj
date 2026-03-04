@@ -10,6 +10,7 @@
       <ProjectReference Include="..\..\..\Shared\Shared.csproj" />
       <ProjectReference Include="..\Inventory.Contracts\Inventory.Contracts.csproj" />
       <ProjectReference Include="..\Inventory.Data\Inventory.Data.csproj" />
+      <ProjectReference Include="..\Inventory.Infrastructure\Inventory.Infrastructure.csproj" />
     </ItemGroup>
 
     <ItemGroup>
