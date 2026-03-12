@@ -7,6 +7,7 @@ namespace System.Api.Controllers.Inventory
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Tags("Inventory | Categories")]
     public class CategoryController(CategoryUseCases categoryUseCases) : ControllerBase
     {
         [HttpPost]

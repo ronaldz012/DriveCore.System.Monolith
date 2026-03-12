@@ -17,7 +17,8 @@ public  static class DependencyInjectionInv
             .AddScoped<CreateCategory>();
         
         services.AddScoped<BrandUseCases>()
-            .AddScoped<CreateBrand>();
+            .AddScoped<CreateBrand>()
+            .AddScoped<GetBrands>();
         return services;
     }
 }
