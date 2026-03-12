@@ -8,28 +8,19 @@ using Microsoft.EntityFrameworkCore;
 /// Middleware que captura todas las excepciones no manejadas y las convierte en ProblemDetails.
 /// Centraliza TODO el manejo de errores para toda la API.
 /// </summary>
-public class GlobalExceptionHandlerMiddleware
+public class GlobalExceptionHandlerMiddleware(
+    RequestDelegate next,
+    ILogger<GlobalExceptionHandlerMiddleware> logger)
 {
-    private readonly RequestDelegate _next;
-    private readonly ILogger<GlobalExceptionHandlerMiddleware> _logger;
-
-    public GlobalExceptionHandlerMiddleware(
-        RequestDelegate next,
-        ILogger<GlobalExceptionHandlerMiddleware> logger)
-    {
-        _next = next;
-        _logger = logger;
-    }
-
     public async Task InvokeAsync(HttpContext context)
     {
         try
         {
-            await _next(context);
+            await next(context);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex,
+            logger.LogError(ex,
                 "Error no manejado en {Path}. Usuario: {User}",
                 context.Request.Path,
                 context.User?.Identity?.Name ?? "Anónimo");

@@ -13,6 +13,7 @@ public class InvDbContext(DbContextOptions<InvDbContext> options) : DbContext(op
     
     public DbSet<Category>  Categories { get; set; }
     public DbSet<Provider>  Providers { get; set; }
+    public DbSet<Brand>  Brands { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -24,6 +25,12 @@ public class InvDbContext(DbContextOptions<InvDbContext> options) : DbContext(op
                 new Category { Id = 1, Name = "Sin categoria" }
             );
         });
+
+        modelBuilder.Entity<Brand>(entity =>
+        {
+            entity.HasData(
+                new Brand { Id = 1, Name = "Sin Marca" });
+        });
         //
         modelBuilder.Entity<Product>(entity =>
             {
@@ -34,10 +41,18 @@ public class InvDbContext(DbContextOptions<InvDbContext> options) : DbContext(op
                 entity.HasOne(p => p.Category)
                     .WithMany(c => c.Products)
                     .HasForeignKey(p => p.CategoryId);
+                
                 entity.Property(p => p.CategoryId)
                     .IsRequired()
-                    .HasDefaultValue(1); 
+                    .HasDefaultValue(1);
+
+                entity.HasOne(p => p.Brand)
+                    .WithMany(b => b.Products)
+                    .HasForeignKey(p => p.BrandId);
                 
+                entity.Property(p => p.BrandId)
+                    .IsRequired()
+                    .HasDefaultValue(1);
             }
         );
         modelBuilder.Entity<ProductVariant>(entity =>

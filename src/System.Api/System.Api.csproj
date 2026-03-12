@@ -32,8 +32,4 @@
     <ProjectReference Include="..\modules\inventory\Inventory.UseCases\Inventory.UseCases.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Controllers\Inventory\" />
-  </ItemGroup>
-
 </Project>

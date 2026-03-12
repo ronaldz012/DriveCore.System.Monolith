@@ -14,5 +14,11 @@ namespace System.Api.Controllers.Inventory
         {
             return await categoryUseCases.CreateCategory.Execute(dto).ToValueOrProblemDetails();
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetCategories([FromQuery] CategoryQueryDto query)
+        {
+            return await categoryUseCases.GetCategories.Execute(query).ToValueOrProblemDetails();
+        }
     }
 }
