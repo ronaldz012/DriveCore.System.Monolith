@@ -14,6 +14,7 @@ public class CreateProduct(InvDbContext context, InventorySignalRStockNotifier n
         {
             Name = request.Name,
             CategoryId = request.CategoryId,
+            BrandId = request.BrandId,
             Description = request.Description
         };
         context.Add(product);

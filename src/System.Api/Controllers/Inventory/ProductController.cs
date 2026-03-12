@@ -10,7 +10,7 @@ namespace System.Api.Controllers.Inventory
     [Route("api/[controller]")]
     [ApiController]
     [Tags("Inventory | Products")]
-    public class InventoryController(InvUseCases invUseCases) : ControllerBase
+    public class ProductController(InvUseCases invUseCases) : ControllerBase
     {
         [HttpPost]
         public async Task<IActionResult> CreateProduct(CreateProductDto request)
