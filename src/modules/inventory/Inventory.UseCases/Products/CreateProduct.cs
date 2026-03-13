@@ -1,10 +1,11 @@
 using Inventory.Contracts.Dtos;
+using Inventory.Contracts.Dtos.Products;
 using Inventory.Data.Entities.Products;
 using Inventory.Data.Persistence;
 using Inventory.Infrastructure;
 using Shared.Result;
 
-namespace Inventory.UseCases.ProductUseCases;
+namespace Inventory.UseCases.Products;
 
 public class CreateProduct(InvDbContext context, InventorySignalRStockNotifier notifier)
 {

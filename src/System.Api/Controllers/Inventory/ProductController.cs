@@ -1,7 +1,8 @@
 using System.Api.Result;
 using Inventory.Contracts.Dtos;
+using Inventory.Contracts.Dtos.Products;
 using Inventory.UseCases;
-using Inventory.UseCases.ProductUseCases;
+using Inventory.UseCases.Products;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,12 +11,18 @@ namespace System.Api.Controllers.Inventory
     [Route("api/[controller]")]
     [ApiController]
     [Tags("Inventory | Products")]
-    public class ProductController(InvUseCases invUseCases) : ControllerBase
+    public class ProductController(ProductUseCases productUseCases) : ControllerBase
     {
         [HttpPost]
-        public async Task<IActionResult> CreateProduct(CreateProductDto request)
+        public async Task<IActionResult> CreateProduct([FromBody]CreateProductDto request)
         {
-            return await invUseCases.CreateProduct.Execute(request).ToValueOrProblemDetails();
+            return await productUseCases.CreateProduct.Execute(request).ToValueOrProblemDetails();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetProducts([FromQuery]ProductQueryDto request)
+        {
+            return await productUseCases.GetProducts.Execute(request).ToValueOrProblemDetails();
         }
     }
 }

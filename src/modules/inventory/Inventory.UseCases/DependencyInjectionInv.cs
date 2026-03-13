@@ -1,6 +1,6 @@
 using Inventory.UseCases.Brands;
 using Inventory.UseCases.Categories;
-using Inventory.UseCases.ProductUseCases;
+using Inventory.UseCases.Products;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Inventory.UseCases;
@@ -9,12 +9,13 @@ public  static class DependencyInjectionInv
 {
     public static IServiceCollection AddInventory(this IServiceCollection services)
     {
-        services.AddScoped<InvUseCases>()
+        services.AddScoped<ProductUseCases>()
             .AddScoped<CreateProduct>()
-            .AddScoped<GetCategories>();
+            .AddScoped<GetProducts>();
         
         services.AddScoped<CategoryUseCases>()
-            .AddScoped<CreateCategory>();
+            .AddScoped<CreateCategory>()
+            .AddScoped<GetCategories>();
         
         services.AddScoped<BrandUseCases>()
             .AddScoped<CreateBrand>()

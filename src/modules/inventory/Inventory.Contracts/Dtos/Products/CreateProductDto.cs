@@ -1,4 +1,4 @@
-namespace Inventory.Contracts.Dtos;
+namespace Inventory.Contracts.Dtos.Products;
 
 public class CreateProductDto
 {
