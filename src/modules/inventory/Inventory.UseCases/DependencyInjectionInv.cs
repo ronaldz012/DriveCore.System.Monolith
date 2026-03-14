@@ -11,7 +11,8 @@ public  static class DependencyInjectionInv
     {
         services.AddScoped<ProductUseCases>()
             .AddScoped<CreateProduct>()
-            .AddScoped<GetProducts>();
+            .AddScoped<GetProducts>()
+            .AddScoped<ValidateProducts>();
         
         services.AddScoped<CategoryUseCases>()
             .AddScoped<CreateCategory>()

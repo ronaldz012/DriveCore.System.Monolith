@@ -1,6 +1,7 @@
 using Inventory.Data.Entities.Inventory;
 using Inventory.Data.Entities.Organization;
 using Inventory.Data.Entities.Products;
+using Inventory.Data.Entities.Receptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Inventory.Data.Persistence;
@@ -14,6 +15,8 @@ public class InvDbContext(DbContextOptions<InvDbContext> options) : DbContext(op
     public DbSet<Category>  Categories { get; set; }
     public DbSet<Provider>  Providers { get; set; }
     public DbSet<Brand>  Brands { get; set; }
+    public DbSet<StockReception>  StockReceptions { get; set; }
+    public DbSet<StockReceptionItem>  StockReceptionItems { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -61,8 +64,24 @@ public class InvDbContext(DbContextOptions<InvDbContext> options) : DbContext(op
                 .WithOne(inv => inv.ProductVariant)
                 .HasForeignKey(inv => inv.ProductVariantId);
         });
+        
+        //RECEPTIONS
+        modelBuilder.Entity<StockReception>(entity =>
+            {
+                    entity.HasMany(r => r.Items)
+                        .WithOne(i => i.StockReception)
+                        .HasForeignKey(i => i.StockReceptionId);
+                    
+            }
+        );
 
-       
+        modelBuilder.Entity<StockReceptionItem>(entity =>
+        {
+            entity.HasOne(ri => ri.ProductVariant)
+                .WithMany(pv => pv.StockReceptionItems)
+                .HasForeignKey(pv => pv.StockReceptionId);
+        });
+
 
     }
 }

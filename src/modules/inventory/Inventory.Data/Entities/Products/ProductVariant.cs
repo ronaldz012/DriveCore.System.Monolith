@@ -1,4 +1,5 @@
 ﻿using Inventory.Data.Entities.Inventory;
+using Inventory.Data.Entities.Receptions;
 using Inventory.Data.Entities.Shared.Base;
 
 namespace Inventory.Data.Entities.Products;
@@ -15,6 +16,6 @@ public class ProductVariant: Params
     
     public Product Product { get; set; } = default!;
     public ICollection<BranchInventory> BranchInventories { get; set; } = new List<BranchInventory>();
-    
+    public ICollection<StockReceptionItem>  StockReceptionItems { get; set; } = new List<StockReceptionItem>();
 
 }

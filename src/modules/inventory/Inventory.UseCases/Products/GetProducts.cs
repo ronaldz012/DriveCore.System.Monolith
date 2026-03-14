@@ -1,4 +1,3 @@
-using Inventory.Contracts.Dtos;
 using Inventory.Contracts.Dtos.Products;
 using Inventory.Data.Entities.Products;
 using Inventory.Data.Persistence;
@@ -13,9 +12,21 @@ public class GetProducts(InvDbContext context)
     public async Task<Result<PagedResultDto<ProductDto>>> Execute(ProductQueryDto queryDto)
     {
         IQueryable<Product>  query = context.Products;
-        
-        var (filteredQuery, totalCount) = query.ApplyFilters(queryDto);
+        if (!string.IsNullOrEmpty(queryDto.Filter))
+        {
+            query = query.Where(x => EF.Functions.ILike(x.Name, $"%{queryDto.Filter}%"));
+        }
+    
+        if (queryDto.BrandId.HasValue)
+        {
+            query = query.Where(x => x.BrandId == queryDto.BrandId);
+        }
 
+        if (queryDto.CategoryId.HasValue)
+        {
+            query = query.Where(x => x.CategoryId == queryDto.CategoryId);
+        }
+        var (filteredQuery, totalCount) = query.ApplyFilters(queryDto);
         var items = await filteredQuery.Select(p => new ProductDto()
         {
             Id = p.Id,
