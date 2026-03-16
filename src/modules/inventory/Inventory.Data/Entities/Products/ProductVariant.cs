@@ -18,4 +18,19 @@ public class ProductVariant: Params
     public ICollection<BranchInventory> BranchInventories { get; set; } = new List<BranchInventory>();
     public ICollection<StockReceptionItem>  StockReceptionItems { get; set; } = new List<StockReceptionItem>();
 
+    public void UpdateQuantity(int quantity, int branchId)
+    {
+        var branchInventory = BranchInventories.FirstOrDefault(bi => bi.BranchId == branchId);
+        if (branchInventory == null)
+        {
+            branchInventory = new BranchInventory
+            {
+                BranchId = branchId,
+                ProductVariantId = Id,
+                Stock = 0
+            };
+            BranchInventories.Add(branchInventory);
+        }
+        branchInventory.Stock += quantity;
+    }
 }
