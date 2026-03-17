@@ -24,5 +24,11 @@ namespace System.Api.Controllers.Inventory
         {
             return await productUseCases.GetProducts.Execute(request).ToValueOrProblemDetails();
         }
+
+        [HttpGet("Search")]
+        public async Task<IActionResult> SearchProduct ([FromQuery]string request)
+        {
+            return await productUseCases.SearchProducts.Execute(request).ToValueOrProblemDetails();
+        }
     }
 }

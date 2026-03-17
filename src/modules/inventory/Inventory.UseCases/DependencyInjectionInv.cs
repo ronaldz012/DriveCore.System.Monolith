@@ -13,6 +13,7 @@ public  static class DependencyInjectionInv
         services.AddScoped<ProductUseCases>()
             .AddScoped<CreateProduct>()
             .AddScoped<GetProducts>()
+            .AddScoped<SearchProduct>()
             .AddScoped<ValidateProducts>()
             .AddScoped<ValidateProductVariants>();
         
@@ -25,7 +26,7 @@ public  static class DependencyInjectionInv
             .AddScoped<GetBrands>();
         
         services.AddScoped<ReceptionUseCases>()
-            .AddScoped<CreateReceptionUC>();
+            .AddScoped<CreateReceptionUc>();
         return services;
     }
 }

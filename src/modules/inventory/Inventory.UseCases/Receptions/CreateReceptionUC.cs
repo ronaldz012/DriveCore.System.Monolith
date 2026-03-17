@@ -9,11 +9,11 @@ using Shared.Result;
 
 namespace Inventory.UseCases.Receptions;
 
-public class CreateReceptionUC(InvDbContext context, ProductUseCases productUseCases)
+public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseCases)
 {
     public async Task<Result<bool>> Execute(CreateStockReceptionDto dto)
     {
-        List<int> productIds = dto.Items
+        var productIds = dto.Items
             .Select(x => x.ProductId)
             .Where(x => x.HasValue)
             .Select(x => x!.Value) 
@@ -26,11 +26,8 @@ public class CreateReceptionUC(InvDbContext context, ProductUseCases productUseC
         if (!productVariants.IsSuccess) return productVariants.Error;
         
         
-        //Separte new Products and existing Products
         var existingProductsReceptionDto = dto.Items.Where(x => x.ProductId.HasValue).ToList();
         var newProductsReceptionDto= dto.Items.Where(x => !x.ProductId.HasValue).ToList();
-        if (newProductsReceptionDto.Any(npr => npr.NewProduct == null || npr.Variants.Any(v => v.NewVariant ==null)))
-            return new Error("INVALID_OPERATION", "new Products has no value");
 
         await using var transaction = await context.Database.BeginTransactionAsync();
         try

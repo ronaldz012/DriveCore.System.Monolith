@@ -9,7 +9,7 @@ namespace Inventory.UseCases.Products;
 
 public class GetProducts(InvDbContext context)
 {
-    public async Task<Result<PagedResultDto<ProductDto>>> Execute(ProductQueryDto queryDto)
+    public async Task<Result<PagedResultDto<ListProductDto>>> Execute(ProductQueryDto queryDto)
     {
         IQueryable<Product>  query = context.Products;
         if (!string.IsNullOrEmpty(queryDto.Filter))
@@ -27,7 +27,7 @@ public class GetProducts(InvDbContext context)
             query = query.Where(x => x.CategoryId == queryDto.CategoryId);
         }
         var (filteredQuery, totalCount) = query.ApplyFilters(queryDto);
-        var items = await filteredQuery.Select(p => new ProductDto()
+        var items = await filteredQuery.Select(p => new ListProductDto()
         {
             Id = p.Id,
             Name = p.Name,
@@ -38,7 +38,7 @@ public class GetProducts(InvDbContext context)
                 .Where(bi => bi.BranchId == queryDto.BranchId)
                 .Sum(bi => bi.Stock),
         }).ToListAsync();
-        return new PagedResultDto<ProductDto>()
+        return new PagedResultDto<ListProductDto>()
         {
             TotalCount = totalCount,
             Items = items,
