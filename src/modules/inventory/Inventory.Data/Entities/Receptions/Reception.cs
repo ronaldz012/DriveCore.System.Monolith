@@ -12,6 +12,15 @@ public class StockReception : Params
     public string? Notes { get; set; }
 
     public ICollection<StockReceptionItem> Items { get; set; } = new List<StockReceptionItem>();
+    public void AddExistingVariant(int variantId, int quantity, decimal unitCost)
+    {
+        Items.Add(new StockReceptionItem
+        {
+            ProductVariantId = variantId,
+            QuantityReceived = quantity,
+            UnitCost = unitCost,
+        });
+    }
 }
 
 public class StockReceptionItem : Params
@@ -32,3 +41,4 @@ public enum ReceptionStatus
     Confirmed=1,
     Rejected=2
 }
+

@@ -2,6 +2,7 @@ using System.Transactions;
 using Inventory.Contracts.Dtos.Receptions;
 using Inventory.Data.Entities.Inventory;
 using Inventory.Data.Entities.Products;
+using Inventory.Data.Entities.Receptions;
 using Inventory.Data.Persistence;
 using Inventory.UseCases.Products;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +31,7 @@ public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseC
         var newProductsReceptionDto= dto.Items.Where(x => !x.ProductId.HasValue).ToList();
 
         await using var transaction = await context.Database.BeginTransactionAsync();
+        var newReception = new StockReception(){BranchId = dto.BranchId, Notes =  dto.Notes};
         try
         {
             foreach (var item in existingProductsReceptionDto)
@@ -40,7 +42,8 @@ public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseC
                     {
                         var productVariant = productVariants.Value
                             .FirstOrDefault(x => x.Id == variantDto.ProductVariantId!.Value);
-                    
+                        
+                        newReception.AddExistingVariant(productVariant!.Id, variantDto.QuantityReceived, variantDto.UnitCost);
                         productVariant!.UpdateQuantity(variantDto.QuantityReceived, dto.BranchId);
                     }
                     var newVariants = item.Variants.Where(v => v.NewVariant != null).ToList();
@@ -54,12 +57,13 @@ public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseC
                             Color = variantDto.NewVariant.Color,
                             Price = variantDto.NewVariant.Price
                         };
-                        newPv.BranchInventories.Add(new BranchInventory
+                        newPv.UpdateQuantity(variantDto.QuantityReceived, dto.BranchId);
+                        newReception.Items.Add(new StockReceptionItem
                         {
-                            BranchId = dto.BranchId,
-                            Stock = variantDto.QuantityReceived
+                            ProductVariant = newPv, 
+                            QuantityReceived = variantDto.QuantityReceived,
+                            UnitCost = variantDto.UnitCost
                         });
-                        context.ProductVariants.Add(newPv);
                     }
             }
 
@@ -83,11 +87,19 @@ public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseC
                         Color = variantDto.NewVariant.Color,
                     };
                     newVariant.UpdateQuantity(variantDto.QuantityReceived, dto.BranchId);
-                    newProduct.ProductVariants.Add(newVariant);
+                    newProduct.ProductVariants.Add(newVariant); // linkea ProductId via grafo
+
+                    newReception.Items.Add(new StockReceptionItem
+                    {
+                        ProductVariant = newVariant, // linkea ProductVariantId via grafo
+                        QuantityReceived = variantDto.QuantityReceived,
+                        UnitCost = variantDto.UnitCost
+                    });
                 }
 
-                context.Products.Add(newProduct);
+                context.Products.Add(newProduct); 
             }
+            context.StockReceptions.Add(newReception);
             await context.SaveChangesAsync(); 
             await transaction.CommitAsync();  
             return true;
