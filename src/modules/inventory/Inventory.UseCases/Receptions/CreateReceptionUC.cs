@@ -102,24 +102,21 @@ public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseC
             context.StockReceptions.Add(newReception);
             await context.SaveChangesAsync(); 
             await transaction.CommitAsync();  
-            return await context.StockReceptions
-                .Where(r => r.Id == newReception.Id)
-                .Select(r => new StockReceptionResultDto
+            return new StockReceptionResultDto
+            {
+                Id = newReception.Id,
+                BranchId = newReception.BranchId,
+                ReceivedAt = newReception.ReceivedAt,
+                Notes = newReception.Notes,
+                Items = newReception.Items.Select(i => new StockReceptionItemResultDto
                 {
-                    Id = r.Id,
-                    BranchId = r.BranchId,
-                    ReceivedAt = r.ReceivedAt,
-                    Notes = r.Notes,
-                    Items = r.Items.Select(i => new StockReceptionItemResultDto
-                    {
-                        ProductVariantId = i.ProductVariantId,
-                        ProductName = i.ProductVariant.Product.Name,
-                        VariantDescription = i.ProductVariant.Description,
-                        QuantityReceived = i.QuantityReceived,
-                        UnitCost = i.UnitCost
-                    }).ToList()
-                })
-                .FirstAsync();
+                    ProductVariantId = i.ProductVariantId,
+                    ProductName = i.ProductVariant.Product.Name,
+                    VariantDescription = i.ProductVariant.Description,
+                    QuantityReceived = i.QuantityReceived,
+                    UnitCost = i.UnitCost
+                }).ToList()
+            };
         }
         catch
         {
