@@ -29,7 +29,7 @@ public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseC
         
         var existingProductsReceptionDto = dto.Items.Where(x => x.ProductId.HasValue).ToList();
         var newProductsReceptionDto= dto.Items.Where(x => !x.ProductId.HasValue).ToList();
-
+        // INIT ATOMIC OPERATION - notes: transaction is useless ok?
         await using var transaction = await context.Database.BeginTransactionAsync();
         var newReception = new StockReception(){BranchId = dto.BranchId, Notes =  dto.Notes};
         try

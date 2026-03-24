@@ -26,7 +26,8 @@ public  static class DependencyInjectionInv
             .AddScoped<GetBrands>();
         
         services.AddScoped<ReceptionUseCases>()
-            .AddScoped<CreateReceptionUc>();
+            .AddScoped<CreateReceptionUc>()
+            .AddScoped<ListReceptions>();
         return services;
     }
 }

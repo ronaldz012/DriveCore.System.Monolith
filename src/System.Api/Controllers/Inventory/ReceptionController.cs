@@ -16,5 +16,11 @@ namespace System.Api.Controllers.Inventory
         {
             return await service.CreateReceptionUc.Execute(dto).ToValueOrProblemDetails();
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ListReceptions([FromQuery] ReceptionQueryDto dto)
+        {
+            return await service.ListReceptions.Execute(dto).ToValueOrProblemDetails();
+        }
     }
 }
