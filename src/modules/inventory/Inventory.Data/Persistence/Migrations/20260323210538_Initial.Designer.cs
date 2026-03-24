@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Inventory.Data.Persistence.Migrations
 {
     [DbContext(typeof(InvDbContext))]
-    [Migration("20260312151331_Brand")]
-    partial class Brand
+    [Migration("20260323210538_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -159,7 +159,7 @@ namespace Inventory.Data.Persistence.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2026, 3, 12, 15, 13, 30, 831, DateTimeKind.Utc).AddTicks(4190),
+                            CreatedAt = new DateTime(2026, 3, 23, 21, 5, 37, 383, DateTimeKind.Utc).AddTicks(1760),
                             Name = "Sin Marca"
                         });
                 });
@@ -205,7 +205,7 @@ namespace Inventory.Data.Persistence.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2026, 3, 12, 15, 13, 30, 831, DateTimeKind.Utc).AddTicks(4077),
+                            CreatedAt = new DateTime(2026, 3, 23, 21, 5, 37, 383, DateTimeKind.Utc).AddTicks(1628),
                             Name = "Sin categoria",
                             ParentId = 0
                         });
@@ -325,6 +325,96 @@ namespace Inventory.Data.Persistence.Migrations
                     b.ToTable("ProductVariants");
                 });
 
+            modelBuilder.Entity("Inventory.Data.Entities.Receptions.StockReception", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BranchId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("DeletedById")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("ReceivedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("StockReceptions");
+                });
+
+            modelBuilder.Entity("Inventory.Data.Entities.Receptions.StockReceptionItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("DeletedById")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ProductVariantId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("QuantityReceived")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("StockReceptionId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("UnitCost")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductVariantId");
+
+                    b.HasIndex("StockReceptionId");
+
+                    b.ToTable("StockReceptionItems");
+                });
+
             modelBuilder.Entity("Inventory.Data.Entities.Inventory.BranchInventory", b =>
                 {
                     b.HasOne("Inventory.Data.Entities.Products.ProductVariant", "ProductVariant")
@@ -366,6 +456,25 @@ namespace Inventory.Data.Persistence.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("Inventory.Data.Entities.Receptions.StockReceptionItem", b =>
+                {
+                    b.HasOne("Inventory.Data.Entities.Products.ProductVariant", "ProductVariant")
+                        .WithMany("StockReceptionItems")
+                        .HasForeignKey("ProductVariantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Inventory.Data.Entities.Receptions.StockReception", "StockReception")
+                        .WithMany("Items")
+                        .HasForeignKey("StockReceptionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProductVariant");
+
+                    b.Navigation("StockReception");
+                });
+
             modelBuilder.Entity("Inventory.Data.Entities.Products.Brand", b =>
                 {
                     b.Navigation("Products");
@@ -384,6 +493,13 @@ namespace Inventory.Data.Persistence.Migrations
             modelBuilder.Entity("Inventory.Data.Entities.Products.ProductVariant", b =>
                 {
                     b.Navigation("BranchInventories");
+
+                    b.Navigation("StockReceptionItems");
+                });
+
+            modelBuilder.Entity("Inventory.Data.Entities.Receptions.StockReception", b =>
+                {
+                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }

@@ -12,7 +12,7 @@ namespace Inventory.UseCases.Receptions;
 
 public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseCases)
 {
-    public async Task<Result<bool>> Execute(CreateStockReceptionDto dto)
+    public async Task<Result<StockReceptionResultDto>> Execute(CreateStockReceptionDto dto)
     {
         var productIds = dto.Items
             .Select(x => x.ProductId)
@@ -20,7 +20,7 @@ public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseC
             .Select(x => x!.Value) 
             .ToList();
         var idsOk= await productUseCases.ValidateProducts.Execute(productIds);
-        if (!idsOk.IsSuccess)return idsOk;
+        if (!idsOk.IsSuccess)return new Error(idsOk.Error.Code, idsOk.Error.Message);
          
         //VALIDATE ALL PRODUCTS VARIANTS REFERENCED
         var productVariants = await GetProductVariants(dto);//all has value and validate
@@ -77,6 +77,7 @@ public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseC
                     BrandId = item.NewProduct.BrandId,
                 };
 
+                
                 foreach (var variantDto in item.Variants)
                 {
                     var newVariant = new ProductVariant
@@ -87,22 +88,38 @@ public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseC
                         Color = variantDto.NewVariant.Color,
                     };
                     newVariant.UpdateQuantity(variantDto.QuantityReceived, dto.BranchId);
-                    newProduct.ProductVariants.Add(newVariant); // linkea ProductId via grafo
+                    newProduct.ProductVariants.Add(newVariant);
 
                     newReception.Items.Add(new StockReceptionItem
                     {
-                        ProductVariant = newVariant, // linkea ProductVariantId via grafo
+                        ProductVariant = newVariant,
                         QuantityReceived = variantDto.QuantityReceived,
                         UnitCost = variantDto.UnitCost
                     });
                 }
-
-                context.Products.Add(newProduct); 
+                context.Products.Add(newProduct);
             }
             context.StockReceptions.Add(newReception);
             await context.SaveChangesAsync(); 
             await transaction.CommitAsync();  
-            return true;
+            return await context.StockReceptions
+                .Where(r => r.Id == newReception.Id)
+                .Select(r => new StockReceptionResultDto
+                {
+                    Id = r.Id,
+                    BranchId = r.BranchId,
+                    ReceivedAt = r.ReceivedAt,
+                    Notes = r.Notes,
+                    Items = r.Items.Select(i => new StockReceptionItemResultDto
+                    {
+                        ProductVariantId = i.ProductVariantId,
+                        ProductName = i.ProductVariant.Product.Name,
+                        VariantDescription = i.ProductVariant.Description,
+                        QuantityReceived = i.QuantityReceived,
+                        UnitCost = i.UnitCost
+                    }).ToList()
+                })
+                .FirstAsync();
         }
         catch
         {

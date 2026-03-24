@@ -156,7 +156,7 @@ namespace Inventory.Data.Persistence.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2026, 3, 14, 2, 41, 4, 136, DateTimeKind.Utc).AddTicks(5562),
+                            CreatedAt = new DateTime(2026, 3, 23, 21, 5, 37, 383, DateTimeKind.Utc).AddTicks(1760),
                             Name = "Sin Marca"
                         });
                 });
@@ -202,7 +202,7 @@ namespace Inventory.Data.Persistence.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2026, 3, 14, 2, 41, 4, 136, DateTimeKind.Utc).AddTicks(5461),
+                            CreatedAt = new DateTime(2026, 3, 23, 21, 5, 37, 383, DateTimeKind.Utc).AddTicks(1628),
                             Name = "Sin categoria",
                             ParentId = 0
                         });
@@ -405,6 +405,8 @@ namespace Inventory.Data.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ProductVariantId");
+
                     b.HasIndex("StockReceptionId");
 
                     b.ToTable("StockReceptionItems");
@@ -455,7 +457,7 @@ namespace Inventory.Data.Persistence.Migrations
                 {
                     b.HasOne("Inventory.Data.Entities.Products.ProductVariant", "ProductVariant")
                         .WithMany("StockReceptionItems")
-                        .HasForeignKey("StockReceptionId")
+                        .HasForeignKey("ProductVariantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

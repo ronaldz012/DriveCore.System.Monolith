@@ -79,7 +79,7 @@ public class InvDbContext(DbContextOptions<InvDbContext> options) : DbContext(op
         {
             entity.HasOne(ri => ri.ProductVariant)
                 .WithMany(pv => pv.StockReceptionItems)
-                .HasForeignKey(pv => pv.StockReceptionId);
+                .HasForeignKey(pv => pv.ProductVariantId);
         });
 
 
