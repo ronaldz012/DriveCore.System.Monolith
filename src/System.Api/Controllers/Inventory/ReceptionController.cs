@@ -22,5 +22,11 @@ namespace System.Api.Controllers.Inventory
         {
             return await service.ListReceptions.Execute(dto).ToValueOrProblemDetails();
         }
+
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetReception([FromRoute] int id)
+        {
+            return await service.GetReception.Execute(id).ToValueOrProblemDetails();
+        }
     }
 }

@@ -1,3 +1,3 @@
 namespace Inventory.UseCases.Receptions;
 
-public record ReceptionUseCases(CreateReceptionUc CreateReceptionUc, ListReceptions ListReceptions);
+public record ReceptionUseCases(CreateReceptionUc CreateReceptionUc, ListReceptions ListReceptions, GetReception GetReception);
