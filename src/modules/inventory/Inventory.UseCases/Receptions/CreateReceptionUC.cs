@@ -13,7 +13,7 @@ namespace Inventory.UseCases.Receptions;
 
 public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseCases, ICurrentUser currentUser)
 {
-    public async Task<Result<StockReceptionResultDto>> Execute(CreateStockReceptionDto dto)
+    public async Task<Result<StockReceptionResultDto?>> Execute(CreateStockReceptionDto dto)
     {
         var userId = currentUser.UserId;
         var productIds = dto.Items
@@ -33,48 +33,52 @@ public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseC
         var newProductsReceptionDto= dto.Items.Where(x => !x.ProductId.HasValue).ToList();
         // INIT ATOMIC OPERATION - notes: transaction is useless ok?
         await using var transaction = await context.Database.BeginTransactionAsync();
-        var newReception = new StockReception(){BranchId = dto.BranchId, Notes =  dto.Notes};
+        var newReception = new StockReception() { BranchId = dto.BranchId, Notes = dto.Notes };
         var stockMovements = new List<StockMovement>();
         try
         {
+
+
             foreach (var item in existingProductsReceptionDto)
             {
-                
-                    var variantsToUpdate = item.Variants.Where(v => v.ProductVariantId.HasValue).ToList();
-                    foreach (var variantDto in variantsToUpdate)
+
+                var variantsToUpdate = item.Variants.Where(v => v.ProductVariantId.HasValue).ToList();
+                foreach (var variantDto in variantsToUpdate)
+                {
+                    var productVariant = productVariants.Value
+                        .FirstOrDefault(x => x.Id == variantDto.ProductVariantId!.Value);
+                    var stockMovement = StockMovement.CreateReception(dto.BranchId, productVariant!.Id,
+                        userId, variantDto.QuantityReceived);
+
+                    newReception.AddExistingVariant(productVariant!.Id, variantDto.QuantityReceived,
+                        variantDto.UnitCost);
+                    productVariant!.UpdateQuantity(variantDto.QuantityReceived, dto.BranchId);
+                    stockMovements.Add(stockMovement);
+                }
+
+                var newVariants = item.Variants.Where(v => v.NewVariant != null).ToList();
+                foreach (var variantDto in newVariants)
+                {
+                    var newPv = new ProductVariant
                     {
-                        var productVariant = productVariants.Value
-                            .FirstOrDefault(x => x.Id == variantDto.ProductVariantId!.Value);
-                        var stockMovement = StockMovement.CreateReception(dto.BranchId, productVariant!.Id,
-                            userId, variantDto.QuantityReceived);
-                        
-                        newReception.AddExistingVariant(productVariant!.Id, variantDto.QuantityReceived, variantDto.UnitCost);
-                        productVariant!.UpdateQuantity(variantDto.QuantityReceived, dto.BranchId);
-                        stockMovements.Add(stockMovement);
-                    }
-                    var newVariants = item.Variants.Where(v => v.NewVariant != null).ToList();
-                    foreach (var variantDto in newVariants)
+                        ProductId = item.ProductId!.Value,
+                        Description = variantDto.NewVariant!.Description,
+                        Size = variantDto.NewVariant.Size,
+                        Color = variantDto.NewVariant.Color,
+                        Price = variantDto.NewVariant.Price
+                    };
+                    var stockMovement = StockMovement.CreateReceptionForNewVariant(dto.BranchId, newPv, userId,
+                        variantDto.QuantityReceived, null);
+
+                    stockMovements.Add(stockMovement);
+                    newPv.UpdateQuantity(variantDto.QuantityReceived, dto.BranchId);
+                    newReception.Items.Add(new StockReceptionItem
                     {
-                        var newPv = new ProductVariant
-                        {
-                            ProductId = item.ProductId!.Value,
-                            Description = variantDto.NewVariant!.Description,
-                            Size = variantDto.NewVariant.Size,
-                            Color = variantDto.NewVariant.Color,
-                            Price = variantDto.NewVariant.Price
-                        };
-                        var stockMovement = StockMovement.CreateReceptionForNewVariant(dto.BranchId, newPv, userId,
-                            variantDto.QuantityReceived, null);
-                        
-                        stockMovements.Add(stockMovement);
-                        newPv.UpdateQuantity(variantDto.QuantityReceived, dto.BranchId);
-                        newReception.Items.Add(new StockReceptionItem
-                        {
-                            ProductVariant = newPv, 
-                            QuantityReceived = variantDto.QuantityReceived,
-                            UnitCost = variantDto.UnitCost
-                        });
-                    }
+                        ProductVariant = newPv,
+                        QuantityReceived = variantDto.QuantityReceived,
+                        UnitCost = variantDto.UnitCost
+                    });
+                }
             }
 
             foreach (var item in newProductsReceptionDto)
@@ -87,7 +91,7 @@ public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseC
                     BrandId = item.NewProduct.BrandId,
                 };
 
-                
+
                 foreach (var variantDto in item.Variants)
                 {
                     var newVariant = new ProductVariant
@@ -102,7 +106,7 @@ public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseC
                     stockMovements.Add(stockMovement);
                     newVariant.UpdateQuantity(variantDto.QuantityReceived, dto.BranchId);
                     newProduct.ProductVariants.Add(newVariant);
-                    
+
                     newReception.Items.Add(new StockReceptionItem
                     {
                         ProductVariant = newVariant,
@@ -110,34 +114,40 @@ public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseC
                         UnitCost = variantDto.UnitCost
                     });
                 }
+
                 context.Products.Add(newProduct);
             }
+
             context.StockReceptions.Add(newReception);
             context.StockMovements.AddRange(stockMovements);
-            await context.SaveChangesAsync(); 
-            await transaction.CommitAsync();  
-            return new StockReceptionResultDto
+            await context.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync(); // primera vez
+            throw; // relanza la excepción
+        }
+
+        var result = await context.StockReceptions
+            .Where(r => r.Id == newReception.Id)
+            .Select(r => new StockReceptionResultDto
             {
-                Id = newReception.Id,
-                BranchId = newReception.BranchId,
-                ReceivedAt = newReception.ReceivedAt,
-                Notes = newReception.Notes,
-                Items = newReception.Items.Select(i => new StockReceptionItemResultDto
+                Id = r.Id,
+                BranchId = r.BranchId,
+                ReceivedAt = r.ReceivedAt,
+                Notes = r.Notes,
+                Items = r.Items.Select(i => new StockReceptionItemResultDto
                 {
                     ProductVariantId = i.ProductVariantId,
+                    // Aquí el JOIN se hace automáticamente en SQL
                     ProductName = i.ProductVariant.Product.Name,
                     VariantDescription = i.ProductVariant.Description,
                     QuantityReceived = i.QuantityReceived,
                     UnitCost = i.UnitCost
                 }).ToList()
-            };
-        }
-        catch
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
-        
+            }).FirstOrDefaultAsync();
+        return result;
     }
     private async Task<Result<List<ProductVariant>>> GetProductVariants(CreateStockReceptionDto createStockReceptionDto)
     {
