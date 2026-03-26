@@ -7,13 +7,15 @@ using Inventory.Data.Persistence;
 using Inventory.UseCases.Products;
 using Microsoft.EntityFrameworkCore;
 using Shared.Result;
+using Shared.Services;
 
 namespace Inventory.UseCases.Receptions;
 
-public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseCases)
+public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseCases, ICurrentUser currentUser)
 {
     public async Task<Result<StockReceptionResultDto>> Execute(CreateStockReceptionDto dto)
     {
+        var userId = currentUser.UserId;
         var productIds = dto.Items
             .Select(x => x.ProductId)
             .Where(x => x.HasValue)
@@ -32,6 +34,7 @@ public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseC
         // INIT ATOMIC OPERATION - notes: transaction is useless ok?
         await using var transaction = await context.Database.BeginTransactionAsync();
         var newReception = new StockReception(){BranchId = dto.BranchId, Notes =  dto.Notes};
+        var stockMovements = new List<StockMovement>();
         try
         {
             foreach (var item in existingProductsReceptionDto)
@@ -42,9 +45,12 @@ public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseC
                     {
                         var productVariant = productVariants.Value
                             .FirstOrDefault(x => x.Id == variantDto.ProductVariantId!.Value);
+                        var stockMovement = StockMovement.CreateReception(dto.BranchId, productVariant!.Id,
+                            userId, variantDto.QuantityReceived);
                         
                         newReception.AddExistingVariant(productVariant!.Id, variantDto.QuantityReceived, variantDto.UnitCost);
                         productVariant!.UpdateQuantity(variantDto.QuantityReceived, dto.BranchId);
+                        stockMovements.Add(stockMovement);
                     }
                     var newVariants = item.Variants.Where(v => v.NewVariant != null).ToList();
                     foreach (var variantDto in newVariants)
@@ -57,6 +63,10 @@ public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseC
                             Color = variantDto.NewVariant.Color,
                             Price = variantDto.NewVariant.Price
                         };
+                        var stockMovement = StockMovement.CreateReceptionForNewVariant(dto.BranchId, newPv, userId,
+                            variantDto.QuantityReceived, null);
+                        
+                        stockMovements.Add(stockMovement);
                         newPv.UpdateQuantity(variantDto.QuantityReceived, dto.BranchId);
                         newReception.Items.Add(new StockReceptionItem
                         {
@@ -87,9 +97,12 @@ public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseC
                         Size = variantDto.NewVariant.Size,
                         Color = variantDto.NewVariant.Color,
                     };
+                    var stockMovement = StockMovement.CreateReceptionForNewVariant(dto.BranchId, newVariant, userId,
+                        variantDto.QuantityReceived);
+                    stockMovements.Add(stockMovement);
                     newVariant.UpdateQuantity(variantDto.QuantityReceived, dto.BranchId);
                     newProduct.ProductVariants.Add(newVariant);
-
+                    
                     newReception.Items.Add(new StockReceptionItem
                     {
                         ProductVariant = newVariant,
@@ -100,6 +113,7 @@ public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseC
                 context.Products.Add(newProduct);
             }
             context.StockReceptions.Add(newReception);
+            context.StockMovements.AddRange(stockMovements);
             await context.SaveChangesAsync(); 
             await transaction.CommitAsync();  
             return new StockReceptionResultDto

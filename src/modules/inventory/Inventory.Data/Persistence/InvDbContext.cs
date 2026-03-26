@@ -17,6 +17,8 @@ public class InvDbContext(DbContextOptions<InvDbContext> options) : DbContext(op
     public DbSet<Brand>  Brands { get; set; }
     public DbSet<StockReception>  StockReceptions { get; set; }
     public DbSet<StockReceptionItem>  StockReceptionItems { get; set; }
+    
+    public DbSet<StockMovement>  StockMovements { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -63,6 +65,10 @@ public class InvDbContext(DbContextOptions<InvDbContext> options) : DbContext(op
             entity.HasMany(pv => pv.BranchInventories)
                 .WithOne(inv => inv.ProductVariant)
                 .HasForeignKey(inv => inv.ProductVariantId);
+            
+            entity.HasMany(pv => pv.StockMovements)
+                .WithOne(inv => inv.ProductVariant)
+                .HasForeignKey(inv => inv.ProductVariantId);
         });
         
         //RECEPTIONS
@@ -81,7 +87,13 @@ public class InvDbContext(DbContextOptions<InvDbContext> options) : DbContext(op
                 .WithMany(pv => pv.StockReceptionItems)
                 .HasForeignKey(pv => pv.ProductVariantId);
         });
-
+        modelBuilder.Entity<StockMovement>(entity =>
+        {
+            entity.HasOne(sm => sm.RelatedMovement)
+                .WithOne()
+                .HasForeignKey<StockMovement>(sm => sm.RelatedMovementId)
+                .IsRequired(false);
+        });
 
     }
 }
