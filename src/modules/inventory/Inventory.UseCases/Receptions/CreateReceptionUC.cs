@@ -13,7 +13,7 @@ namespace Inventory.UseCases.Receptions;
 
 public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseCases, ICurrentUser currentUser)
 {
-    public async Task<Result<StockReceptionResultDto?>> Execute(CreateStockReceptionDto dto)
+    public async Task<Result<StockReceptionResultDto>> Execute(CreateStockReceptionDto dto)
     {
         var userId = currentUser.UserId;
         var productIds = dto.Items
@@ -147,6 +147,9 @@ public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseC
                     UnitCost = i.UnitCost
                 }).ToList()
             }).FirstOrDefaultAsync();
+        if (result == null)
+            throw new Exception($"La recepción {newReception.Id} se guardó, pero no pudo ser consultada para el resultado.");
+
         return result;
     }
     private async Task<Result<List<ProductVariant>>> GetProductVariants(CreateStockReceptionDto createStockReceptionDto)
