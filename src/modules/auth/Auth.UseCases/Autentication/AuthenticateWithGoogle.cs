@@ -3,13 +3,20 @@ using Auth.Contracts.Dtos.Users;
 using Auth.Data.Entities;
 using Auth.Data.Persistence;
 using Auth.Infrastructure.Authentication;
+using Auth.UseCases.Autentication.functions;
+using Branches.Contracts;
+using Branches.module.Services;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Shared.Result;
 
 namespace Auth.UseCases.Autentication;
 
-public class AuthenticateWithGoogle(AuthDbContext dbContext,  RegisterUser registerUser, IMapper mapper, IGoogleTokenValidator googleTokenValidator, ITokenGenerator tokenGenerator)
+public class AuthenticateWithGoogle(AuthDbContext dbContext,
+    RegisterUser registerUser, 
+    IMapper mapper, IGoogleTokenValidator googleTokenValidator,
+    ITokenGenerator tokenGenerator,
+    IBranchService branchService)
 {
     public async Task<Result<SuccessLoginDto>> Execute(string idToken)
     {
@@ -23,7 +30,7 @@ public class AuthenticateWithGoogle(AuthDbContext dbContext,  RegisterUser regis
         // Buscar si el usuario ya existe
         var existingUser = await dbContext.Users
         .AsSplitQuery()
-            .Include(u => u.UserRoles)
+            .Include(u => u.UserBranchRoles)
             .ThenInclude(ur => ur.Role)
                 .ThenInclude(r => r.RoleModulePermissions)
                     .ThenInclude(mp => mp.Module)
@@ -43,11 +50,10 @@ public class AuthenticateWithGoogle(AuthDbContext dbContext,  RegisterUser regis
         // Generar JWT token
         var token = tokenGenerator.GenerateAccessToken(existingUser!.Id);
         var refreshToken = tokenGenerator.GenerateRefreshToken();
-        var roles = existingUser.UserRoles
-            .Select(ur => ur.Role.Name)
-            .Distinct()
-            .OrderBy(r => r)
-            .ToList();
+        //BUILD PERMISSIONS
+        var branchesResult = await UserMappingUtils.BuildBranchAccess(existingUser, branchService);
+        if (!branchesResult.IsSuccess)
+            return branchesResult.Error!;
 
 
         var response = new SuccessLoginDto
@@ -57,8 +63,7 @@ public class AuthenticateWithGoogle(AuthDbContext dbContext,  RegisterUser regis
             AuthProvider = existingUser.AuthProvider.ToString(),
             Status = existingUser.Status.ToString(),
             User = mapper.Map<UserDetailsDto>(existingUser),
-            Roles = roles,
-            Modules = BuildUserModulesWithMenus(existingUser)
+            Branches = branchesResult.Value,
         };
 
         return response;
@@ -71,7 +76,6 @@ public class AuthenticateWithGoogle(AuthDbContext dbContext,  RegisterUser regis
         var roleResult = await registerUser.GetDefaultUserRole();
         if (!roleResult.IsSuccess)
             return roleResult.Error!;
-
         var user = new User
         {
             Email = googleUser.Email,
@@ -83,9 +87,9 @@ public class AuthenticateWithGoogle(AuthDbContext dbContext,  RegisterUser regis
             AuthProvider = AuthProvider.Google,
             ExternalAuthId = googleUser.GoogleId,
             // ProfilePictureUrl = googleUser.Picture,
-            UserRoles = new List<UserRole>
+            UserBranchRoles = new List<UserBranchRole>
             {
-                new UserRole { RoleId = roleResult.Value }
+                new UserBranchRole { RoleId = roleResult.Value }
             }
         };
 
@@ -116,46 +120,6 @@ public class AuthenticateWithGoogle(AuthDbContext dbContext,  RegisterUser regis
         //         await _dbContext.SaveChangesAsync();
         //     }
         // }
-    private List<ModulePermissionsDeductedDto> BuildUserModulesWithMenus(User user)
-    {
-        // UNION DE PERMISOS
-        var modulePermissions = user.UserRoles
-            .SelectMany(ur => ur.Role.RoleModulePermissions)
-            .GroupBy(rmp => rmp.ModuleId)
-            .Select(g => new
-            {
-                Module = g.First().Module,
-                CanRead = g.Any(rmp => rmp.CanRead),
-                CanCreate = g.Any(rmp => rmp.CanCreate),
-                CanUpdate = g.Any(rmp => rmp.CanUpdate),
-                CanDelete = g.Any(rmp => rmp.CanDelete)
-            })
-            //.Where(x => x.CanRead)  // Solo módulos con al menos lectura
-            //.OrderBy(x => x.Module.Order)
-            .ToList();
 
-        // Construir DTOs
-        var moduleDtos = modulePermissions.Select(mp => new ModulePermissionsDeductedDto
-        {
-            Id = mp.Module.Id,
-            Name = mp.Module.Name,
-            CanRead = mp.CanRead,
-            CanCreate = mp.CanCreate,
-            CanUpdate = mp.CanUpdate,
-            CanDelete = mp.CanDelete,
-            Menus = mp.Module.Menus
-                .OrderBy(m => m.Order)
-                .Select(m => new MenuDto
-                {
-                    Id = m.Id,
-                    Name = m.Name,
-                    Icon = m.Icon,
-                    Order = m.Order
-                })
-                .ToList()
-        }).ToList();
-
-        return moduleDtos;
-    }
 }
     

@@ -11,12 +11,19 @@ public class SuccessLoginDto
     public string Status { get; set; } = string.Empty;
     public string AuthProvider { get; set; } = string.Empty;
     public UserDetailsDto User { get; set; } = default!;
-    public List<string> Roles { get; set; } = new();
-    public List<AvailableBranchesDto> Branches { get; set; } = [];
-    public List<ModulePermissionsDeductedDto> Modules { get; set; } = new();
+    public List<BranchAccessDto> Branches = new List<BranchAccessDto>();
+
 }
 
-public class AvailableBranchesDto
+public class BranchAccessDto
+{
+    public int BranchId { get; set; }
+    public string BranchName { get; set; } = string.Empty;
+    public List<RoleDto> Roles { get; set; } = [];
+    public List<ModulePermissionsDeductedDto> Modules { get; set; } = [];
+}
+
+public class RoleDto
 {
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;

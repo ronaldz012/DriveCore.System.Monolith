@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../../../Shared/Shared.csproj" />
+    <ProjectReference Include="..\..\branches\Branches.module\Branches.module.csproj" />
   </ItemGroup>
 
   <ItemGroup>

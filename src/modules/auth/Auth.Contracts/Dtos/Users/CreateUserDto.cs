@@ -17,6 +17,11 @@ public class CreateUserDto
     public string Nationality { get; set; } = string.Empty;
     public DateTime BirthDate { get; set; } = DateTime.MinValue;
     
-    public IEnumerable<int> RoleIds { get; set; } = new List<int>();
-    public IEnumerable<int> BranchIds { get; set; } = new List<int>();
+    public IEnumerable<UserBranchRoleDto> BranchRoles { get; set; } = [];
+    
+}
+public class UserBranchRoleDto
+{
+    public int BranchId { get; set; }
+    public int RoleId { get; set; }
 }

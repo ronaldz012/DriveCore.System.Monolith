@@ -2,7 +2,6 @@ using System.Api.Result;
 using Auth.Contracts.Dtos.Users;
 using Auth.UseCases.Autentication;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace System.Api.Controllers.Auth

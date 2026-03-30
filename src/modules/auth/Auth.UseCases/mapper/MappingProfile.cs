@@ -51,6 +51,6 @@ public class MappingConfig: IRegister
         
         
         //EXTERNAL MAPPING/////////////////////////
-        config.NewConfig<BranchDto, AvailableBranchesDto>(); //BranchDto es de otro modulo
+        //config.NewConfig<BranchDto, AvailableBranchesDto>(); //BranchDto es de otro modulo
     }
 }

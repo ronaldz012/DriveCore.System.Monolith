@@ -16,37 +16,33 @@ public class CreateUser(AuthDbContext context, IBranchService branchService, IMa
     public async Task<Result<bool>> Execute(CreateUserDto dto)
     {
         var validation = await context.Users.AnyAsync(u => u.Email == dto.Email || u.Username == dto.Username);
-        if(validation) return new Error("INVALID_OPERATION", "email or username taken");
-        
- 
-        
-        //CORRER EN PARALELO AMBAS TAREAS, VER SI MEJORA
-        var branchesResult = await branchService.GetBranchesByIds(dto.BranchIds.ToList());
-        var rolesExist =await ValidateRoles(dto.RoleIds.ToList());
-        
-        if(!branchesResult.IsSuccess) return new Error("NOT_FOUND", branchesResult.Error?.Message ?? "");
-        
-        if(!rolesExist.IsSuccess) return new Error("NOT_FOUND",rolesExist.Error?.Message ?? "");
-        
+        if (validation) return new Error("INVALID_OPERATION", "email or username taken");
+
+        var branchIds = dto.BranchRoles.Select(br => br.BranchId).Distinct().ToList();
+        var roleIds = dto.BranchRoles.Select(br => br.RoleId).Distinct().ToList();
+
+        var branchesResult = await branchService.GetBranchesByIds(branchIds);
+        var rolesResult = await ValidateRoles(roleIds);
+
+        if (!branchesResult.IsSuccess) return new Error("NOT_FOUND", branchesResult.Error?.Message ?? "");
+        if (!rolesResult.IsSuccess) return new Error("NOT_FOUND", rolesResult.Error?.Message ?? "");
+
         byte[] passwordHash, passwordSalt;
         ValidatePassword.CreatePasswordHash(dto.Password, out passwordHash, out passwordSalt);
-        
-        var newUser = mapper.Map<User>(dto);//propiedades simples
+
+        var newUser = mapper.Map<User>(dto);
         newUser.PasswordHash = passwordHash;
         newUser.PasswordSalt = passwordSalt;
         newUser.Status = UserStatus.Active;
-        newUser.UserBranches = dto.BranchIds.Select(branchId => new UserBranch
+        newUser.UserBranchRoles = dto.BranchRoles.Select(br => new UserBranchRole
         {
-            BranchId = branchId,
+            BranchId = br.BranchId,
+            RoleId = br.RoleId,
         }).ToList();
-        newUser.UserRoles = dto.RoleIds.Select(roleId => new UserRole()
-        {
-            RoleId = roleId,
-        }).ToList();
+
         context.Add(newUser);
         await context.SaveChangesAsync();
         return true;
-
     }
 
     private async Task<Result<bool>> ValidateRoles(List<int> roleIds)

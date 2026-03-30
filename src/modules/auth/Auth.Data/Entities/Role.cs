@@ -17,7 +17,7 @@ public class Role : ICreatedAt, ISoftDelete, ICreatedBy
         public int? DeletedBy { get; set; }
 
     //Navigation property
-    public ICollection<UserRole> UserRoles { get; set; } = default!;
+    public ICollection<UserBranchRole> UserRoles { get; set; } = default!;
     public ICollection<RoleModulePermission> RoleModulePermissions { get; set; } = default!;
 
 }

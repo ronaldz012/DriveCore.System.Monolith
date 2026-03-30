@@ -14,9 +14,9 @@ public class RegisterDefaultUser(IMapper mapper, RegisterUser registerUser)
             return roleResult.Error!;
         var user = mapper.Map<User>(dto);
         user.Status = UserStatus.PendingVerification; //this should be based on the settings or always be this way? not sure
-        user.UserRoles = new List<UserRole>
+        user.UserBranchRoles = new List<UserBranchRole>
         {
-            new UserRole { RoleId = roleResult.Value }
+            new UserBranchRole { RoleId = roleResult.Value }
         };
 
         return await registerUser.Execute(user, dto.Password);

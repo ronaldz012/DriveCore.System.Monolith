@@ -11,7 +11,7 @@ public class CompletePublicRegister(AuthDbContext dbContext, ICurrentUser curren
 {
     public async Task<Result<bool>> Execute(CompleteUserRoleDto dto) // update with I Currente User Service
     {
-        User? user = await dbContext.Users.Include(u => u.UserRoles).FirstOrDefaultAsync(u => u.Id == currentUser.UserId);
+        User? user = await dbContext.Users.Include(u => u.UserBranchRoles).FirstOrDefaultAsync(u => u.Id == currentUser.UserId);
         if (user == null)
             return new Error("NOT_FOUND", "User not found");
 
@@ -29,8 +29,8 @@ public class CompletePublicRegister(AuthDbContext dbContext, ICurrentUser curren
         if (roleId <= 0)
             return new Error("NOT_FOUND", "role not found");
 
-        user.UserRoles.Clear();
-        user.UserRoles.Add(new UserRole { RoleId = roleId, UserId = currentUser.UserId });  //test id UserId implicit is neccesary
+        user.UserBranchRoles.Clear();
+        user.UserBranchRoles.Add(new UserBranchRole { RoleId = roleId, UserId = currentUser.UserId });  //test id UserId implicit is neccesary
 
         user.FirstName = dto.FirstName;
         user.LastName = dto.LastName;

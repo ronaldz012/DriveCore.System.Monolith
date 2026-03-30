@@ -21,14 +21,14 @@ public static class UseCasesDependencyInjection
                     .AddUsersUseCases()
                    .AddMapper()
                    .AddServices();
-    public static IServiceCollection AddServices(this IServiceCollection services)
+    static IServiceCollection AddServices(this IServiceCollection services)
     => services.AddScoped<IEmailVerificationService, EmailVerificationService>();
 
-    public static IServiceCollection AddUsersUseCases(this IServiceCollection services)
+    static IServiceCollection AddUsersUseCases(this IServiceCollection services)
         => services.AddScoped<UserUserCases>()
             .AddScoped<GetAllUsers>()
             .AddScoped<CreateUser>();
-    public static IServiceCollection AddAutenticationUseCases(this IServiceCollection services)
+    static IServiceCollection AddAutenticationUseCases(this IServiceCollection services)
     => services.AddScoped<AutenticationUseCases>()
                 .AddScoped<RegisterUser>()
                 .AddScoped<RegisterDefaultUser>()
@@ -37,7 +37,7 @@ public static class UseCasesDependencyInjection
                 .AddScoped<CompletePublicRegister>()
                 .AddScoped<VerifyUser>()
                 .AddScoped<AuthenticateWithGoogle>();
-    public static IServiceCollection AddMenuUseCases(this IServiceCollection services)
+    static IServiceCollection AddMenuUseCases(this IServiceCollection services)
     => services.AddScoped<MenuUseCases>()
                 .AddScoped<AddMenu>()
                 .AddScoped<GetMenu>()
@@ -45,7 +45,7 @@ public static class UseCasesDependencyInjection
                 .AddScoped<UpdateMenu>()
                 .AddScoped<DeleteMenu>();
 
-    public static IServiceCollection AddModulesUseCases(this IServiceCollection services)
+    static IServiceCollection AddModulesUseCases(this IServiceCollection services)
     => services.AddScoped<ModulesUseCases>()
                 .AddScoped<AddModule>()
                 .AddScoped<GetModule>()
@@ -53,11 +53,11 @@ public static class UseCasesDependencyInjection
     // .AddScoped<UpdateModule>()
     // .AddScoped<DeleteModule>();
 
-    public static IServiceCollection AddRolesUseCases(this IServiceCollection services)
+    static IServiceCollection AddRolesUseCases(this IServiceCollection services)
     => services.AddScoped<RoleUseCases>()
                 .AddScoped<AddRole>()
                 .AddScoped<GetRole>();
-    public static IServiceCollection AddMapper(this IServiceCollection services)
+    static IServiceCollection AddMapper(this IServiceCollection services)
     {
         var config = TypeAdapterConfig.GlobalSettings;
         config.Scan(typeof(MappingConfig).Assembly);

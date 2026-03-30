@@ -9,12 +9,11 @@ public class AuthDbContext(DbContextOptions<AuthDbContext> options) : DbContext(
     // DbSets
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
-        public DbSet<UserRole> UserRoles { get; set; }
+        public DbSet<UserBranchRole> UserBranchRoles { get; set; }
         public DbSet<Module> Modules { get; set; }
         public DbSet<RoleModulePermission> RoleModulePermissions { get; set; }
         public DbSet<Menu> Menus { get; set; }
 
-        public DbSet<UserBranch> UserBranches { get; set; }
         public DbSet<EmailVerificationCode> EmailVerificationCodes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -26,23 +25,21 @@ public class AuthDbContext(DbContextOptions<AuthDbContext> options) : DbContext(
             entity.HasMany(u => u.EmailVerificationCodes)
                   .WithOne(evc => evc.User)
                   .HasForeignKey(evc => evc.UserId);
-            
-            entity.HasMany(u => u.UserBranches)
-                  .WithOne(b => b.User)
-                  .HasForeignKey(b => b.UserId);
         });
         modelBuilder.Entity<Role>(entity =>
         {
         });
-        modelBuilder.Entity<UserRole>(entity =>
+        modelBuilder.Entity<UserBranchRole>(entity =>
         {
             entity.HasOne(ur => ur.User)
-                  .WithMany(u => u.UserRoles)
+                  .WithMany(u => u.UserBranchRoles)
                   .HasForeignKey(ur => ur.UserId);
 
             entity.HasOne(ur => ur.Role)
                     .WithMany(r => r.UserRoles)
                     .HasForeignKey(ur => ur.RoleId);
+            
+            
         });
         modelBuilder.Entity<Module>(entity =>
         {
