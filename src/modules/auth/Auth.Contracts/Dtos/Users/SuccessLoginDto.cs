@@ -11,7 +11,7 @@ public class SuccessLoginDto
     public string Status { get; set; } = string.Empty;
     public string AuthProvider { get; set; } = string.Empty;
     public UserDetailsDto User { get; set; } = default!;
-    public List<BranchAccessDto> Branches = new List<BranchAccessDto>();
+    public List<BranchAccessDto> Branches { get; set; } = new List<BranchAccessDto>();
 
 }
 
