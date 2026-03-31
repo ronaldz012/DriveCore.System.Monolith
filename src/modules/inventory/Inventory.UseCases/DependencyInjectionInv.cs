@@ -1,7 +1,9 @@
+using Inventory.Data.Entities.Transfers;
 using Inventory.UseCases.Brands;
 using Inventory.UseCases.Categories;
 using Inventory.UseCases.Products;
 using Inventory.UseCases.Receptions;
+using Inventory.UseCases.Transfers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Inventory.UseCases;
@@ -29,6 +31,10 @@ public  static class DependencyInjectionInv
             .AddScoped<CreateReceptionUc>()
             .AddScoped<ListReceptions>()
             .AddScoped<GetReception>();
+
+        services.AddScoped<StockTransferUseCases>()
+            .AddScoped<CreateStockTransfer>()
+            .AddScoped<ResolveStockTransfer>();
         return services;
     }
 }

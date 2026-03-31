@@ -7,7 +7,7 @@ using Shared.Services;
 
 namespace Inventory.UseCases.Transfers;
 
-public class CreateTranfer(InvDbContext context,ICurrentUser currentUser)
+public class CreateStockTransfer(InvDbContext context,ICurrentUser currentUser)
 {
      public async Task<Result<StockTransferDetailDto>> Execute(CreateStockTransferDto dto)
     {
