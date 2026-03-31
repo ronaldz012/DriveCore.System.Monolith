@@ -2,7 +2,6 @@ using System.Api.Filters;
 using System.Api.Result;
 using Inventory.Contracts.Dtos.Transfers;
 using Inventory.UseCases.Transfers;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace System.Api.Controllers.Inventory
