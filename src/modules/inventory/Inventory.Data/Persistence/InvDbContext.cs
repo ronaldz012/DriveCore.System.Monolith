@@ -2,6 +2,7 @@ using Inventory.Data.Entities.Inventory;
 using Inventory.Data.Entities.Organization;
 using Inventory.Data.Entities.Products;
 using Inventory.Data.Entities.Receptions;
+using Inventory.Data.Entities.Transfers;
 using Microsoft.EntityFrameworkCore;
 
 namespace Inventory.Data.Persistence;
@@ -19,6 +20,9 @@ public class InvDbContext(DbContextOptions<InvDbContext> options) : DbContext(op
     public DbSet<StockReceptionItem>  StockReceptionItems { get; set; }
     
     public DbSet<StockMovement>  StockMovements { get; set; }
+    
+    public DbSet<StockTransfer> StockTransfers { get; set; }
+    public DbSet<StockTransferItem>  StockTransferItems { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -69,6 +73,9 @@ public class InvDbContext(DbContextOptions<InvDbContext> options) : DbContext(op
             entity.HasMany(pv => pv.StockMovements)
                 .WithOne(inv => inv.ProductVariant)
                 .HasForeignKey(inv => inv.ProductVariantId);
+            entity.HasMany(pv => pv.TransferItems)
+                .WithOne(ti => ti.ProductVariant)
+                .HasForeignKey(ti => ti.ProductVariantId);
         });
         
         //RECEPTIONS
