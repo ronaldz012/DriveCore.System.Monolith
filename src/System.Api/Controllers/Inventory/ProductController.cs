@@ -1,3 +1,4 @@
+using System.Api.Filters;
 using System.Api.Result;
 using Inventory.Contracts.Dtos;
 using Inventory.Contracts.Dtos.Products;
@@ -20,6 +21,7 @@ namespace System.Api.Controllers.Inventory
         }
 
         [HttpGet]
+        [RequireBranch]
         public async Task<IActionResult> GetProducts([FromQuery]ProductQueryDto request)
         {
             return await productUseCases.GetProducts.Execute(request).ToValueOrProblemDetails();

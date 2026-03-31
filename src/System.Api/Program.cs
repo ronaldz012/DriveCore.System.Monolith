@@ -1,3 +1,4 @@
+using System.Api.Filters;
 using System.Api.Middlewares;
 using System.Api.Result;
 using System.Text;
@@ -53,6 +54,7 @@ builder.Services.AddSwaggerGen(c =>
             new List<string>()
           }
     });
+  c.OperationFilter<BranchHeaderFilter>();
 });
 
 builder.Services.AddHttpContextAccessor();

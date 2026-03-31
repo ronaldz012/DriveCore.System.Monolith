@@ -4,10 +4,11 @@ using Inventory.Data.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Shared.Extensions;
 using Shared.Result;
+using Shared.Services;
 
 namespace Inventory.UseCases.Products;
 
-public class GetProducts(InvDbContext context)
+public class GetProducts(InvDbContext context, ICurrentUser currentUser)
 {
     public async Task<Result<PagedResultDto<ListProductDto>>> Execute(ProductQueryDto queryDto)
     {
@@ -35,7 +36,7 @@ public class GetProducts(InvDbContext context)
             Description = p.Description,
             Stock = p.ProductVariants
                 .SelectMany(pv => pv.BranchInventories)
-                .Where(bi => bi.BranchId == queryDto.BranchId)
+                .Where(bi => currentUser.BranchIds.Contains(bi.BranchId))
                 .Sum(bi => bi.Stock),
         }).ToListAsync();
         return new PagedResultDto<ListProductDto>()

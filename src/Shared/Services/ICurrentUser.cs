@@ -1,44 +1,55 @@
-using System;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
+
 namespace Shared.Services;
 
 public interface ICurrentUser
 {
     int UserId { get; }
     string Username { get; }
-    //IEnumerable<string> Roles { get; }
-    //IEnumerable<(string Role, string Permission)> Permissions { get; }
-    public string? Token { get; }
+    string? Token { get; }
     bool IsAuthenticated { get; }
+    IReadOnlyList<int> BranchIds { get; }
+    bool HasBranch(int branchId);
 }
-
-
-public class CurrentUserService(IHttpContextAccessor httpContextAccessor) : ICurrentUser
+public class CurrentUserService : ICurrentUser
 {
+    // Campos calculados una sola vez
+    public int UserId { get; }
+    public string Username { get; }
+    public string? Token { get; }
+    public bool IsAuthenticated { get; }
+    public IReadOnlyList<int> BranchIds { get; }
 
-    private ClaimsPrincipal User => httpContextAccessor.HttpContext.User;
+    public CurrentUserService(IHttpContextAccessor httpContextAccessor)
+    {
+        var context = httpContextAccessor.HttpContext;
+        var user = context?.User;
 
-    public bool IsAuthenticated => User?.Identity?.IsAuthenticated ?? false;
-    public int UserId => IsAuthenticated
-    ? int.Parse(User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? "0")
-    : 0;
+        // 1. Datos de Identidad
+        IsAuthenticated = user?.Identity?.IsAuthenticated ?? false;
+        
+        UserId = IsAuthenticated 
+            ? int.Parse(user?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0") 
+            : 0;
 
-    public string Username => User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value ?? "Anonymous";
-    public string? Token => httpContextAccessor.HttpContext?.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
-    // public IEnumerable<string> Roles =>
-    //     User?.Claims
-    //         .Where(c => c.Type == "r")
-    //         .Select(c => c.Value)
-    //         ?? Enumerable.Empty<string>();
+        Username = user?.FindFirst(ClaimTypes.Name)?.Value ?? "Anonymous";
 
-    // public IEnumerable<(string Role, string Permission)> Permissions =>
-    //     User?.Claims
-    //         .Where(c => c.Type == "p")
-    //         .Select(c =>
-    //         {
-    //             var parts = c.Value.Split(':');
-    //             return (Role: parts[0], Permission: parts[1]);
-    //         })
-    //         ?? Enumerable.Empty<(string, string)>();
+        // 2. Token
+        Token = context?.Request.Headers["Authorization"]
+            .FirstOrDefault()?.Split(" ").Last();
+
+        // 3. Sucursales (Extraemos el string del header una vez)
+        var headerValues = context?.Request.Headers["X-Branch-Id"].ToString();
+
+        BranchIds = string.IsNullOrWhiteSpace(headerValues)
+            ? [] 
+            : headerValues.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(s => int.TryParse(s.Trim(), out var id) ? id : 0)
+                .Where(id => id > 0)
+                .ToList()
+                .AsReadOnly();
+    }
+
+    public bool HasBranch(int branchId) => BranchIds.Contains(branchId);
 }
