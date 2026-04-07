@@ -11,7 +11,8 @@ public class CreateBrand(InvDbContext context)
     {
         var newBrand = new Brand
         {
-            Name = dto.Name
+            Name = dto.Name,
+            Description = dto.Description
         };  
         context.Brands.Add(newBrand);
         await context.SaveChangesAsync();

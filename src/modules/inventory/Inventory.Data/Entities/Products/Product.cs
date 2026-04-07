@@ -9,6 +9,8 @@ public class Product:Params
     public string Description { get; set; } = string.Empty;
     public int CategoryId { get; set; }
     public int BrandId { get; set; }
+    public Gender Gender { get; set; }
+    public decimal BasePrice { get; set; }
 
     public int UnitMeasurementSin { get; set; } // unidad de medida siat
     public string EconomicActivity { get; set; } = string.Empty; // codigo actividad economica siat
@@ -17,4 +19,11 @@ public class Product:Params
     public ICollection<ProductVariant> ProductVariants { get; set; } = new List<ProductVariant>();
     public Category Category { get; set; } = default!;
     public Brand Brand { get; set; } = null!;
+}
+
+public enum Gender
+{
+    Unisex,
+    Male,
+    Female
 }

@@ -15,8 +15,10 @@ public class SearchProduct(InvDbContext context)
                 Id = x.Id,
                 Name = x.Name,
                 Description = x.Description,
-                Category = x.Category.Name,
-                Brand = x.Brand.Name,
+                CategoryName = x.Category.Name,
+                BrandName = x.Brand.Name,
+                BasePrice = x.BasePrice,
+                Gender =  x.Gender,
                 ProductVariants = x.ProductVariants.Select(y => new ProductVariantDto
                 {
                     Id = y.Id,

@@ -3,6 +3,7 @@ using System;
 using Inventory.Data.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Inventory.Data.Persistence.Migrations
 {
     [DbContext(typeof(InvDbContext))]
-    partial class InvDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260403150946_basePriceGender")]
+    partial class basePriceGender
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -199,10 +202,6 @@ namespace Inventory.Data.Persistence.Migrations
                     b.Property<int?>("DeletedById")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -221,8 +220,7 @@ namespace Inventory.Data.Persistence.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2026, 4, 7, 20, 41, 51, 639, DateTimeKind.Utc).AddTicks(4728),
-                            Description = "",
+                            CreatedAt = new DateTime(2026, 4, 3, 15, 9, 45, 830, DateTimeKind.Utc).AddTicks(9221),
                             Name = "Sin Marca"
                         });
                 });
@@ -247,10 +245,6 @@ namespace Inventory.Data.Persistence.Migrations
                     b.Property<int?>("DeletedById")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -272,8 +266,7 @@ namespace Inventory.Data.Persistence.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2026, 4, 7, 20, 41, 51, 639, DateTimeKind.Utc).AddTicks(4603),
-                            Description = "",
+                            CreatedAt = new DateTime(2026, 4, 3, 15, 9, 45, 830, DateTimeKind.Utc).AddTicks(9115),
                             Name = "Sin categoria",
                             ParentId = 0
                         });

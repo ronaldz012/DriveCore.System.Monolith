@@ -1,3 +1,5 @@
+using Inventory.Data.Entities.Products;
+
 namespace Inventory.Contracts.Dtos.Products;
 
 public class ProductDto
@@ -5,8 +7,11 @@ public class ProductDto
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public string Category { get; set; } = string.Empty;
-    public string Brand { get; set; } = string.Empty;
+    public string CategoryName { get; set; } = string.Empty;
+    public string BrandName { get; set; } = string.Empty;
+    public decimal BasePrice { get; set; }
+    public Gender Gender { get; set; }
+    
 
     public List<ProductVariantDto> ProductVariants { get; set; } = new List<ProductVariantDto>();
 }
