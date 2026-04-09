@@ -1,6 +1,6 @@
 # DriveCore.System 🚀
 
-A robust **Modular Monolith** built with **.NET 8** and **PostgreSQL**, following the **Driven Core System** architecture. This project manages Authentication, Inventory, and Branch infrastructure with a strictly decoupled data approach.
+A robust **Modular Monolith BACKEND** built with **.NET 8** and **PostgreSQL**, following the **Driven Core System** architecture. This project manages Authentication, Inventory, and Branch infrastructure with a strictly decoupled data approach.
 
 ## 🏗️ Architecture: Driven Core
 Each module is structured to ensure high maintainability and testability:
