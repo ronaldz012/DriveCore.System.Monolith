@@ -111,7 +111,14 @@ Communication between modules is handled through interfaces to maintain loose co
 This approach ensures:
 - Clear separation of concerns  
 - Low coupling between modules  
-- Easier testing and maintainability  
+- Easier testing and maintainability
 
+## 📘 API Documentation (Swagger)
+
+You can explore the API using Swagger UI:
+
+🔗 http://localhost:5253/swagger
+
+![Swagger UI]("Documentation/Pasted image.png")
 > **Note:**  
 > Modules should never directly reference other module implementations—only their contracts.
