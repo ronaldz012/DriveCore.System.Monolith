@@ -7,7 +7,7 @@ namespace Inventory.UseCases.Categories;
 
 public class CreateCategory(InvDbContext context)
 {
-    public async Task<Result<bool>> Execute(CreateCategoryDto dto)
+    public async Task<Result<CategoryDto>> Execute(CreateCategoryDto dto)
     {
         var category = new Category
         {
@@ -15,6 +15,11 @@ public class CreateCategory(InvDbContext context)
         };
         context.Add(category);
         await context.SaveChangesAsync();
-        return true;
+        return new CategoryDto
+        {
+            Id = category.Id,
+            Name = category.Name,
+            Description = category.Description,
+        };
     }
 }
