@@ -1,6 +1,6 @@
 # DriveCore.System.Monolith 🚀
 
-A high-performance **Modular Monolith** built with **.NET 9**, following a custom **Driven Core System** architecture. This project integrates Authentication, Inventory Management, and Branch control using a strictly decoupled approach where each module owns its data.
+A high-performance **Modular Monolith** built with **.NET 8**, following a custom **Driven Core System** architecture. This project integrates Authentication, Inventory Management, and Branch control using a strictly decoupled approach where each module owns its data.
 
 ## 🏗️ Architecture Overview
 
