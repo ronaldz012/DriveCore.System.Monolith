@@ -119,6 +119,6 @@ You can explore the API using Swagger UI:
 
 🔗 http://localhost:5253/swagger
 
-![Swagger UI]("Documentation/Pasted image.png")
+![Swagger UI]("Documentation/swagger.png")
 > **Note:**  
 > Modules should never directly reference other module implementations—only their contracts.
