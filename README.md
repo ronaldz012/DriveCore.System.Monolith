@@ -48,9 +48,9 @@ The project uses an example configuration file. You must create your local setti
 
 ```json
 "ConnectionStrings": {
-  "AuthConnection": "Server=localhost;Database=AuthService;User Id=postgres;Password=your_password;",
-  "BranchConnection": "Server=localhost;Database=BranchService;User Id=postgres;Password=your_password;",
-  "InventoryConnection": "Server=localhost;Database=InventoryService;User Id=postgres;Password=your_password;"
+  "AuthConnection": "Server=localhost,5432;Database=AuthService;User Id=postgres;Password=your_password;",
+  "BranchConnection": "Server=localhost,5432;Database=BranchService;User Id=postgres;Password=your_password;",
+  "InventoryConnection": "Server=localhost,5432;Database=InventoryService;User Id=postgres;Password=your_password;"
 }
 
 ```
