@@ -1,38 +1,33 @@
-# DriveCore.System.Monolith 🚀
+# DriveCore.System 🚀
 
-A high-performance **Modular Monolith** built with **.NET 8**, following a custom **Driven Core System** architecture. This project integrates Authentication, Inventory Management, and Branch control using a strictly decoupled approach where each module owns its data.
+A robust **Modular Monolith** built with **.NET 8** and **PostgreSQL**, following the **Driven Core System** architecture. This project manages Authentication, Inventory, and Branch infrastructure with a strictly decoupled data approach.
 
-## 🏗️ Architecture Overview
+## 🏗️ Architecture: Driven Core
+Each module is structured to ensure high maintainability and testability:
+* **Data:** Entity Framework Core persistence and PostgreSQL configurations.
+* **UseCases:** Pure business logic and application flows.
+* **Infrastructure:** Implementations for SMTP, Google OAuth, and external services.
+* **Contracts:** DTOs and interfaces for cross-module communication.
+* **Shared:** A single transversal project containing the `Result<T>` pattern and global utilities.
 
-The project uses a specialized Clean Architecture pattern (Driven Core) applied to modular monoliths:
+## 🔐 Authentication & Verification
+The system supports:
+* **Google OAuth:** Native integration for seamless sign-in.
+* **Email Verification:** Controlled via `PublicAuthentication:Enable`. 
+    * If `false`: Users can access the system immediately after signup.
+    * If `true`: Users must verify their account via an OTP/Link sent via SMTP before gaining access.
 
-* **Modular Monolith:** Three distinct domains (**Auth**, **Inventory**, **Branch**) residing in the same codebase but logically separated.
-* **Driven Core System:** Each major module is split into:
-    * `Data`: Persistence and Database configurations.
-    * `UseCases`: Application logic and Business rules.
-    * `Infrastructure`: External implementations (Email, Storage, etc).
-    * `Contracts`: Public interfaces and DTOs for inter-module communication.
-* **Shared Project:** Transversal utilities used across the entire solution.
-* **Result Pattern:** Uses a custom `Result<T>` pattern instead of exceptions for flow control, handled by `ToValueOrProblemDetails()` to map results to HTTP 200/400/404/500 responses.
-
-## 📊 System Diagram
+## 📊 Database Architecture
+Each module manages its own independent schema within PostgreSQL to prevent tight coupling.
 
 ```mermaid
-graph TD
-    API[Web API Project] --> Auth[Auth Module]
+graph LR
+    API[System.Api] --> Auth[Auth Module]
     API --> Inv[Inventory Module]
-    API --> Br[Branch Module]
+    API --> Br[Branches Module]
     
-    subgraph Modules
-        Auth --> AuthDB[(PostgreSQL: AuthService)]
-        Inv --> InvDB[(PostgreSQL: InventoryService)]
-        Br --> BrDB[(PostgreSQL: BranchService)]
+    subgraph Databases
+        Auth --- DB1[(AuthService DB)]
+        Inv --- DB2[(InventoryService DB)]
+        Br --- DB3[(BranchService DB)]
     end
-
-    subgraph Core
-        Shared[Shared Project] -.-> Auth
-        Shared -.-> Inv
-        Shared -.-> Br
-    end
-
-    style API fill:#f9f,stroke:#333,stroke-width:2px
