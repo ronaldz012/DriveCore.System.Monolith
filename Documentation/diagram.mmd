@@ -1,7 +1,10 @@
-flowchart TD
-    A[Christmas] -->|Get money| B(Go shopping)
-    B --> C{Let me think}
-    C -->|One| D[Laptop]
-    C -->|Two| E[iPhone]
-    C -->|Three| F[fa:fa-car Car]
-  
+graph LR
+    API[System.Api] --> Auth[Auth Module]
+    API --> Inv[Inventory Module]
+    API --> Br[Branches Module]
+    
+    subgraph Databases
+        Auth --- DB1[(AuthService DB)]
+        Inv --- DB2[(InventoryService DB)]
+        Br --- DB3[(BranchService DB)]
+    end
