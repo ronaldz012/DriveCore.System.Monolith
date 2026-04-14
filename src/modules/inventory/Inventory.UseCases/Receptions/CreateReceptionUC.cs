@@ -19,18 +19,18 @@ public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseC
         var productIds = dto.Items
             .Select(x => x.ProductId)
             .Where(x => x.HasValue)
-            .Select(x => x!.Value) 
+            .Select(x => x!.Value)
             .ToList();
-        var idsOk= await productUseCases.ValidateProducts.Execute(productIds);
-        if (!idsOk.IsSuccess)return new Error(idsOk.Error.Code, idsOk.Error.Message);
-         
+        var idsOk = await productUseCases.ValidateProducts.Execute(productIds);
+        if (!idsOk.IsSuccess) return new Error(idsOk.Error.Code, idsOk.Error.Message);
+
         //VALIDATE ALL PRODUCTS VARIANTS REFERENCED
         var productVariants = await GetProductVariants(dto);//all has value and validate
         if (!productVariants.IsSuccess) return productVariants.Error;
-        
-        
+
+
         var existingProductsReceptionDto = dto.Items.Where(x => x.ProductId.HasValue).ToList();
-        var newProductsReceptionDto= dto.Items.Where(x => !x.ProductId.HasValue).ToList();
+        var newProductsReceptionDto = dto.Items.Where(x => !x.ProductId.HasValue).ToList();
         // INIT ATOMIC OPERATION - notes: transaction is useless ok?
         await using var transaction = await context.Database.BeginTransactionAsync();
         var newReception = new StockReception() { BranchId = dto.BranchId, Notes = dto.Notes };
@@ -89,6 +89,7 @@ public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseC
                     Description = item.NewProduct.Description,
                     CategoryId = item.NewProduct.CategoryId,
                     BrandId = item.NewProduct.BrandId,
+                    BasePrice = item.NewProduct.BasePrice
                 };
 
 
@@ -154,17 +155,17 @@ public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseC
     }
     private async Task<Result<List<ProductVariant>>> GetProductVariants(CreateStockReceptionDto createStockReceptionDto)
     {
-        var variantsIds =  createStockReceptionDto.Items.SelectMany(pv => pv.Variants).Where(v => v.ProductVariantId.HasValue).Select(x => x.ProductVariantId!.Value).ToList();
+        var variantsIds = createStockReceptionDto.Items.SelectMany(pv => pv.Variants).Where(v => v.ProductVariantId.HasValue).Select(x => x.ProductVariantId!.Value).ToList();
         var productVariants = await context.ProductVariants
             .Include(x => x.BranchInventories)
             .Where(x => variantsIds.Contains(x.Id)).ToListAsync();
-        
+
         var foundIds = productVariants.Select(x => x.Id).ToList();
         var missingIds = variantsIds.Except(foundIds).ToList();
-        
+
         if (missingIds.Count != 0)
             return new Error("NOT_FOUND", $"the next Ids of VariantIds were Not founded: {missingIds}");
         return productVariants;
     }
-    
+
 }

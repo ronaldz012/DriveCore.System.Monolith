@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Inventory.Contracts.Dtos.Receptions;
 
-public class CreateStockReceptionDto :IValidatableObject
+public class CreateStockReceptionDto : IValidatableObject
 {
     public int BranchId { get; set; }
     public string? Notes { get; set; }
@@ -14,23 +14,23 @@ public class CreateStockReceptionDto :IValidatableObject
 
         // Productos nuevos deben tener NewProduct y todas sus variantes con NewVariant
         var newProducts = Items.Where(x => x.ProductId == null).ToList();
-        
+
         if (newProducts.Any(x => x.NewProduct == null))
             yield return new ValidationResult(
-                "NewProduct is required when ProductId is not provided", 
+                "NewProduct is required when ProductId is not provided",
                 [nameof(Items)]);
 
         if (newProducts.Any(x => x.Variants.Any(v => v.NewVariant == null)))
             yield return new ValidationResult(
-                "All variants must have NewVariant when creating a new product", 
+                "All variants must have NewVariant when creating a new product",
                 [nameof(Items)]);
 
         // Productos existentes deben tener al menos una variante
         var existingProducts = Items.Where(x => x.ProductId.HasValue).ToList();
-        
+
         if (existingProducts.Any(x => !x.Variants.Any()))
             yield return new ValidationResult(
-                "Each existing product must have at least one variant", 
+                "Each existing product must have at least one variant",
                 [nameof(Items)]);
     }
 }
@@ -63,6 +63,7 @@ public class NewProductDto
     public string Description { get; set; } = string.Empty;
     public int CategoryId { get; set; }
     public int BrandId { get; set; }
+    public decimal BasePrice { get; set; }
     public int UnitMeasurementSin { get; set; }
     public string EconomicActivity { get; set; } = string.Empty;
     public int ProductCodeSin { get; set; }
