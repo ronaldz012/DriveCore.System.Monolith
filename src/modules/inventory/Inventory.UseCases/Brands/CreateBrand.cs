@@ -7,15 +7,20 @@ namespace Inventory.UseCases.Brands;
 
 public class CreateBrand(InvDbContext context)
 {
-    public async Task<Result<int>> Execute(CreateBrandDto dto)
+    public async Task<Result<BrandDto>> Execute(CreateBrandDto dto)
     {
         var newBrand = new Brand
         {
             Name = dto.Name,
             Description = dto.Description
-        };  
+        };
         context.Brands.Add(newBrand);
         await context.SaveChangesAsync();
-        return newBrand.Id;
+        return new BrandDto
+        {
+            Id = newBrand.Id,
+            Name = newBrand.Name,
+            Description = newBrand.Description
+        };
     }
 }
