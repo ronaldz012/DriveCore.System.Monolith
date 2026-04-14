@@ -3,6 +3,7 @@ using Inventory.Contracts.Dtos.Products;
 using Inventory.Data.Entities.Products;
 using Inventory.Data.Persistence;
 using Inventory.Infrastructure;
+using Org.BouncyCastle.Ocsp;
 using Shared.Result;
 
 namespace Inventory.UseCases.Products;
@@ -16,7 +17,8 @@ public class CreateProduct(InvDbContext context, InventorySignalRStockNotifier n
             Name = request.Name,
             CategoryId = request.CategoryId,
             BrandId = request.BrandId,
-            Description = request.Description
+            Description = request.Description,
+            BasePrice = request.BasePrice
         };
         context.Add(product);
         await context.SaveChangesAsync();

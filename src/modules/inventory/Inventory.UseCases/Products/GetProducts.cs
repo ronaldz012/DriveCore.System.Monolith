@@ -12,12 +12,12 @@ public class GetProducts(InvDbContext context, ICurrentUser currentUser)
 {
     public async Task<Result<PagedResultDto<ListProductDto>>> Execute(ProductQueryDto queryDto)
     {
-        IQueryable<Product>  query = context.Products;
+        IQueryable<Product> query = context.Products;
         if (!string.IsNullOrEmpty(queryDto.Filter))
         {
             query = query.Where(x => EF.Functions.ILike(x.Name, $"%{queryDto.Filter}%"));
         }
-    
+
         if (queryDto.BrandId.HasValue)
         {
             query = query.Where(x => x.BrandId == queryDto.BrandId);
@@ -32,7 +32,7 @@ public class GetProducts(InvDbContext context, ICurrentUser currentUser)
         {
             Id = p.Id,
             Name = p.Name,
-            BasePrice = 100m,
+            BasePrice = p.BasePrice,
             Description = p.Description,
             Stock = p.ProductVariants
                 .SelectMany(pv => pv.BranchInventories)
@@ -47,5 +47,5 @@ public class GetProducts(InvDbContext context, ICurrentUser currentUser)
             PageSize = queryDto.GetPageSizeValue()
         };
     }
-        
+
 }

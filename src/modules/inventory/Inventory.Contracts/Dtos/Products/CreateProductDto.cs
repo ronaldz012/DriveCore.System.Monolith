@@ -6,6 +6,7 @@ public class CreateProductDto
     public string Description { get; set; } = string.Empty;
     public int CategoryId { get; set; }
     public int BrandId { get; set; }
+    public decimal BasePrice { get; set; }
 
     public int UnitMeasurementSin { get; set; } // unidad de medida siat
     public string EconomicActivity { get; set; } = string.Empty; // codigo actividad economica siat
