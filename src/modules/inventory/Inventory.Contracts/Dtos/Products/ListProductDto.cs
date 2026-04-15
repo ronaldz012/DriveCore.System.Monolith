@@ -10,6 +10,7 @@ public class ListProductDto
     public string Description { get; set; } = string.Empty;
     public decimal BasePrice { get; set; }
     public decimal Stock { get; set; }
+    public string InternalCode { get; set; } = string.Empty;
 }
 public class ProductQueryDto : GenericPaginationQueryDto
 {

@@ -10,6 +10,7 @@ namespace Inventory.UseCases.Products;
 
 public class CreateProduct(InvDbContext context, InventorySignalRStockNotifier notifier)
 {
+    //MUST BE DEPRECATED
     public async Task<Result<bool>> Execute(CreateProductDto request)
     {
         var product = new Product

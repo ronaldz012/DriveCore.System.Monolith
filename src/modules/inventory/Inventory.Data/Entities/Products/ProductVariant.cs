@@ -9,6 +9,7 @@ public class ProductVariant: Params
 {
     public int Id { get; set; }
     public int ProductId { get; set; }
+    public string Sku { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty; 
     public string Size { get; set; } = string.Empty;
     public string Color { get; set; } = string.Empty;

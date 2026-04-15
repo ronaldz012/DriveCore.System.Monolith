@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Inventory.Data.Entities.Products;
 
 namespace Inventory.Contracts.Dtos.Receptions;
 
@@ -63,6 +64,7 @@ public class NewProductDto
     public string Description { get; set; } = string.Empty;
     public int CategoryId { get; set; }
     public int BrandId { get; set; }
+    public Gender Gender { get; set; }
     public decimal BasePrice { get; set; }
     public int UnitMeasurementSin { get; set; }
     public string EconomicActivity { get; set; } = string.Empty;

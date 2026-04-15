@@ -4,6 +4,7 @@ using Inventory.Data.Entities.Inventory;
 using Inventory.Data.Entities.Products;
 using Inventory.Data.Entities.Receptions;
 using Inventory.Data.Persistence;
+using Inventory.Infrastructure.CodeGenerator;
 using Inventory.UseCases.Products;
 using Microsoft.EntityFrameworkCore;
 using Shared.Result;
@@ -21,6 +22,11 @@ public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseC
             .Where(x => x.HasValue)
             .Select(x => x!.Value)
             .ToList();
+        var existingProductsData = await context.Products
+            .Where(p => productIds.Contains(p.Id))
+            .Select(p => new { p.Id, p.InternalCode })
+            .ToDictionaryAsync(x => x.Id, x => x.InternalCode);
+        
         var idsOk = await productUseCases.ValidateProducts.Execute(productIds);
         if (!idsOk.IsSuccess) return new Error(idsOk.Error.Code, idsOk.Error.Message);
 
@@ -41,6 +47,7 @@ public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseC
 
             foreach (var item in existingProductsReceptionDto)
             {
+                var parentInternalCode = existingProductsData[item.ProductId!.Value];
 
                 var variantsToUpdate = item.Variants.Where(v => v.ProductVariantId.HasValue).ToList();
                 foreach (var variantDto in variantsToUpdate)
@@ -65,7 +72,8 @@ public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseC
                         Description = variantDto.NewVariant!.Description,
                         Size = variantDto.NewVariant.Size,
                         Color = variantDto.NewVariant.Color,
-                        Price = variantDto.NewVariant.Price
+                        Price = variantDto.NewVariant.Price,
+                        Sku = CodeGenerator.GenerateVariantSku(parentInternalCode)
                     };
                     var stockMovement = StockMovement.CreateReceptionForNewVariant(dto.BranchId, newPv, userId,
                         variantDto.QuantityReceived, null);
@@ -83,13 +91,16 @@ public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseC
 
             foreach (var item in newProductsReceptionDto)
             {
+                var productInternalCode = CodeGenerator.GenerateProductCode();
                 var newProduct = new Product
                 {
                     Name = item.NewProduct!.Name,
                     Description = item.NewProduct.Description,
                     CategoryId = item.NewProduct.CategoryId,
                     BrandId = item.NewProduct.BrandId,
-                    BasePrice = item.NewProduct.BasePrice
+                    BasePrice = item.NewProduct.BasePrice,
+                    Gender = item.NewProduct.Gender,
+                    InternalCode = productInternalCode
                 };
 
 
@@ -101,6 +112,7 @@ public class CreateReceptionUc(InvDbContext context, ProductUseCases productUseC
                         Price = variantDto.NewVariant.Price,
                         Size = variantDto.NewVariant.Size,
                         Color = variantDto.NewVariant.Color,
+                        Sku = CodeGenerator.GenerateVariantSku(productInternalCode)
                     };
                     var stockMovement = StockMovement.CreateReceptionForNewVariant(dto.BranchId, newVariant, userId,
                         variantDto.QuantityReceived);

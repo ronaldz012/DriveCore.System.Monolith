@@ -34,6 +34,7 @@ public class GetProducts(InvDbContext context, ICurrentUser currentUser)
             Name = p.Name,
             BasePrice = p.BasePrice,
             Description = p.Description,
+            InternalCode = p.InternalCode,
             Stock = p.ProductVariants
                 .SelectMany(pv => pv.BranchInventories)
                 .Where(bi => currentUser.BranchIds.Contains(bi.BranchId))
