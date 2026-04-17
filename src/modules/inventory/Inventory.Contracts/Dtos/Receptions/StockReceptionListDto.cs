@@ -12,6 +12,8 @@ public class StockReceptionListDto
     public string Status { get; set; } = string.Empty;
     public int TotalItems { get; set; }
     public decimal TotalCost { get; set; }
+    public List<string> Brands { get; set; } = [];
+    public List<string> Categories { get; set; } = [];
 }
 
 public class ReceptionQueryDto : GenericPaginationQueryDto

@@ -24,7 +24,9 @@ public class ListReceptions(InvDbContext context)
                 Notes = r.Notes,
                 Status = r.Status.ToString(),
                 TotalItems = r.Items.Count,
-                TotalCost = r.Items.Sum(i => i.UnitCost * i.QuantityReceived)
+                TotalCost = r.Items.Sum(i => i.UnitCost * i.QuantityReceived),
+                Brands = r.Items.Select(x =>  x.ProductVariant.Product.Brand.Name).Distinct().ToList(),
+                Categories = r.Items.Select(x =>  x.ProductVariant.Product.Category.Name).Distinct().ToList(),
             }).ToListAsync();
 
         return new PagedResultDto<StockReceptionListDto>
