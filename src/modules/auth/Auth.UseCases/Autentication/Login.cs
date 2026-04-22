@@ -50,13 +50,13 @@ public class Login(AuthDbContext dbContext, ITokenGenerator tokenGenerator, IMap
 
         // Convertimos a diccionario para lookup eficiente
         var branchResult = await UserMappingUtils.BuildBranchAccess(user, branchService);
-        if(!branchResult.IsSuccess) return new  Error("NOT_FOUND", branchResult.Error.Message);
-        
+        if (!branchResult.IsSuccess) return new Error("NOT_FOUND", branchResult.Error.Message);
+
         var accessToken = tokenGenerator.GenerateAccessToken(user.Id);
         var refreshToken = tokenGenerator.GenerateRefreshToken();
 
 
-        return new SuccessLoginDto
+        var result = new SuccessLoginDto
         {
             Status = user.Status.ToString(),
             AuthProvider = user.AuthProvider.ToString(),
@@ -66,6 +66,7 @@ public class Login(AuthDbContext dbContext, ITokenGenerator tokenGenerator, IMap
             User = mapper.Map<UserDetailsDto>(user),
             Branches = branchResult.Value
         };
+        return result;
     }
-        
+
 }

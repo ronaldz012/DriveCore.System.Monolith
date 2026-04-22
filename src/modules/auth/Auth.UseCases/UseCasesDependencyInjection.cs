@@ -1,4 +1,6 @@
+using Auth.Contracts.Interfaces;
 using Auth.UseCases.Autentication;
+using Auth.UseCases.cache;
 using Auth.UseCases.Email;
 using Auth.UseCases.mapper;
 using Auth.UseCases.Menus;
@@ -18,9 +20,11 @@ public static class UseCasesDependencyInjection
                     .AddModulesUseCases()
                     .AddRolesUseCases()
                     .AddAutenticationUseCases()
+                    .AddCache()
                     .AddUsersUseCases()
-                   .AddMapper()
-                   .AddServices();
+                    .AddMapper()
+                    .AddServices()
+                    .AddScoped<ICurrentUser, CurrentUserService>();
     static IServiceCollection AddServices(this IServiceCollection services)
     => services.AddScoped<IEmailVerificationService, EmailVerificationService>();
 
@@ -33,10 +37,13 @@ public static class UseCasesDependencyInjection
                 .AddScoped<RegisterUser>()
                 .AddScoped<RegisterDefaultUser>()
                 .AddScoped<Login>()
-                .AddScoped<AutenticateMe>()
+                .AddScoped<IAuthenticateMe, AutenticateMe>()
                 .AddScoped<CompletePublicRegister>()
                 .AddScoped<VerifyUser>()
                 .AddScoped<AuthenticateWithGoogle>();
+
+    static IServiceCollection AddCache(this IServiceCollection services)
+    => services.AddScoped<IUserPermissionsCacheService, UserPermissionsCacheService>();
     static IServiceCollection AddMenuUseCases(this IServiceCollection services)
     => services.AddScoped<MenuUseCases>()
                 .AddScoped<AddMenu>()

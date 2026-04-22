@@ -1,3 +1,4 @@
+using Auth.Contracts.Interfaces;
 using Inventory.Contracts.Dtos.Transfers;
 using Inventory.Data.Entities.Inventory;
 using Inventory.Data.Entities.Transfers;

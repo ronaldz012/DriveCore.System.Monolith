@@ -1,4 +1,5 @@
 using System.Transactions;
+using Auth.Contracts.Interfaces;
 using Inventory.Contracts.Dtos.Receptions;
 using Inventory.Data.Entities.Inventory;
 using Inventory.Data.Entities.Products;

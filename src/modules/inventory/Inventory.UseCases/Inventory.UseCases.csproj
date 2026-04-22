@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\Shared\Shared.csproj" />
+      <ProjectReference Include="..\..\auth\Auth.Contracts\Auth.Contracts.csproj" />
       <ProjectReference Include="..\Inventory.Contracts\Inventory.Contracts.csproj" />
       <ProjectReference Include="..\Inventory.Data\Inventory.Data.csproj" />
       <ProjectReference Include="..\Inventory.Infrastructure\Inventory.Infrastructure.csproj" />

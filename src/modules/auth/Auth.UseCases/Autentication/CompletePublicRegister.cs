@@ -1,4 +1,5 @@
 using Auth.Contracts.Dtos.Users;
+using Auth.Contracts.Interfaces;
 using Auth.Data.Entities;
 using Auth.Data.Persistence;
 using Microsoft.EntityFrameworkCore;

@@ -107,6 +107,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
   options.SuppressModelStateInvalidFilter = true;
 });
+builder.Services.AddMemoryCache();
 builder.Services.AddAuthData()
                 .AddUseCases()
                 .AddInfrastructure(builder.Configuration)

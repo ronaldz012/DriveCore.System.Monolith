@@ -1,6 +1,8 @@
+using System.Api.Filters;
 using System.Api.Result;
 using Inventory.Contracts.Dtos.Receptions;
 using Inventory.UseCases.Receptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,6 +20,8 @@ namespace System.Api.Controllers.Inventory
         }
 
         [HttpGet]
+        [Authorize]
+        [RequireBranch]
         public async Task<IActionResult> ListReceptions([FromQuery] ReceptionQueryDto dto)
         {
             return await service.ListReceptions.Execute(dto).ToValueOrProblemDetails();

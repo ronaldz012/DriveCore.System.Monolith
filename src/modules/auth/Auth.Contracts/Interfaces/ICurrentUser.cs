@@ -1,7 +1,8 @@
 using System.Security.Claims;
+using Auth.Contracts.Dtos.Users;
 using Microsoft.AspNetCore.Http;
 
-namespace Shared.Services;
+namespace Auth.Contracts.Interfaces;
 
 public interface ICurrentUser
 {
@@ -11,39 +12,39 @@ public interface ICurrentUser
     bool IsAuthenticated { get; }
     IReadOnlyList<int> BranchIds { get; }
     bool HasBranch(int branchId);
+    Task<List<BranchAccessDto>> GetBranchesAsync();
 }
 public class CurrentUserService : ICurrentUser
 {
-    // Campos calculados una sola vez
+    private readonly IUserPermissionsCacheService _cache;
+    private List<BranchAccessDto>? _branches;
+
     public int UserId { get; }
     public string Username { get; }
     public string? Token { get; }
     public bool IsAuthenticated { get; }
     public IReadOnlyList<int> BranchIds { get; }
 
-    public CurrentUserService(IHttpContextAccessor httpContextAccessor)
+    public CurrentUserService(
+        IHttpContextAccessor httpContextAccessor,
+        IUserPermissionsCacheService cache)
     {
+        _cache = cache;
+
         var context = httpContextAccessor.HttpContext;
         var user = context?.User;
 
-        // 1. Datos de Identidad
         IsAuthenticated = user?.Identity?.IsAuthenticated ?? false;
-        
-        UserId = IsAuthenticated 
-            ? int.Parse(user?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0") 
+        UserId = IsAuthenticated
+            ? int.Parse(user?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0")
             : 0;
-
         Username = user?.FindFirst(ClaimTypes.Name)?.Value ?? "Anonymous";
-
-        // 2. Token
         Token = context?.Request.Headers["Authorization"]
             .FirstOrDefault()?.Split(" ").Last();
 
-        // 3. Sucursales (Extraemos el string del header una vez)
         var headerValues = context?.Request.Headers["X-Branch-Id"].ToString();
-
         BranchIds = string.IsNullOrWhiteSpace(headerValues)
-            ? [] 
+            ? []
             : headerValues.Split(',', StringSplitOptions.RemoveEmptyEntries)
                 .Select(s => int.TryParse(s.Trim(), out var id) ? id : 0)
                 .Where(id => id > 0)
@@ -52,4 +53,10 @@ public class CurrentUserService : ICurrentUser
     }
 
     public bool HasBranch(int branchId) => BranchIds.Contains(branchId);
+
+    public async Task<List<BranchAccessDto>> GetBranchesAsync()
+    {
+        _branches ??= await _cache.GetAsync(UserId);
+        return _branches;
+    }
 }

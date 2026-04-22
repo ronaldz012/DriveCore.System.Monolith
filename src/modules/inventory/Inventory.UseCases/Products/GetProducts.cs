@@ -1,3 +1,4 @@
+using Auth.Contracts.Interfaces;
 using Inventory.Contracts.Dtos.Products;
 using Inventory.Data.Entities.Products;
 using Inventory.Data.Persistence;

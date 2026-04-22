@@ -1,4 +1,5 @@
 using Auth.Contracts.Dtos.Users;
+using Auth.Contracts.Interfaces;
 using Auth.Data.Persistence;
 using Auth.UseCases.Autentication.functions;
 using Branches.Contracts;
@@ -10,12 +11,12 @@ using Shared.Services;
 
 namespace Auth.UseCases.Autentication;
 
-public class AutenticateMe(AuthDbContext context, ICurrentUser currentUser,  IMapper mapper, IBranchService branchService)
+public class AutenticateMe(AuthDbContext context, ICurrentUser currentUser, IMapper mapper, IBranchService branchService) : IAuthenticateMe
 {
     //sacar el token, leer el token y sacar id, devolver data no sensible (Reutilizar dtos )
     public async Task<Result<SuccessLoginDto>> Execute()
     {
-        var userId =  currentUser.UserId;
+        var userId = currentUser.UserId;
         var user = await context.Users
             .AsSplitQuery()
             .Include(u => u.UserBranchRoles.Where(ur => ur.DeletedAt == null))
@@ -33,8 +34,8 @@ public class AutenticateMe(AuthDbContext context, ICurrentUser currentUser,  IMa
             .Distinct()
             .ToList();
 
-       var branchResult = await UserMappingUtils.BuildBranchAccess(user, branchService);
-       if (!branchResult.IsSuccess) return new Error("NOT_FOUND", branchResult.Error.Message);
+        var branchResult = await UserMappingUtils.BuildBranchAccess(user, branchService);
+        if (!branchResult.IsSuccess) return new Error("NOT_FOUND", branchResult.Error.Message);
 
         return new SuccessLoginDto
         {
@@ -44,6 +45,6 @@ public class AutenticateMe(AuthDbContext context, ICurrentUser currentUser,  IMa
             User = mapper.Map<UserDetailsDto>(user)
         };
     }
-    
-    
+
+
 }

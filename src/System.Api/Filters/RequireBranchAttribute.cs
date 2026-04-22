@@ -1,7 +1,11 @@
+using Auth.Contracts.Dtos.Users;
+using Auth.Contracts.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Build.Experimental.ProjectCache;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
+using Shared.Result;
 using Shared.Services;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -16,21 +20,39 @@ public class RequireBranchAttribute : TypeFilterAttribute
     public RequireBranchAttribute() : base(typeof(RequireBranchFilter)) { }
 }
 
-public class RequireBranchFilter(ICurrentUser currentUser) : IAuthorizationFilter
+public class RequireBranchFilter(IUserPermissionsCacheService branchCache, ICurrentUser currentUser, IAuthenticateMe authenticateMe, ILogger<RequireBranchFilter> logger) : IAsyncAuthorizationFilter
 {
-    public void OnAuthorization(AuthorizationFilterContext context)
+    public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
-        // Si la lista está vacía, cortamos la ejecución y devolvemos 400 Bad Request
         if (currentUser.BranchIds.Count == 0)
         {
-            context.Result = new BadRequestObjectResult(new
+            context.Result = new ObjectResult(new
             {
                 StatusCode = 400,
-                Message = "Acceso denegado: Se requiere al menos una sucursal válida.",
-                Details = "Asegúrese de enviar el header 'X-Branch-Id' con un ID numérico válido."
-            });
+                Message = "Se requiere al menos una sucursal válida.",
+                Details = "Envíe el header 'X-Branch-Id' con un ID numérico válido."
+            }) { StatusCode = 400 };
+            return;
+        }
+
+        var allowedBranches = await currentUser.GetBranchesAsync();
+        var allowedIds = allowedBranches.Select(x => x.BranchId).ToHashSet();
+        var unauthorized = currentUser.BranchIds.Except(allowedIds).ToList();
+
+        if (unauthorized.Count > 0)
+        {
+            logger.LogWarning("Usuario {UserId} intentó acceder a sucursales no permitidas: {Ids}",
+                currentUser.UserId, string.Join(", ", unauthorized));
+
+            context.Result = new ObjectResult(new
+            {
+                StatusCode = 403,
+                Message = $"Sin acceso a las sucursales: {string.Join(", ", unauthorized)}.",
+                Details = "Verifique el header 'X-Branch-Id'."
+            }) { StatusCode = 403 };
         }
     }
+
 }
 
 
@@ -58,7 +80,7 @@ public class BranchHeaderFilter : IOperationFilter
                 Schema = new OpenApiSchema
                 {
                     Type = "string",
-                    Default = new OpenApiString("") 
+                    Default = new OpenApiString("")
                 }
             });
         }
