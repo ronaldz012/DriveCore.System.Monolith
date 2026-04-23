@@ -485,3 +485,7 @@ $RECYCLE.BIN/
 src/System.Api/appsettings.json
 src/System.Api/appsettings.Development.json
 Common/GooglePopUp/google.html
+
+#IDES
+.vscode
+.idea
