@@ -26,6 +26,7 @@ public static class UserMappingUtils
             {
                 Id = mp.Module.Id,
                 Name = mp.Module.Name,
+                Route = mp.Module.Route,
                 CanRead = mp.CanRead,
                 CanCreate = mp.CanCreate,
                 CanUpdate = mp.CanUpdate,
@@ -36,6 +37,7 @@ public static class UserMappingUtils
                     {
                         Id = m.Id,
                         Name = m.Name,
+                        Route = m.Route,
                         Icon = m.Icon,
                         Order = m.Order
                     }).ToList()

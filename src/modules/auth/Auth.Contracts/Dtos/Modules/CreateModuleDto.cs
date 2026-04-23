@@ -1,10 +1,15 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Auth.Contracts.Dtos.Modules;
 
 public class CreateModuleDto
 {
+    [Required]
     public string Name { get; set; } = string.Empty;
+    [Required]
+    public string Route { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-
+    [MinLength(1)]
     public IEnumerable<CreateMenuForModuleDto> Menus { get; set; } = Array.Empty<CreateMenuForModuleDto>();
 }
 
