@@ -1,6 +1,7 @@
 using System.Api.Result;
 using Branches.Contracts;
 using Branches.Contracts.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace System.Api.Controllers.Branch
@@ -8,6 +9,7 @@ namespace System.Api.Controllers.Branch
     [Route("api/[controller]")]
     [ApiController]
     [Tags("Branch")]
+    [Authorize]
     public class BranchController (IBranchService branchService): ControllerBase
     {
         [HttpPost]

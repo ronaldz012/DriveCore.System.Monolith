@@ -1,6 +1,7 @@
 using System.Api.Result;
 using Auth.Contracts.Dtos.Roles;
 using Auth.UseCases.Roles;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,6 +10,7 @@ namespace System.Api.Controllers.Auth
     [Route("api/[controller]")]
     [ApiController]
     [Tags("Authentication | Roles")]
+    [Authorize]
     public class RoleController(RoleUseCases roleUseCases) : ControllerBase
     {
 

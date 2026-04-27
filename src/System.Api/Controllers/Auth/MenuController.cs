@@ -1,6 +1,7 @@
 using System.Api.Result;
 using Auth.Contracts.Dtos.Modules;
 using Auth.UseCases;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -9,6 +10,7 @@ namespace System.Api.Controllers.Auth
     [Route("api/[controller]")]
     [ApiController]
     [Tags("Authentication | Menus")]
+    [Authorize]
     public class MenuController(MenuUseCases menuUseCases) : ControllerBase
     {
         [HttpGet("{id:int}")]

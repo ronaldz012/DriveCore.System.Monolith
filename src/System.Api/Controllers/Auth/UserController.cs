@@ -2,6 +2,7 @@
 using System.Api.Result;
 using Auth.Contracts.Dtos.Users;
 using Auth.UseCases.Users;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace System.Api.Controllers.Auth
@@ -9,6 +10,7 @@ namespace System.Api.Controllers.Auth
     [Route("api/[controller]")]
     [ApiController]
     [Tags("Authentication | Users")]
+    [Authorize]
     public class UserController(UserUserCases userUserCases) : ControllerBase
     {
 

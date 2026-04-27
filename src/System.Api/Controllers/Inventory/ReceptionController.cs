@@ -11,6 +11,7 @@ namespace System.Api.Controllers.Inventory
     [Route("api/[controller]")]
     [ApiController]
     [Tags("Inventory | Receptions")]
+    [Authorize]
     public class ReceptionController(ReceptionUseCases service) : ControllerBase
     {
         [HttpPost]

@@ -1,6 +1,7 @@
 using System.Api.Result;
 using Inventory.Contracts.Dtos.Brands;
 using Inventory.UseCases.Brands;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,6 +10,7 @@ namespace System.Api.Controllers.Inventory
     [Route("api/[controller]")]
     [ApiController]
     [Tags("Inventory | Brands")]
+    [Authorize]
     public class BrandController(BrandUseCases service) : ControllerBase
     {
         [HttpPost]

@@ -1,6 +1,7 @@
 using System.Api.Result;
 using Inventory.Contracts.Dtos.Categories;
 using Inventory.UseCases.Categories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace System.Api.Controllers.Inventory
@@ -8,6 +9,7 @@ namespace System.Api.Controllers.Inventory
     [Route("api/[controller]")]
     [ApiController]
     [Tags("Inventory | Categories")]
+    [Authorize]
     public class CategoryController(CategoryUseCases categoryUseCases) : ControllerBase
     {
         [HttpPost]
