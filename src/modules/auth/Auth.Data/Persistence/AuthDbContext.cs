@@ -10,9 +10,9 @@ public class AuthDbContext(DbContextOptions<AuthDbContext> options) : DbContext(
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<UserBranchRole> UserBranchRoles { get; set; }
+        public DbSet<Feature> Features { get; set; }
         public DbSet<Module> Modules { get; set; }
-        public DbSet<RoleModulePermission> RoleModulePermissions { get; set; }
-        public DbSet<Menu> Menus { get; set; }
+        public DbSet<RoleFeaturePermission> RoleFeaturePermissions { get; set; }
 
         public DbSet<EmailVerificationCode> EmailVerificationCodes { get; set; }
 
@@ -41,26 +41,23 @@ public class AuthDbContext(DbContextOptions<AuthDbContext> options) : DbContext(
             
             
         });
-        modelBuilder.Entity<Module>(entity =>
+        modelBuilder.Entity<Feature>(entity =>
         {
+            entity.HasOne(x => x.Module)
+                .WithMany(m => m.Features)
+                .HasForeignKey(x => x.ModuleId);
         });
-        modelBuilder.Entity<RoleModulePermission>(entity =>
+        modelBuilder.Entity<RoleFeaturePermission>(entity =>
         {
             entity.HasOne(rmp => rmp.Role)
-                  .WithMany(r => r.RoleModulePermissions)
+                  .WithMany(r => r.RoleFeaturePermissions)
                   .HasForeignKey(rmp => rmp.RoleId);
 
-            entity.HasOne(rmp => rmp.Module)
-                  .WithMany(m => m.RoleModulePermissions)
-                  .HasForeignKey(rmp => rmp.ModuleId);
+            entity.HasOne(rmp => rmp.Feature)
+                  .WithMany(m => m.RoleFeaturePermissions)
+                  .HasForeignKey(rmp => rmp.FeatureId);
         });
-
-        modelBuilder.Entity<Menu>(entity =>
-        {
-            entity.HasOne(m => m.Module)
-                  .WithMany(mod => mod.Menus)
-                  .HasForeignKey(m => m.ModuleId);
-        });
+        
     }
 
 }

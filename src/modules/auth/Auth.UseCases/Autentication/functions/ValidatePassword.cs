@@ -1,4 +1,4 @@
-namespace Auth.UseCases.Autentication;
+namespace Auth.UseCases.Autentication.functions;
 
 public  static class ValidatePassword//////////MOVER A UN LUGAR PARA EVITAR DDEPENDENCIA,. Users esta usando esto
     {

@@ -1,4 +1,3 @@
-using Auth.Contracts.Dtos.Modules;
 using Auth.Contracts.Dtos.Users;
 using Auth.Data.Entities;
 using Auth.Data.Persistence;
@@ -32,9 +31,8 @@ public class AuthenticateWithGoogle(AuthDbContext dbContext,
         .AsSplitQuery()
             .Include(u => u.UserBranchRoles)
             .ThenInclude(ur => ur.Role)
-                .ThenInclude(r => r.RoleModulePermissions)
-                    .ThenInclude(mp => mp.Module)
-                        .ThenInclude(m => m.Menus)
+                .ThenInclude(r => r.RoleFeaturePermissions)
+                    .ThenInclude(mp => mp.Feature)
             .FirstOrDefaultAsync(u => u.Email == googleUser!.Email);
 
         if (existingUser == null)

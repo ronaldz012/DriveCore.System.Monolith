@@ -12,8 +12,8 @@ public interface ICurrentUser
     bool IsAuthenticated { get; }
     IReadOnlyList<int> BranchIds { get; }
     bool HasBranch(int branchId);
-    Task<List<BranchAccessDto>> GetBranchesAsync();
-}
+     Task<List<BranchAccessDto>> GetBranchesAsync();
+ }
 public class CurrentUserService : ICurrentUser
 {
     private readonly IUserPermissionsCacheService _cache;

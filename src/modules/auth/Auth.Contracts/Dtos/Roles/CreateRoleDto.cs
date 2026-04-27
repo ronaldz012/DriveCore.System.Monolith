@@ -4,13 +4,13 @@ public class CreateRoleDto
 {
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public IEnumerable<RoleModulePermissionDto> RoleModulePermissions { get; set; } = Enumerable.Empty<RoleModulePermissionDto>();
+    public IEnumerable<RoleFeaturePermissionDto> RoleModulePermissions { get; set; } = Enumerable.Empty<RoleFeaturePermissionDto>();
     
 }
 
-public class RoleModulePermissionDto
+public class RoleFeaturePermissionDto
 {
-    public int ModuleId { get; set; }
+    public int FeatureId { get; set; }
     public bool CanCreate { get; set; } = false;
     public bool CanRead { get; set; } = false;
     public bool CanUpdate { get; set; } = false;

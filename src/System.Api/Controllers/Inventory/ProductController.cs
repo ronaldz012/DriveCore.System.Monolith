@@ -1,3 +1,4 @@
+using System.Api.Attributes;
 using System.Api.Filters;
 using System.Api.Result;
 using Inventory.Contracts.Dtos;
@@ -17,6 +18,7 @@ namespace System.Api.Controllers.Inventory
     public class ProductController(ProductUseCases productUseCases) : ControllerBase
     {
         [HttpPost]
+        [RequireFeature("inventory", "read")]
         public async Task<IActionResult> CreateProduct([FromBody] CreateProductDto request)
         {
             return await productUseCases.CreateProduct.Execute(request).ToValueOrProblemDetails();

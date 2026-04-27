@@ -9,7 +9,6 @@ namespace System.Api.Controllers.Branch
     [Route("api/[controller]")]
     [ApiController]
     [Tags("Branch")]
-    [Authorize]
     public class BranchController (IBranchService branchService): ControllerBase
     {
         [HttpPost]

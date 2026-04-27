@@ -10,7 +10,6 @@ namespace System.Api.Controllers.Auth
     [Route("api/[controller]")]
     [ApiController]
     [Tags("Authentication | Users")]
-    [Authorize]
     public class UserController(UserUserCases userUserCases) : ControllerBase
     {
 

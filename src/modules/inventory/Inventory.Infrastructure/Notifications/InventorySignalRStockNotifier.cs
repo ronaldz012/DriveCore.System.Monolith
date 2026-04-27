@@ -1,7 +1,6 @@
-using Inventory.Infrastructure.Notifications;
 using Microsoft.AspNetCore.SignalR;
 
-namespace Inventory.Infrastructure;
+namespace Inventory.Infrastructure.Notifications;
 
 // Infrastructure/Notifications/SignalRStockNotifier.cs
 public class InventorySignalRStockNotifier(IHubContext<NotificationHub> hub)

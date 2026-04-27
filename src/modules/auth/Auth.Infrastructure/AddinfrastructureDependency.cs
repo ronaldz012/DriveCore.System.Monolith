@@ -1,6 +1,6 @@
 using System;
 using Auth.Infrastructure.Authentication;
-using Auth.Infrastructure.Email.Emailtemplates;
+using Auth.Infrastructure.Email.EmailTemplates;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 

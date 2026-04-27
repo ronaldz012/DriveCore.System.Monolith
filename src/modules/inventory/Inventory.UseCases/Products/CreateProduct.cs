@@ -3,6 +3,7 @@ using Inventory.Contracts.Dtos.Products;
 using Inventory.Data.Entities.Products;
 using Inventory.Data.Persistence;
 using Inventory.Infrastructure;
+using Inventory.Infrastructure.Notifications;
 using Org.BouncyCastle.Ocsp;
 using Shared.Result;
 

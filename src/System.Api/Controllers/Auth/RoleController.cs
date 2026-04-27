@@ -10,7 +10,6 @@ namespace System.Api.Controllers.Auth
     [Route("api/[controller]")]
     [ApiController]
     [Tags("Authentication | Roles")]
-    [Authorize]
     public class RoleController(RoleUseCases roleUseCases) : ControllerBase
     {
 

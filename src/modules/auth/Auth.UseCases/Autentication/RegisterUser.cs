@@ -1,7 +1,8 @@
 using Auth.Data.Entities;
 using Auth.Data.Persistence;
 using Auth.Infrastructure.Authentication;
-using Auth.UseCases.Email;
+using Auth.UseCases.Autentication.functions;
+using Auth.UseCases.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;

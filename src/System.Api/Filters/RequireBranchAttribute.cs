@@ -20,7 +20,7 @@ public class RequireBranchAttribute : TypeFilterAttribute
     public RequireBranchAttribute() : base(typeof(RequireBranchFilter)) { }
 }
 
-public class RequireBranchFilter(IUserPermissionsCacheService branchCache, ICurrentUser currentUser, IAuthenticateMe authenticateMe, ILogger<RequireBranchFilter> logger) : IAsyncAuthorizationFilter
+public class RequireBranchFilter( ICurrentUser currentUser , ILogger<RequireBranchFilter> logger) : IAsyncAuthorizationFilter
 {
     public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {

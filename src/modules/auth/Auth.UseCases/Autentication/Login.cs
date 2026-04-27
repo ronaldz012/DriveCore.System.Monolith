@@ -19,9 +19,9 @@ public class Login(AuthDbContext dbContext, ITokenGenerator tokenGenerator, IMap
             .AsSplitQuery()
             .Include(u => u.UserBranchRoles.Where(ur => ur.DeletedAt == null))
                 .ThenInclude(ur => ur.Role)
-                    .ThenInclude(r => r.RoleModulePermissions)
-                        .ThenInclude(rmp => rmp.Module)
-                            .ThenInclude(m => m.Menus)
+                    .ThenInclude(r => r.RoleFeaturePermissions)
+                        .ThenInclude(rmp => rmp.Feature)
+                                .ThenInclude(f => f.Module)
             .FirstOrDefaultAsync(u => u.Email == request.Email);
 
         if (user == null)

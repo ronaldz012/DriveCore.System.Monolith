@@ -1,5 +1,5 @@
 using System;
-using Auth.Contracts.Dtos.Modules;
+using Auth.Contracts.Dtos.Features;
 using Auth.Contracts.Dtos.Roles;
 using Auth.Contracts.Dtos.Users;
 using Auth.Data.Entities;
@@ -12,31 +12,21 @@ public class MappingConfig: IRegister
 {
     public void Register(TypeAdapterConfig config)
     {
-        config.NewConfig<CreateMenuDto, Menu>()
+        config.NewConfig<CreateFeatureDto, Feature>()
             .IgnoreNullValues(true);
-
-
-        config.NewConfig<UpdateMenuDto, Menu>()
-            .IgnoreNullValues(true);
-
-        config.NewConfig<CreateModuleDto, Module>()
-            .IgnoreNullValues(true);
-        config.NewConfig<CreateMenuForModuleDto, Menu>()
-            .IgnoreNullValues(true);
-
-        config.NewConfig<Module, ModuleDto>();
-        config.NewConfig<Module, ModuleDetailsDto>();
-        config.NewConfig<Menu, MenuDto>();
+        
+        config.NewConfig<Feature, FeatureDto>();
+        config.NewConfig<Feature, FeatureDetailsDto>();
 
         config.NewConfig<CreateRoleDto, Role>();
-        config.NewConfig<RoleModulePermissionDto, RoleModulePermission>();
+        config.NewConfig<RoleFeaturePermissionDto, RoleFeaturePermission>();
 
         config.NewConfig<Role, RoleDetailsDto>()
-        .Map(dest => dest.ModulePermissions,
-         src => src.RoleModulePermissions.Select(rmp => new ModulePermissionsDto
+        .Map(dest => dest.FeaturePermissions,
+         src => src.RoleFeaturePermissions.Select(rmp => new FeaturePermissionsDto
          {
-             ModuleId = rmp.ModuleId,
-             ModuleName = rmp.Module.Name,
+             FeatureId = rmp.FeatureId,
+             FeatureName = rmp.Feature.Name,
              CanCreate = rmp.CanCreate,
              CanRead = rmp.CanRead,
              CanUpdate = rmp.CanUpdate,

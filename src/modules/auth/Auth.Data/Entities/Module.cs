@@ -1,20 +1,13 @@
-using System;
-using Shared.Domain;
-
 namespace Auth.Data.Entities;
 
-public class Module : ICreatedAt, IUpdatedAt
+public class Module
 {
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
-    public string Route { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-
-    //Audit fields
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime? UpdatedAt { get; set; }
-
-    // Navigation property
-    public ICollection<RoleModulePermission> RoleModulePermissions { get; set; } = default!;
-    public ICollection<Menu> Menus { get; set; } = default!;
-}
+    public string Icon { get; set; } = string.Empty;
+    public string Route { get; set; } = string.Empty;
+    public bool IsEnabled { get; set; } = true;
+    
+    public ICollection<Feature> Features { get; set; } = new List<Feature>();
+ }

@@ -1,8 +1,7 @@
-using System;
 using Auth.Infrastructure.Authentication;
 using Microsoft.Extensions.Options;
 
-namespace Auth.Infrastructure.Email.Emailtemplates;
+namespace Auth.Infrastructure.Email.EmailTemplates;
 
 public class EmailTemplateRenderer(IOptions<ProjectInfo> projectInfo,
     IOptions<AuthenticationSettings> authenticationSettings) 

@@ -2,6 +2,7 @@ using Auth.Contracts.Dtos.Users;
 using Auth.Data.Entities;
 using Auth.Data.Persistence;
 using Auth.UseCases.Autentication;
+using Auth.UseCases.Autentication.functions;
 using Branches.Contracts;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;

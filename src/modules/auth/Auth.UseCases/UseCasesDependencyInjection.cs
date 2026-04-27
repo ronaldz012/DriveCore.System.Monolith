@@ -1,22 +1,23 @@
 using Auth.Contracts.Interfaces;
 using Auth.UseCases.Autentication;
 using Auth.UseCases.cache;
-using Auth.UseCases.Email;
+using Auth.UseCases.Features;
 using Auth.UseCases.mapper;
-using Auth.UseCases.Menus;
 using Auth.UseCases.Modules;
 using Auth.UseCases.Roles;
+using Auth.UseCases.Services;
 using Auth.UseCases.Users;
 using Mapster;
 using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Auth.UseCases;
 
 public static class UseCasesDependencyInjection
 {
     public static IServiceCollection AddUseCases(this IServiceCollection services)
-        => services.AddMenuUseCases()
+        => services.AddFeatureUseCases()
                     .AddModulesUseCases()
                     .AddRolesUseCases()
                     .AddAutenticationUseCases()
@@ -44,19 +45,16 @@ public static class UseCasesDependencyInjection
 
     static IServiceCollection AddCache(this IServiceCollection services)
     => services.AddScoped<IUserPermissionsCacheService, UserPermissionsCacheService>();
-    static IServiceCollection AddMenuUseCases(this IServiceCollection services)
-    => services.AddScoped<MenuUseCases>()
-                .AddScoped<AddMenu>()
-                .AddScoped<GetMenu>()
-                .AddScoped<GetAllMenus>()
-                .AddScoped<UpdateMenu>()
-                .AddScoped<DeleteMenu>();
-
+    static IServiceCollection AddFeatureUseCases(this IServiceCollection services)
+    => services.AddScoped<FeatureUseCases>()
+                .AddScoped<CreateFeature>()
+                .AddScoped<GetFeature>()
+                .AddScoped<ListFeatures>();
+    
+    
     static IServiceCollection AddModulesUseCases(this IServiceCollection services)
-    => services.AddScoped<ModulesUseCases>()
-                .AddScoped<AddModule>()
-                .AddScoped<GetModule>()
-                .AddScoped<GetAllModules>();
+    => services.AddScoped<ModuleUseCases>()
+        .AddScoped<CreateModuleUseCase>().AddScoped<ListModules>();
     // .AddScoped<UpdateModule>()
     // .AddScoped<DeleteModule>();
 

@@ -1,16 +1,15 @@
-using System;
 using System.Security.Cryptography;
 using System.Text;
 using Auth.Data.Entities;
 using Auth.Data.Persistence;
 using Auth.Infrastructure;
 using Auth.Infrastructure.Authentication;
-using Auth.Infrastructure.Email.Emailtemplates;
+using Auth.Infrastructure.Email.EmailTemplates;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Shared.Services;
 
-namespace Auth.UseCases.Email;
+namespace Auth.UseCases.Services;
 
 public interface IEmailVerificationService
 {

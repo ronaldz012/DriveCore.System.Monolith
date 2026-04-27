@@ -1,4 +1,3 @@
-using Auth.Contracts.Dtos.Modules;
 using Auth.Contracts.Dtos.Users;
 using Auth.Data.Entities;
 using Branches.Contracts;
@@ -9,38 +8,30 @@ namespace Auth.UseCases.Autentication.functions;
 // La clase debe ser 'public static' para que puedas acceder a ella sin instanciarla
 public static class UserMappingUtils
 {
-    public static List<ModulePermissionsDeductedDto> CalculateModulePermissions(List<UserBranchRole> branchRoles)
+    public static List<FeaturePermissionsDeductedDto> CalculateFeaturePermissions(List<UserBranchRole> branchRoles)
     {
         return branchRoles
-            .SelectMany(ubr => ubr.Role.RoleModulePermissions)
-            .GroupBy(rmp => rmp.ModuleId)
+            .SelectMany(ubr => ubr.Role.RoleFeaturePermissions)
+            .GroupBy(rmp => rmp.FeatureId)
             .Select(g => new
             {
-                Module = g.First().Module,
+                Feature = g.First().Feature,
                 CanRead = g.Any(rmp => rmp.CanRead),
                 CanCreate = g.Any(rmp => rmp.CanCreate),
                 CanUpdate = g.Any(rmp => rmp.CanUpdate),
                 CanDelete = g.Any(rmp => rmp.CanDelete)
             })
-            .Select(mp => new ModulePermissionsDeductedDto
+            .Select(mp => new FeaturePermissionsDeductedDto
             {
-                Id = mp.Module.Id,
-                Name = mp.Module.Name,
-                Route = mp.Module.Route,
+                Id = mp.Feature.Id,
+                Name = mp.Feature.Name,
+                Route = mp.Feature.Route,
+                ModuleId =  mp.Feature.ModuleId,
+                ModuleName = mp.Feature.Module.Name,
                 CanRead = mp.CanRead,
                 CanCreate = mp.CanCreate,
                 CanUpdate = mp.CanUpdate,
                 CanDelete = mp.CanDelete,
-                Menus = mp.Module.Menus
-                    .OrderBy(m => m.Order)
-                    .Select(m => new MenuDto
-                    {
-                        Id = m.Id,
-                        Name = m.Name,
-                        Route = m.Route,
-                        Icon = m.Icon,
-                        Order = m.Order
-                    }).ToList()
             }).ToList();
     }
     public static async Task<Result<List<BranchAccessDto>>> BuildBranchAccess(
@@ -72,7 +63,7 @@ public static class UserMappingUtils
                         Id = ubr.Role.Id,
                         Name = ubr.Role.Name
                     }).ToList(),
-                    Modules = CalculateModulePermissions(g.ToList())
+                    Features = CalculateFeaturePermissions(g.ToList())
                 };
             }).ToList();
     }
