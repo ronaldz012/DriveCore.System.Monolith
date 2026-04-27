@@ -14,6 +14,5 @@ public class ListProductDto
 }
 public class ProductQueryDto : GenericPaginationQueryDto
 {
-    public int? BrandId { get; set; }
     public int? CategoryId { get; set; }
 }

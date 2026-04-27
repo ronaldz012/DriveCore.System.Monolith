@@ -19,11 +19,6 @@ public class GetProducts(InvDbContext context, ICurrentUser currentUser)
             query = query.Where(x => EF.Functions.ILike(x.Name, $"%{queryDto.Filter}%"));
         }
 
-        if (queryDto.BrandId.HasValue)
-        {
-            query = query.Where(x => x.BrandId == queryDto.BrandId);
-        }
-
         if (queryDto.CategoryId.HasValue)
         {
             query = query.Where(x => x.CategoryId == queryDto.CategoryId);

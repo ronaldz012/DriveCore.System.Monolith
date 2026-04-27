@@ -26,35 +26,69 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-  c.SwaggerDoc("v1", new OpenApiInfo { Title = "Sales API", Version = "v1" });
-  c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-  {
-    Description = @"JWT Authorization header using the Bearer scheme. <br /> <br />
-                      Enter 'Bearer' [space] and then your token in the text input below.<br /> <br />
-                      Example: 'Bearer 12345abcdef'<br /> <br />",
-    Name = "Authorization",
-    In = ParameterLocation.Header,
-    Type = SecuritySchemeType.ApiKey,
-    Scheme = "Bearer"
-  });
-  c.AddSecurityRequirement(new OpenApiSecurityRequirement()
-      {
-        {
-          new OpenApiSecurityScheme
-          {
-            Reference = new OpenApiReference
-              {
-                Type = ReferenceType.SecurityScheme,
-                Id = "Bearer"
-              },
-              Scheme = "oauth2",
-              Name = "Bearer",
-              In = ParameterLocation.Header,
-            },
-            new List<string>()
-          }
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Sales API", Version = "v1" });
+
+    // ── Security definition: Bearer + Branch IDs ─────────────────
+    c.AddSecurityDefinition("BearerWithBranch", new OpenApiSecurityScheme
+    {
+        Type = SecuritySchemeType.ApiKey,   // "ApiKey" permite campo libre
+        In   = ParameterLocation.Header,
+        Name = "Authorization",             // header real que se envía
+        Description =
+            "**JWT** — ingrese: `Bearer <token>`\n\n" +
+            "**X-Branch-Id** — IDs de sucursal separados por coma (ej: `1,2,3`)\n\n" +
+            "Formato combinado en este campo → `Bearer <token> | branches: 1,2,3`\n\n" +
+            "> El UI enviará el valor tal cual; use el campo de abajo para los branch IDs."
     });
-  c.OperationFilter<BranchHeaderFilter>();
+
+    // ── Definición separada para X-Branch-Id ────────────────────
+    c.AddSecurityDefinition("BranchId", new OpenApiSecurityScheme
+    {
+        Type        = SecuritySchemeType.ApiKey,
+        In          = ParameterLocation.Header,
+        Name        = "X-Branch-Id",
+        Description = "IDs de sucursal separados por coma. Ejemplo: `1,2,3`"
+    });
+
+    // ── Ambos requeridos globalmente ─────────────────────────────
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id   = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        },
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id   = "BranchId"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+
+    // ── Bearer estándar (para el candado verde) ──────────────────
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description =
+            "JWT Authorization header usando el esquema Bearer.\n\n" +
+            "Ingrese **Bearer** [espacio] y luego su token.\n\n" +
+            "Ejemplo: `Bearer eyJhbGci...`",
+        Name   = "Authorization",
+        In     = ParameterLocation.Header,
+        Type   = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
 });
 
 builder.Services.AddHttpContextAccessor();
@@ -141,6 +175,9 @@ if (app.Environment.IsDevelopment())
 }
 app.MapHub<NotificationHub>("/hubs/notifications");
 app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseMiddleware<BranchMiddleware>();
 app.MapControllers();
 app.Run();
 
