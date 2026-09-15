@@ -4,6 +4,7 @@ using Module.Auth.Application.UseCases.Branches.GetBranchDetails;
 using Module.Auth.Application.UseCases.Branches.GetBranchTypes;
 using Module.Auth.Application.UseCases.Branches.UpdateBranch;
 using Module.Auth.Application.UseCases.Branches.ToggleBranchStatus;
+using Module.Auth.Application.UseCases.Branches.SetBranchCompleteness;
 namespace Module.Auth.Application.UseCases.Branches;
 
 public record BranchesUseCases(
@@ -12,4 +13,5 @@ public record BranchesUseCases(
     UpdateBranch.UpdateBranch UpdateBranch,
     ToggleBranchStatus.ToggleBranchStatus ToggleBranchStatus,
     GetBranchDetails.GetBranchDetails GetBranchDetails,
-    GetBranchTypes.GetBranchTypes GetBranchTypes);
+    GetBranchTypes.GetBranchTypes GetBranchTypes,
+    SetBranchCompleteness.SetBranchCompleteness SetBranchCompleteness);

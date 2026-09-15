@@ -13,6 +13,7 @@ public class Branch : IMustHaveTenant, ICreatedAt, ICreatedBy
     public string BranchCode { get; set; } = string.Empty;
     public BranchType Type { get; set; } = BranchType.Warehouse;
     public List<string> AllowedFeatureKeys { get; set; } = [];
+    public DateTime? CompleteSince { get; set; }
 
     public Guid TenantId { get; set; }
     public DateTime CreatedAt { get; set; }
@@ -62,5 +63,13 @@ public class Branch : IMustHaveTenant, ICreatedAt, ICreatedBy
         Place = place;
         PhoneNumber = phoneNumber;
         BranchCode = branchCode;
+    }
+
+    /// <summary>
+    /// Marca la branch como completa. Operación sin retorno: no se puede reabrir la transición.
+    /// </summary>
+    public void MarkComplete(DateTime completeSince)
+    {
+        CompleteSince = completeSince;
     }
 }

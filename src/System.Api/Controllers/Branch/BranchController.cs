@@ -8,6 +8,7 @@ using Module.Auth.Application.UseCases.Branches.CreateBranch;
 using Module.Auth.Application.UseCases.Branches.GetBranches;
 using Module.Auth.Application.UseCases.Branches.GetBranchDetails;
 using Module.Auth.Application.UseCases.Branches.UpdateBranch;
+using Module.Auth.Application.UseCases.Branches.SetBranchCompleteness;
 using Module.Auth.Domain;
 
 namespace System.Api.Controllers.Branch
@@ -46,6 +47,13 @@ namespace System.Api.Controllers.Branch
         public async Task<IActionResult> ToggleBranchStatus([FromRoute] Guid id)
         {
             return await features.ToggleBranchStatus.Execute(id).ToValueOrProblemDetails();
+        }
+
+        [HttpPatch("{id:guid}/completeness")]
+        [RequireUserType(UserType.TenantAdmin)]
+        public async Task<IActionResult> SetBranchCompleteness([FromRoute] Guid id, [FromBody] SetBranchCompletenessRequest request)
+        {
+            return await features.SetBranchCompleteness.Execute(id, request).ToValueOrProblemDetails();
         }
 
         [HttpGet("{id:guid}/details")]

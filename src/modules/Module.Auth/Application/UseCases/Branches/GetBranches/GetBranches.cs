@@ -22,6 +22,7 @@ public class GetBranches(IAuthDbContext context)
             IsActive = x.IsActive,
             Place = x.Place,
             BranchCode = x.BranchCode,
+            CompleteSince = x.CompleteSince,
         }).ToListAsync();
     }
 }
