@@ -8,4 +8,5 @@ public class GetBranchDetailsResponse
     public string PhoneNumber { get; set; } = string.Empty;
     public bool IsActive { get; set; }
     public DateTime CreatedAt { get; set; }
+    public DateTime? CompleteSince { get; set; }
 }

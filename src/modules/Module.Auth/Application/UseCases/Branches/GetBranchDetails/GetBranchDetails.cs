@@ -18,6 +18,7 @@ public class GetBranchDetails(IAuthDbContext context)
                 PhoneNumber = b.PhoneNumber,
                 IsActive = b.IsActive,
                 CreatedAt = b.CreatedAt,
+                CompleteSince = b.CompleteSince,
             })
             .FirstOrDefaultAsync();
 

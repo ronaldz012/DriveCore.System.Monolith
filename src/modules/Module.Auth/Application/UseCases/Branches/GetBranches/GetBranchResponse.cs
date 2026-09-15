@@ -7,4 +7,5 @@ public class GetBranchResponse
     public bool IsActive { get; set; }
     public string Place { get; set; } = string.Empty;
     public string BranchCode { get; set; } = string.Empty;
+    public DateTime? CompleteSince { get; set; }
 }

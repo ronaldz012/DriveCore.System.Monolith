@@ -22,6 +22,7 @@ public class UpdateBranch(IAuthDbContext context)
             Name = branch.Name,
             IsActive = branch.IsActive,
             BranchCode = branch.BranchCode,
+            CompleteSince = branch.CompleteSince,
         };
     }
 }
