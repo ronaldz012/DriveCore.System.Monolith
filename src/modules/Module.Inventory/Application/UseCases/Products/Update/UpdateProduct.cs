@@ -34,6 +34,29 @@ public class UpdateProduct(IInvDbContext context)
         product.UpdatedBy = ctx.UserId;
         product.UpdatedByName = ctx.FullName;
         product.UpdatedAt = DateTime.UtcNow;
+
+        // Bulk de precios: se valida todo antes de mutar nada (todo o nada).
+        if (dto.VariantPrices is { Count: > 0 })
+        {
+            var variantIds = dto.VariantPrices.Select(v => v.VariantId).ToList();
+
+            var variants = await context.ProductVariants
+                .Where(pv => pv.ProductId == id && variantIds.Contains(pv.Id))
+                .ToListAsync();
+
+            if (variants.Count != variantIds.Count)
+                return UpdateProductErrors.VariantNotFound;
+
+            foreach (var item in dto.VariantPrices)
+            {
+                var variant = variants.First(pv => pv.Id == item.VariantId);
+                variant.Price = item.Price;
+                variant.UpdatedBy = ctx.UserId;
+                variant.UpdatedByName = ctx.FullName;
+                variant.UpdatedAt = DateTime.UtcNow;
+            }
+        }
+
         await context.SaveChangesAsync();
         return true;
 
