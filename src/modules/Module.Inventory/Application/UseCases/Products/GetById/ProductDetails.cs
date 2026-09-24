@@ -25,7 +25,7 @@ public class ProductDetails(IInvDbContext context, IBranchService branchService)
             CategoryName = p.Category.Name,
             BrandId = p.BrandId,
             BrandName = p.Brand.Name,
-            Variants = p.ProductVariants.OrderBy(pv => pv.Sku).ThenBy(pv => pv.Color.Name).ThenBy(pv => pv.Size.SortOrder).Select(pv => new ProductVarianListDto
+            Variants = p.ProductVariants.OrderBy(pv => pv.Color.Name).ThenBy(pv => pv.Size.SortOrder).ThenBy(pv => pv.Sku).Select(pv => new ProductVarianListDto
             {
                 Id = pv.Id,
                 Sku = pv.Sku,
