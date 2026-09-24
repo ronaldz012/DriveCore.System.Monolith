@@ -46,7 +46,7 @@ public class SearchProduct(IInvDbContext context)
                 IsActive = x.IsActive,
                 VariantsCount = x.ProductVariants.Count(),
                 CreatedAt = x.CreatedAt,
-                ProductVariants = x.ProductVariants.Select(y => new ProductVariantDto
+                ProductVariants = x.ProductVariants.OrderBy(y => y.Color.Name).ThenBy(y => y.Size.SortOrder).ThenBy(y => y.Sku).Select(y => new ProductVariantDto
                 {
                     Id = y.Id,
                     Description = y.Description,

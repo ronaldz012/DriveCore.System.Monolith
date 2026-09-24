@@ -173,4 +173,60 @@ public class ProductDetailsTests
         ctx.ProductVariants.Add(variant);
         ctx.SaveChanges();
     }
+
+    [Fact]
+    public async Task Execute_ShouldOrderVariantsByColorThenSize_WhenSkusAreOutOfOrder()
+    {
+        using var ctx = CreateDbContext();
+
+        var brand = new Brand { Id = Guid.NewGuid(), Name = "Brand", TenantId = TenantId, CreatedAt = DateTime.UtcNow };
+        var category = new Category { Id = Guid.NewGuid(), Name = "Cat", TenantId = TenantId, CreatedAt = DateTime.UtcNow };
+        var azul = new Color { Id = Guid.NewGuid(), Name = "azul", TenantId = TenantId };
+        var negro = new Color { Id = Guid.NewGuid(), Name = "negro", TenantId = TenantId };
+        var size38 = new Size { Id = Guid.NewGuid(), Name = "38", SortOrder = 1, TenantId = TenantId };
+        var size41 = new Size { Id = Guid.NewGuid(), Name = "41", SortOrder = 2, TenantId = TenantId };
+        var size42 = new Size { Id = Guid.NewGuid(), Name = "42", SortOrder = 3, TenantId = TenantId };
+        ctx.Brands.Add(brand);
+        ctx.Categories.Add(category);
+        ctx.Colors.AddRange(azul, negro);
+        ctx.Sizes.AddRange(size38, size41, size42);
+
+        var product = new Product
+        {
+            Id = Guid.NewGuid(),
+            TenantId = TenantId,
+            Name = "Test Product",
+            InternalCode = "IC-001",
+            BrandId = brand.Id,
+            CategoryId = category.Id,
+            BasePrice = 100m,
+            CreatedAt = DateTime.UtcNow
+        };
+        ctx.Products.Add(product);
+
+        // Creadas desordenadas y con SKUs que no reflejan el orden lógico
+        // (azul 38 agregada al final, como variante tardía con SKU de cola)
+        ctx.ProductVariants.AddRange(
+            new ProductVariant { Id = Guid.NewGuid(), TenantId = TenantId, ProductId = product.Id, Sku = "SKU-001", ColorId = azul.Id, SizeId = size42.Id, Price = 100m },
+            new ProductVariant { Id = Guid.NewGuid(), TenantId = TenantId, ProductId = product.Id, Sku = "SKU-002", ColorId = negro.Id, SizeId = size41.Id, Price = 100m },
+            new ProductVariant { Id = Guid.NewGuid(), TenantId = TenantId, ProductId = product.Id, Sku = "SKU-003", ColorId = negro.Id, SizeId = size42.Id, Price = 100m },
+            new ProductVariant { Id = Guid.NewGuid(), TenantId = TenantId, ProductId = product.Id, Sku = "SKU-004", ColorId = azul.Id, SizeId = size41.Id, Price = 100m },
+            new ProductVariant { Id = Guid.NewGuid(), TenantId = TenantId, ProductId = product.Id, Sku = "SKU-005", ColorId = azul.Id, SizeId = size38.Id, Price = 100m });
+        ctx.SaveChanges();
+
+        var sut = new ProductDetails(ctx, CreateBranchServiceMock());
+
+        var result = await sut.Execute(CreateActorContext(), product.Id);
+
+        Assert.True(result.IsSuccess);
+        var ordered = result.Value.Variants.Select(v => (v.Color, v.Size, v.Sku)).ToList();
+        Assert.Equal(
+        [
+            ("azul", "38", "SKU-005"),
+            ("azul", "41", "SKU-004"),
+            ("azul", "42", "SKU-001"),
+            ("negro", "41", "SKU-002"),
+            ("negro", "42", "SKU-003")
+        ], ordered);
+    }
 }

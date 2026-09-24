@@ -113,7 +113,7 @@ public class CreateProductUc(IInvDbContext context, IProductCodeService codeServ
                 BrandName = saved.Brand.Name,
                 CategoryName = saved.Category.Name,
                 IsActive = saved.IsActive,
-                Variants = saved.ProductVariants.Select(pv => new ProductVariantsCreated
+                Variants = saved.ProductVariants.OrderBy(pv => pv.Color.Name).ThenBy(pv => pv.Size.SortOrder).ThenBy(pv => pv.Sku).Select(pv => new ProductVariantsCreated
                 {
                     ProductVariantId = pv.Id,
                     Sku = pv.Sku,
