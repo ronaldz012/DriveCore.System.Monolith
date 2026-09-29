@@ -1,0 +1,8 @@
+{
+  "dataset": "seasonal",
+  "windowDays": 90,
+  "eventDate": "2026-10-10",
+  "objectiveType": "rotate_slow_stock",
+  "marginFloor": "loss_up_to_fifteen",
+  "userNotes": "In ten days the winter is really over here in Oruro, it's already hot at noon. The whole winter line has to come down, that's the heavy jackets, the sweaters, the thermals, the scarves, the boots, all of that, nobody's buying any of it. The mid-season stuff I leave where it is, the chinos and the t-shirts still sell all year round. And leave the summer stuff alone, that's about to start selling again, no point putting a discount on that now."
+}

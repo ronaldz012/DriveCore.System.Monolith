@@ -1,0 +1,8 @@
+{
+  "dataset": "workwear",
+  "windowDays": 90,
+  "eventDate": "2026-10-10",
+  "objectiveType": "rotate_slow_stock",
+  "marginFloor": "loss_up_to_fifteen",
+  "userNotes": "I want to move the stock aimed at people who need work clothes, to be out on the street, doing manual work or walking a lot around here. Those durable, reinforced, functional garments that are gathering dust, put them on clearance. Anything that's pure fashion, decorative urban, runway trends or fine clothing that won't take daily punishment, leave it at normal price."
+}

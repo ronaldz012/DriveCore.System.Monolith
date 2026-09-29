@@ -1,0 +1,71 @@
+{
+  "model": "jev-latest",
+  "state": {
+    "context": {
+      "branch": "Campero",
+      "date": "2026-09-29T00:00:00Z",
+      "window_days": 90,
+      "event_date": "2026-10-09T00:00:00",
+      "days_until_event": 10,
+      "objective": { "type": "attract_customers" },
+      "margin_floor": "loss_up_to_10",
+      "user_notes": "WHEN: in ten days the university semester starts and the students start coming in from other provinces to register. WHO: young people, first-time buyers, mostly. WHAT they want: the loose stuff, the oversized tees, they don't want anything tight. DO: prioritize the young people's clothes that are stagnant, the ones that have been sitting there for months, take the brand into account, that's where they shop. DON'T: leave the adult clothes alone, those sell to older customers and they move fine even when it doesn't look like it. DON'T: don't touch the kids clothes either, that market is different and it's not the one I'm trying to grow. DON'T: the star products for young people, the ones that already sell on their own, leave those alone too, I don't want to lose margin on what already moves."
+    },
+    "products": [
+      {
+        "id": "p0",
+        "code": "ZAR-2",
+        "name": "Denim Overshirt",
+        "brand": "ZARA",
+        "category": "Outerwear",
+        "gender": "Unisex",
+        "days_in_stock": 300,
+        "total_stock": 22,
+        "sales_90d_total": 2,
+        "margin_90d": 96,
+        "return_rate_pct": 1,
+        "weeks_of_cover": 90,
+        "variants": [
+          { "id": "p0_v0", "sku": "ZAR-2-001", "color": "blue", "size": "M", "stock": 12, "sales_90d": 1, "price": 140, "cost": 80, "margin_pct": 42.9, "days_in_stock": 300, "weeks_of_cover": 120 },
+          { "id": "p0_v1", "sku": "ZAR-2-002", "color": "blue", "size": "L", "stock": 10, "sales_90d": 0, "price": 140, "cost": 80, "margin_pct": 42.9, "days_in_stock": 300, "weeks_of_cover": 140 }
+        ]
+      },
+      {
+        "id": "p9",
+        "code": "DIE-4",
+        "name": "Slim Fit Chino",
+        "brand": "DIESEL",
+        "category": "Pants",
+        "gender": "Unisex",
+        "days_in_stock": 280,
+        "total_stock": 31,
+        "sales_90d_total": 3,
+        "margin_90d": 41,
+        "return_rate_pct": 1.1,
+        "weeks_of_cover": 100,
+        "variants": [
+          { "id": "p9_v0", "sku": "DIE-4-001", "color": "khaki", "size": "32", "stock": 17, "sales_90d": 2, "price": 195, "cost": 137, "margin_pct": 29.7, "days_in_stock": 280, "weeks_of_cover": 118 },
+          { "id": "p9_v1", "sku": "DIE-4-002", "color": "navy", "size": "34", "stock": 14, "sales_90d": 1, "price": 195, "cost": 137, "margin_pct": 29.7, "days_in_stock": 280, "weeks_of_cover": 190 }
+        ]
+      }
+    ]
+  },
+  "questions": {
+    "p0": {
+      "type": "noul",
+      "instructions": "According to `context`, should a discount be applied to `products[0]` (ZAR-2 Denim Overshirt) as a whole?",
+      "criteria": {
+        "true": "A discount would attract the buyers described in `context.user_notes` and is within the margin floor",
+        "false": "A discount would not attract those buyers, or it would break the margin floor"
+      }
+    },
+    "p9": {
+      "type": "noul",
+      "instructions": "According to `context`, should a discount be applied to `products[1]` (DIE-4 Slim Fit Chino) as a whole?",
+      "criteria": {
+        "true": "A discount would attract the buyers described in `context.user_notes` and is within the margin floor",
+        "false": "A discount would not attract those buyers, or it would break the margin floor"
+      }
+    }
+  }
+}

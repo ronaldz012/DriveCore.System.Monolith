@@ -8,6 +8,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\Common\Common.csproj" />
+        <ProjectReference Include="/home/ronald/Projects/Personal/jev-dotnet/src/JevDotNet/JevDotNet.csproj" />
     </ItemGroup>
 
     <ItemGroup>

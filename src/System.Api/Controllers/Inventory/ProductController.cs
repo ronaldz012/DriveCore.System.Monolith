@@ -79,5 +79,6 @@ namespace System.Api.Controllers.Inventory
             if (!actorResult.IsSuccess)  return actorResult.ToValueOrProblemDetails();
             return await productUseCases.DeleteProduct.Execute(actorResult.Value, id).ToValueOrProblemDetails();
         }
+
     }
 }

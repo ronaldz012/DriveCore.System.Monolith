@@ -1,5 +1,7 @@
 using Common.Contracts.inventory;
 using Common.Contracts.Seeder;
+using JevDotNet;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Module.Inventory.Application.Abstraction;
 using Module.Inventory.Infrastructure.Services;
@@ -52,7 +54,9 @@ using Module.Inventory.Application.UseCases.Transfers.GetById;
 using Module.Inventory.Application.UseCases.Transfers.Resolve;
 using Module.Inventory.Application.UseCases.StockMovements;
 using Module.Inventory.Application.UseCases.StockMovements.Get;
+using Module.Inventory.Application.UseCases.Liquidation;
 using Module.Inventory.Infrastructure;
+using Module.Inventory.Infrastructure.Advisor;
 using Module.Inventory.Infrastructure.Seeder;
 
 namespace Module.Inventory;
@@ -125,12 +129,49 @@ public  static class InvDependencyInjection
 
         services.AddScoped<IInventoryIntegrationService, InventoryIntegrationService>();
         services.AddScoped<IProductCodeService, ProductCodeService>();
+        services.AddScoped<AdviseLiquidation>();
+        services.AddScoped<BrandAudienceProber>();
         services.AddScoped<IDefaultCatalogProvisioner, DefaultCatalogProvisioner>();
 
         services.AddScoped<IDataSeeder, InventorySeeder>();
         services.AddScoped<IDataSeeder, DefaultCatalogSeeder>();
         services.AddScoped<IDataSeeder, StockReceptionSeeder>();
         services.AddScoped<IDataSeeder, StockTransferSeeder>();
+
+        return services;
+    }
+
+    /// <summary>
+    /// Registra el cliente Jev (singleton de la librería) para el asesor de liquidación.
+    /// Endpoint/Model salen de appsettings (sección Jev); la key de Jev:ApiKey
+    /// con fallback a la variable de entorno TypeSafeApiKey (nunca hardcodeada).
+    /// Si no hay key, se registra un advisor que responde error controlado.
+    /// </summary>
+    public static IServiceCollection AddInventoryJev(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<JevSettings>(configuration.GetSection(JevSettings.SectionName));
+
+        var section = configuration.GetSection(JevSettings.SectionName);
+        var apiKey = string.IsNullOrWhiteSpace(section["ApiKey"])
+            ? Environment.GetEnvironmentVariable(JevSettings.ApiKeyEnvVar)
+            : section["ApiKey"];
+
+        if (string.IsNullOrWhiteSpace(apiKey))
+        {
+            services.AddScoped<ILiquidationAdvisor, MissingKeyLiquidationAdvisor>();
+            return services;
+        }
+
+        JevClientOptions defaults = new() { ApiKey = apiKey };
+        var model = section["Model"];
+        var endpoint = section["Endpoint"];
+        services.AddSingleton(new JevClient(new JevClientOptions
+        {
+            ApiKey = apiKey,
+            Model = string.IsNullOrWhiteSpace(model) ? defaults.Model : model,
+            Endpoint = string.IsNullOrWhiteSpace(endpoint) ? defaults.Endpoint : new Uri(endpoint)
+        }));
+        services.AddScoped<ILiquidationAdvisor, LiquidationAdvisor>();
 
         return services;
     }

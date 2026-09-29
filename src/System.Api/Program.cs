@@ -127,6 +127,7 @@ builder.Services.AddCommon(builder.Configuration);
 
   builder.Services.AddAppInfrastructure();
   builder.Services.AddInventory();
+  builder.Services.AddInventoryJev(builder.Configuration);
   builder.Services.AddSales();
 
 builder.Services.AddControllers(options =>
