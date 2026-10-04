@@ -33,7 +33,7 @@ public class SessionStateService(
         // 2. No está cacheado: armar la sesión desde la DB.
         var user = await context.Users
             .IgnoreQueryFilters()
-            .FirstOrDefaultAsync(u => u.ExternalAuthId == externalAuthId);
+            .FirstOrDefaultAsync(u => u.Email == externalAuthId);
 
         if (user is null)
             return new Error(ErrorCode.NotFound, "No user is linked to this external account");

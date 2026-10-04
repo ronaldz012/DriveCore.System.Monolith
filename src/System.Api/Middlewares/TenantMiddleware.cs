@@ -35,8 +35,7 @@ public class TenantMiddleware(RequestDelegate next)
         }
 
         // El JWT de Auth0 identifica al usuario por su "sub" (= ExternalAuthId, ej. auth0|...)
-        var externalAuthId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                             ?? context.User.FindFirst("sub")?.Value;
+        var externalAuthId =  context.User.FindFirst("email")?.Value;
 
         if (string.IsNullOrEmpty(externalAuthId))
         {

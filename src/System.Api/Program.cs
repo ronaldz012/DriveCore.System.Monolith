@@ -72,46 +72,39 @@ builder.Services.AddOpenApi(options =>
 });
 
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddAuthentication(options =>
-{
-  // The default scheme for authenticating API requests (JWT)
-  options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+var clerkIssuer = builder.Configuration["Clerk:Issuer"]!;
+var authorizedParties = builder.Configuration
+    .GetSection("Clerk:AuthorizedParties").Get<string[]>() ?? [];
 
-  // The default scheme for challenging unauthenticated users (JWT)
-  options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-  var auth0Issuer = builder.Configuration["Auth0:Issuer"];
-  var auth0Audience = builder.Configuration["Auth0:Audience"];
-  var auth0SpaSecret = builder.Configuration["Auth0:SpaClientSecret"];
-
-  var configManager = new ConfigurationManager<OpenIdConnectConfiguration>(
-      $"{auth0Issuer}.well-known/openid-configuration",
-      new OpenIdConnectConfigurationRetriever(),
-      new HttpDocumentRetriever { RequireHttps = true });
-
-  options.TokenValidationParameters = new TokenValidationParameters
-  {
-    ValidateIssuer = true,
-    ValidateAudience = true,
-    ValidateLifetime = true,
-    ValidateIssuerSigningKey = true,
-    ClockSkew = TimeSpan.FromMinutes(2),
-    ValidIssuer = auth0Issuer,
-    ValidAudience = auth0Audience,
-    RequireSignedTokens = false,
-    TokenDecryptionKey = new SymmetricSecurityKey(
-        Encoding.UTF8.GetBytes(auth0SpaSecret!)[..32]),
-    IssuerSigningKeyResolver = (token, securityToken, kid, validationParameters) =>
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
-      var config = configManager.GetConfigurationAsync(CancellationToken.None)
-          .ConfigureAwait(false).GetAwaiter().GetResult();
-      return config.SigningKeys;
-    },
-  };
-});
+        options.Authority = clerkIssuer;     // descarga el JWKS y rota las claves solo
+        options.MapInboundClaims = false;    // conserva "sub" y "email" con su nombre real
 
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = clerkIssuer,
+            ValidateAudience = false,        // Clerk no pone aud por defecto
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            RequireSignedTokens = true,
+            ClockSkew = TimeSpan.FromSeconds(15), // el token dura 60 s: 2 min de margen lo triplicaría
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = ctx =>
+            {
+                var azp = ctx.Principal?.FindFirst("azp")?.Value;
+                if (azp is null || !authorizedParties.Contains(azp))
+                    ctx.Fail("Origen no autorizado.");
+                return Task.CompletedTask;
+            },
+        };
+    });
 
 
 
