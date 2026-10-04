@@ -1,4 +1,5 @@
 using Common.Contracts.authentication;
+using Common.Domain.Documents;
 using Common.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Module.Sales.Application.Abstraction;
@@ -13,7 +14,7 @@ public static class OpenCashRegisterErrors
     public static readonly Error Failed = new(ErrorCode.InternalError, "Could not open cash register.");
 }
 
-public class OpenCashRegister(ISalesDbContext context)
+public class OpenCashRegister(ISalesDbContext context, ISalesNumberGenerator numberGenerator)
 {
     public async Task<Result<Guid>> Execute(ActorContext ctx, OpenCashRegisterDto dto)
     {
@@ -27,8 +28,22 @@ public class OpenCashRegister(ISalesDbContext context)
 
         var closure = CashRegisterClosure.Open(branchId, dto.OpeningBalance, ctx.UserId, ctx.FullName);
 
-        context.CashRegisterClosures.Add(closure);
-        await context.SaveChangesAsync();
+
+        await using var transaction = await context.Database.BeginTransactionAsync();
+        try
+        {
+ 
+            closure.Number = await numberGenerator.NextAsync(context.Database, ctx.TenantId, SalesCounterKey.CashClose);
+
+            context.CashRegisterClosures.Add(closure);
+            await context.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
 
         return closure.Id;
     }

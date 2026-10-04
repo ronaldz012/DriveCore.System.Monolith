@@ -17,6 +17,9 @@ public static class SalesEntityConfiguration
                 .WithMany(s => s.Returns)
                 .HasForeignKey(s => s.OriginalSaleId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => new { e.TenantId, e.Number })
+                .IsUnique();
         });
         builder.Entity<SaleItem>(entity =>
         {
@@ -31,6 +34,10 @@ public static class SalesEntityConfiguration
                 .IsUnique()
                 .HasFilter("\"IsOpen\" = true")
                 .HasDatabaseName("IX_CashRegisterClosures_Tenant_Branch_OpenOnly");
+
+            entity.HasIndex(e => new { e.TenantId, e.Number })
+                .IsUnique();
+
             entity.HasMany(c => c.Movements)
                 .WithOne(m => m.CashRegisterClosure)
                 .HasForeignKey(m => m.CashRegisterClosureId);

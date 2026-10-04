@@ -84,7 +84,7 @@ public class CreateReceptionTests
     }
 
     private static CreateReceptionUc CreateSut(TestAppDbContext ctx)
-        => new(ctx, NullLogger<CreateReceptionUc>.Instance);
+        => new(ctx, new FakeInventoryNumberGenerator(), NullLogger<CreateReceptionUc>.Instance);
 
     [Fact]
     public async Task Execute_ShouldIncreaseStock_AndCreateReceptionMovement()

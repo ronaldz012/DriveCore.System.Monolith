@@ -70,7 +70,7 @@ public class AverageCostTests
     }
 
     private static CreateReceptionUc CreateSut(TestAppDbContext ctx)
-        => new(ctx, NullLogger<CreateReceptionUc>.Instance);
+        => new(ctx, new FakeInventoryNumberGenerator(), NullLogger<CreateReceptionUc>.Instance);
 
     private static async Task<decimal> GetAverageCost(TestAppDbContext ctx, Guid variantId)
         => (await ctx.ProductVariants.SingleAsync(pv => pv.Id == variantId)).AverageCost;

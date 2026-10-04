@@ -1,5 +1,6 @@
 using Common.Contracts.authentication;
 using Common.Contracts.inventory;
+using Common.Domain.Documents;
 using Common.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -11,6 +12,7 @@ namespace Module.Sales.Application.UseCases.Sales.Create;
 public class CreateSale(
     ISalesDbContext context,
     IInventoryIntegrationService inventoryService,
+    ISalesNumberGenerator numberGenerator,
     ILogger<CreateSale> logger)
 {
     public async Task<Result<bool>> Execute(ActorContext ctx, CreateSaleDto dto)
@@ -91,6 +93,9 @@ public class CreateSale(
                 await transaction.RollbackAsync();
                 return deductResult.Error;
             }
+
+
+            sale.Number = await numberGenerator.NextAsync(context.Database, ctx.TenantId, SalesCounterKey.Sale);
 
             context.Sales.Add(sale);
             await context.SaveChangesAsync();

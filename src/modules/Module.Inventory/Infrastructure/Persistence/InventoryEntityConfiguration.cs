@@ -84,6 +84,9 @@ public static class InventoryEntityConfiguration
             entity.HasMany(r => r.Items)
                 .WithOne(i => i.StockReception)
                 .HasForeignKey(i => i.StockReceptionId);
+
+            entity.HasIndex(e => new { e.TenantId, e.Number })
+                .IsUnique();
         });
         builder.Entity<StockReceptionItem>(entity =>
         {
@@ -96,6 +99,8 @@ public static class InventoryEntityConfiguration
         });
         builder.Entity<StockTransfer>(entity =>
         {
+            entity.HasIndex(e => new { e.TenantId, e.Number })
+                .IsUnique();
         });
         builder.Entity<StockTransferItem>(entity =>
         {

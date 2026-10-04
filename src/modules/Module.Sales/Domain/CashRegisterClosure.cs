@@ -7,6 +7,7 @@ public class CashRegisterClosure : IMustHaveTenant, ICreatedAt, ICreatedBy, IUpd
     public Guid Id { get; set; }
     public Guid TenantId { get; set; }
     public Guid BranchId { get; set; }
+    public int Number { get; set; }
     public Guid OpenById { get; set; }
     public string OpenByName { get; set; } = string.Empty;
     public Guid? CloseById { get; set; }

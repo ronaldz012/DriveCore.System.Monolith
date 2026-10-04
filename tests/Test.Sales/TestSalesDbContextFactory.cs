@@ -1,8 +1,11 @@
 using System.Data.Common;
 using System.Transactions;
 using Common.Contracts.authentication;
+using Common.Domain.Documents;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Module.Sales.Application.Abstraction;
 using System.Infrastructure.Persistence;
 
 namespace Test.Sales;
@@ -46,4 +49,12 @@ public class TenantConnectionContext : ITenantConnectionContext
     public Task EnsureOpenAsync() => Task.CompletedTask;
     public Task<TransactionScope> BeginTransactionScopeAsync() =>
         Task.FromResult(new TransactionScope(TransactionScopeOption.Suppress));
+}
+
+public sealed class FakeSalesNumberGenerator : ISalesNumberGenerator
+{
+    private int _last;
+
+    public Task<int> NextAsync(DatabaseFacade db, Guid tenantId, SalesCounterKey key, CancellationToken cancellationToken = default)
+        => Task.FromResult(++_last);
 }

@@ -10,6 +10,7 @@ public class StockTransfer : Params, IMustHaveTenant
     public Guid TenantId { get; set; }
     public Guid FromBranchId { get; set; }
     public Guid ToBranchId { get; set; }
+    public int Number { get; set; }
     public Guid RequestedByUserId { get; set; }
     public Guid? ResolvedByUserId { get; set; }
     public TransferStatus Status { get; set; } = TransferStatus.Pending;

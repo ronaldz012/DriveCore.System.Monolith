@@ -74,7 +74,7 @@ public class CreateSaleStockTests
     private static CreateSale CreateSut(AppDbContext ctx)
     {
         var inventoryService = new InventoryIntegrationService(ctx);
-        return new CreateSale(ctx, inventoryService, Mock.Of<ILogger<CreateSale>>());
+        return new CreateSale(ctx, inventoryService, new FakeSalesNumberGenerator(), Mock.Of<ILogger<CreateSale>>());
     }
 
     private static CreateSaleDto CreateDto(int quantity)

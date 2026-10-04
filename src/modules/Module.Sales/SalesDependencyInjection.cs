@@ -1,5 +1,6 @@
 using Common.Contracts.sales;
 using Microsoft.Extensions.DependencyInjection;
+using Module.Sales.Application.Abstraction;
 using Module.Sales.Application.UseCases;
 using Module.Sales.Application.UseCases.Movements.Create;
 using Module.Sales.Application.UseCases.Movements.Delete;
@@ -20,6 +21,7 @@ using Module.Sales.Application.UseCases.Sales.Return.GetSaleForReturn;
 using Module.Sales.Application.UseCases.Sales.Return.List;
 using Module.Sales.Application.UseCases.Sales.Search;
 using Module.Sales.Infrastructure;
+using Module.Sales.Infrastructure.Services;
 
 namespace Module.Sales;
 
@@ -51,6 +53,7 @@ public static class SalesDependencyInjection
                         .AddScoped<DeleteMovement>();
 
                 services.AddScoped<ISalesIntegrationService, SalesIntegrationService>();
+                services.AddScoped<ISalesNumberGenerator, SalesNumberGenerator>();
 
                 return services;
         }

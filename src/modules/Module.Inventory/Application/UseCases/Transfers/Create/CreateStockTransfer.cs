@@ -1,4 +1,5 @@
 using Common.Contracts.authentication;
+using Common.Domain.Documents;
 using Common.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Module.Inventory.Application.Abstraction;
@@ -6,7 +7,7 @@ using Module.Inventory.Domain.Transfers;
 
 namespace Module.Inventory.Application.UseCases.Transfers.Create;
 
-public class CreateStockTransfer(IInvDbContext context)
+public class CreateStockTransfer(IInvDbContext context, IInventoryNumberGenerator numberGenerator)
 {
     public async Task<Result<bool>> Execute(ActorContext ctx, CreateStockTransferDto dto)
     {
@@ -60,9 +61,21 @@ public class CreateStockTransfer(IInvDbContext context)
             });
         }
 
-        context.StockTransfers.Add(transfer);
-        await context.SaveChangesAsync();
-        return true;
-        
+ 
+        await using var transaction = await context.Database.BeginTransactionAsync();
+        try
+        {
+            transfer.Number = await numberGenerator.NextAsync(context.Database, ctx.TenantId, InventoryCounterKey.Transfer);
+
+            context.StockTransfers.Add(transfer);
+            await context.SaveChangesAsync();
+            await transaction.CommitAsync();
+            return true;
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 }

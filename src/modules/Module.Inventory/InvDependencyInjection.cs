@@ -125,6 +125,7 @@ public  static class InvDependencyInjection
 
         services.AddScoped<IInventoryIntegrationService, InventoryIntegrationService>();
         services.AddScoped<IProductCodeService, ProductCodeService>();
+        services.AddScoped<IInventoryNumberGenerator, InventoryNumberGenerator>();
         services.AddScoped<IDefaultCatalogProvisioner, DefaultCatalogProvisioner>();
 
         services.AddScoped<IDataSeeder, InventorySeeder>();

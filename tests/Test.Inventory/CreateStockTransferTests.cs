@@ -78,7 +78,7 @@ public class CreateStockTransferTests
     }
 
     private static CreateStockTransfer CreateSut(TestAppDbContext ctx)
-        => new(ctx);
+        => new(ctx, new FakeInventoryNumberGenerator());
 
     [Fact]
     public async Task Execute_ShouldCreatePendingTransfer_WithoutMovingStock()
