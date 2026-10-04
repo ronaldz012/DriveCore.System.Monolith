@@ -1,5 +1,6 @@
 using Common.Contracts.authentication;
 using Common.Contracts.inventory;
+using Common.Domain.Documents;
 using Common.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -11,6 +12,7 @@ namespace Module.Sales.Application.UseCases.Sales.Return;
 public class CreateReturn(
     ISalesDbContext context,
     IInventoryIntegrationService inventoryService,
+    ISalesNumberGenerator numberGenerator,
     ILogger<CreateReturn> logger)
 {
     public async Task<Result<CreateReturnResponse>> Execute(ActorContext ctx, CreateReturnDto dto)
@@ -70,6 +72,8 @@ public class CreateReturn(
                             originalItem.UnitPrice, item.Quantity, originalItem.DiscountAmount, originalItem.UnitCost, item.OriginalSaleItemId);
                 }).ToList()
             );
+
+            returnSale.Number = await numberGenerator.NextAsync(context.Database, ctx.TenantId, SalesCounterKey.Sale);
 
             context.Sales.Add(returnSale);
 

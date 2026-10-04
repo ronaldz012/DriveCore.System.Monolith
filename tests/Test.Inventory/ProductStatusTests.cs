@@ -196,7 +196,7 @@ public class ProductStatusTests
         var product = SeedProduct(ctx, "Inactive Product", "PRD-1", isActive: false);
         var variant = await ctx.ProductVariants.FirstAsync(v => v.ProductId == product.Id);
 
-        var sut = new CreateReceptionUc(ctx, NullLogger<CreateReceptionUc>.Instance);
+        var sut = new CreateReceptionUc(ctx, new FakeInventoryNumberGenerator(), NullLogger<CreateReceptionUc>.Instance);
         var result = await sut.Execute(new ActorContext(TenantId, UserId, "Test User", BranchId, [BranchId]), new CreateStockReceptionDto
         {
             ProviderId = ProviderId,

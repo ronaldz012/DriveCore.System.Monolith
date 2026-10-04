@@ -10,6 +10,7 @@ public class Sale : IMustHaveTenant, ICreatedAt, ICreatedBy, IUpdatedAt, IUpdate
     public Guid SoldById { get; set; }
     public string SoldByName { get; set; } = string.Empty;
     public Guid CashRegisterClosureId { get; set; } 
+    public int Number { get; set; }
     public PaymentMethod PaymentMethod { get; set; }
     public string? TransactionCode { get; set; }
     public decimal TotalAmount { get; set; }

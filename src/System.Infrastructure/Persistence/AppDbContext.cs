@@ -1,5 +1,6 @@
 using Common.Contracts.authentication;
 using Common.Domain;
+using Common.Domain.Documents;
 using Microsoft.EntityFrameworkCore;
 using Module.Inventory.Application.Abstraction;
 using Module.Inventory.Domain.Inventory;
@@ -37,12 +38,14 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantConnect
     public DbSet<StockMovement> StockMovements { get; set; }
     public DbSet<StockTransfer> StockTransfers { get; set; }
     public DbSet<StockTransferItem> StockTransferItems { get; set; }
+    public DbSet<DocumentCounter> DocumentCounters { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
         SalesEntityConfiguration.Apply(modelBuilder);
         InventoryEntityConfiguration.Apply(modelBuilder);
+        DocumentCounterConfiguration.Apply(modelBuilder);
 
         // Filtros por tenant (capturan this.tenantConnectionContext -> evaluado por DbContext actual)
         modelBuilder.Entity<Product>().HasQueryFilter(x => x.TenantId == tenantConnectionContext.TenantId && x.DeletedAt == null);

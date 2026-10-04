@@ -11,6 +11,7 @@ public class StockReception : Params, IMustHaveTenant
     public Guid TenantId { get; set; }
     public Guid BranchId { get; set; }
     public Guid ProviderId { get; set; }
+    public int Number { get; set; }
     public DateTime ReceivedAt { get; set; }
     public ReceptionStatus Status { get; set; } = ReceptionStatus.Confirmed;
     public string? Notes { get; set; }

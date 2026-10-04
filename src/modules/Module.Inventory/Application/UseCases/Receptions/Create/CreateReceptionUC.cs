@@ -1,4 +1,5 @@
 using Common.Contracts.authentication;
+using Common.Domain.Documents;
 using Common.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -10,6 +11,7 @@ namespace Module.Inventory.Application.UseCases.Receptions.Create;
 
 public class CreateReceptionUc(
     IInvDbContext context,
+    IInventoryNumberGenerator numberGenerator,
     ILogger<CreateReceptionUc> logger)
 {
     public async Task<Result<StockReceptionResultDto>> Execute(ActorContext ctx, CreateStockReceptionDto dto)
@@ -65,6 +67,8 @@ public class CreateReceptionUc(
                 stockMovements.Add(StockMovement.CreateReception(
                     branchId, variant.Id, userId, userName, item.QuantityReceived, reception.Id, item.UnitCost, stockBefore, stockAfter));
             }
+
+            reception.Number = await numberGenerator.NextAsync(context.Database, ctx.TenantId, InventoryCounterKey.Reception);
 
             context.StockReceptions.Add(reception);
             context.StockMovements.AddRange(stockMovements);

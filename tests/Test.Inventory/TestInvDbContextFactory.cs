@@ -1,8 +1,11 @@
 using System.Data.Common;
 using System.Transactions;
 using Common.Contracts.authentication;
+using Common.Domain.Documents;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Module.Inventory.Application.Abstraction;
 using System.Infrastructure.Persistence;
 
 namespace Test.Inventory;
@@ -46,4 +49,12 @@ public class TenantConnectionContext : ITenantConnectionContext
     public Task EnsureOpenAsync() => Task.CompletedTask;
     public Task<TransactionScope> BeginTransactionScopeAsync() =>
         Task.FromResult(new TransactionScope(TransactionScopeOption.Suppress));
+}
+
+public sealed class FakeInventoryNumberGenerator : IInventoryNumberGenerator
+{
+    private int _last;
+
+    public Task<int> NextAsync(DatabaseFacade db, Guid tenantId, InventoryCounterKey key, CancellationToken cancellationToken = default)
+        => Task.FromResult(++_last);
 }

@@ -314,7 +314,7 @@ public class CreateReturnTests
         await ctx.SaveChangesAsync();
 
         var inventoryService = new InventoryIntegrationService(ctx);
-        var sut = new CreateReturn(ctx, inventoryService, Mock.Of<ILogger<CreateReturn>>());
+        var sut = new CreateReturn(ctx, inventoryService, new FakeSalesNumberGenerator(), Mock.Of<ILogger<CreateReturn>>());
 
         var result = await sut.Execute(CreateActorContext(), new CreateReturnDto
         {
@@ -345,6 +345,7 @@ public class CreateReturnTests
         return new CreateReturn(
             dbContext,
             inventoryService ?? new Mock<IInventoryIntegrationService>().Object,
+            new FakeSalesNumberGenerator(),
             new Mock<ILogger<CreateReturn>>().Object);
     }
 

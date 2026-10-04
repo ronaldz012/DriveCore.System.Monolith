@@ -209,6 +209,7 @@ public class CreateSaleTests
         return new CreateSale(
             dbContext,
             inventoryService ?? new Mock<IInventoryIntegrationService>().Object,
+            new FakeSalesNumberGenerator(),
             new Mock<ILogger<CreateSale>>().Object);
     }
 
