@@ -33,6 +33,7 @@ public class CloseCashRegister(ISalesDbContext context)
         return new CloseCashRegisterResponseDto
         {
             Id = closure.Id,
+            Number = closure.Number,
             OpeningBalance = closure.OpeningBalance,
             CashSalesTotal = cashSalesTotal,
             OutflowsTotal = outflowsTotal,

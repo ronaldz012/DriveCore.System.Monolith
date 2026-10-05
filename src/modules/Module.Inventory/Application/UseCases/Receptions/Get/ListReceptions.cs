@@ -37,6 +37,7 @@ public class ListReceptions(IInvDbContext context)
             .Select(r => new StockReceptionListDto
             {
                 Id = r.Id,
+                Number = r.Number,
                 BranchId = r.BranchId,
                 ProviderId = r.ProviderId,
                 ProviderName = r.Provider.Name,

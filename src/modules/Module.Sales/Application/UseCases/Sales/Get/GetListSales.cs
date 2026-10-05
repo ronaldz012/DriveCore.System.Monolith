@@ -35,6 +35,7 @@ public class GetListSales(ISalesDbContext context)
             .Select(s => new SaleListDto
             {
                 Id = s.Id,
+                Number = s.Number,
                 CreatedAt = s.CreatedAt,
                 TotalAmount = s.TotalAmount,
                 SoldByName = s.SoldByName,

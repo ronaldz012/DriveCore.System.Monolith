@@ -16,6 +16,7 @@ public class GetReception(IInvDbContext context)
             .Select(r => new StockReceptionDetailDto
             {
                 Id = r.Id,
+                Number = r.Number,
                 BranchId = r.BranchId,
                 ProviderId = r.ProviderId,
                 ProviderName = r.Provider.Name,

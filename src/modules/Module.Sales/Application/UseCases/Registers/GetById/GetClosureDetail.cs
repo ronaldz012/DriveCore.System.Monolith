@@ -46,6 +46,7 @@ public class GetClosureDetail(
             .Select(c => new ClosureDetailDto
             {
                 Id = c.Id,
+                Number = c.Number,
                 BranchId = c.BranchId,
                 OpenedAt = c.OpenAt,
                 ClosedAt = c.ClosedAt,
@@ -64,6 +65,7 @@ public class GetClosureDetail(
                     .Select(s => new ClosureSaleItemDto
                     {
                         Id = s.Id,
+                        Number = s.Number,
                         CreatedAt = s.CreatedAt,
                         SoldByName = s.SoldByName,
                         TotalAmount = s.TotalAmount,

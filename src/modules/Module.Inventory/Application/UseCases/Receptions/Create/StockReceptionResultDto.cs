@@ -3,6 +3,7 @@ namespace Module.Inventory.Application.UseCases.Receptions.Create;
 public class StockReceptionResultDto
 {
     public Guid Id { get; set; }
+    public int Number { get; set; }
     public Guid BranchId { get; set; }
     public Guid ProviderId { get; set; }
     public string ProviderName { get; set; } = string.Empty;

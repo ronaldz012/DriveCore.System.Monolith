@@ -16,6 +16,7 @@ public class GetCurrentRegister(ISalesDbContext context)
             {
                 IsOpen = true,
                 ClosureId = c.Id,
+                Number = c.Number,
                 OpeningBalance = c.OpeningBalance,
                 OpenedAt = c.OpenAt,
                 OpenByName = c.OpenByName

@@ -3,6 +3,7 @@ namespace Module.Sales.Application.UseCases.Registers.List;
 public class ClosureListDto
 {
     public Guid Id { get; set; }
+    public int Number { get; set; }
     public DateTime OpenedAt { get; set; }
     public DateTime? ClosedAt { get; set; }
     public string OpenedByName { get; set; } = string.Empty;

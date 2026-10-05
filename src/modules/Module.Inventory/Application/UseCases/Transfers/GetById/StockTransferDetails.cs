@@ -48,6 +48,7 @@ public class StockTransferDetails(IInvDbContext context, IBranchService branchSe
         return new StockTransferDetailDto
         {
             Id = transfer.Id,
+            Number = transfer.Number,
             Direction = direction,
             FromBranchName = branches.GetValueOrDefault(transfer.FromBranchId) ?? "Unknown",
             ToBranchName = branches.GetValueOrDefault(transfer.ToBranchId) ?? "Unknown",

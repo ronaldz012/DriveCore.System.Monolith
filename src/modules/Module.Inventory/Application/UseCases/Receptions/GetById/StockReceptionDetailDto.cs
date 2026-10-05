@@ -5,6 +5,7 @@ namespace Module.Inventory.Application.UseCases.Receptions.GetById;
 public class StockReceptionDetailDto
 {
     public Guid Id { get; set; }
+    public int Number { get; set; }
     public Guid BranchId { get; set; }
     public Guid ProviderId { get; set; }
     public string ProviderName { get; set; } = string.Empty;

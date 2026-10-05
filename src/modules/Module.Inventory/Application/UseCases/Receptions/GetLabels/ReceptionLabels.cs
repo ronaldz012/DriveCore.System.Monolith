@@ -11,6 +11,7 @@ public class ReceptionLabels(IInvDbContext context)
         var result=  await context.StockReceptions.Where(r => r.Id == receptionId).Select(r => new ReceptionLabelsDto
         {
             ReceptionId = r.Id,
+            Number = r.Number,
             ReceptionDate = r.ReceivedAt,
             Items = r.Items.OrderBy(ri => ri.ProductVariant.Product.Name).ThenBy(ri => ri.ProductVariant.Color.Name).ThenBy(ri => ri.ProductVariant.Size.SortOrder).ThenBy(ri => ri.ProductVariant.Sku).Select(ri =>new ReceptionLabelItemDto
             {

@@ -22,6 +22,7 @@ public class SkuSearchResponseDto
 public class SaleSkuSearchDto
 {
     public Guid Id { get; set; }
+    public int Number { get; set; }
     public DateTime CreatedAt { get; set; }
     public decimal TotalAmount { get; set; }
     public string SoldByName { get; set; } = string.Empty;

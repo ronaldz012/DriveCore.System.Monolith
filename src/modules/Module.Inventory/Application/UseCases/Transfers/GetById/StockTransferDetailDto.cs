@@ -5,6 +5,7 @@ namespace Module.Inventory.Application.UseCases.Transfers.GetById;
 public class StockTransferDetailDto
 {
     public Guid Id { get; set; }
+    public int Number { get; set; }
     public TransferDirection Direction { get; set; }
     public string FromBranchName { get; set; } = string.Empty;
     public string ToBranchName { get; set; } = string.Empty;

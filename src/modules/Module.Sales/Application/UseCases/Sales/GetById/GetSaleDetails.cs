@@ -17,6 +17,7 @@ public class GetSaleDetail(ISalesDbContext context)
             .Select(s => new SaleDetailDto
             {
                 Id = s.Id,
+                Number = s.Number,
                 BranchId = s.BranchId,
                 SoldById = s.SoldById,
                 SoldByName = s.SoldByName,
@@ -48,6 +49,7 @@ public class GetSaleDetail(ISalesDbContext context)
                 Returns = s.Returns.Select(r => new SaleRefundDto
                 {
                     Id = r.Id,
+                    Number = r.Number,
                     CreatedAt = r.CreatedAt,
                     TotalAmount = r.TotalAmount
                 }).ToList()

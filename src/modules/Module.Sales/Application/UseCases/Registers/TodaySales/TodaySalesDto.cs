@@ -4,6 +4,7 @@ public class TodaySalesDto
 {
     public bool IsOpen { get; set; }
     public Guid? ClosureId { get; set; }
+    public int? Number { get; set; }
     public decimal? OpeningBalance { get; set; }
     public DateTime? OpeningAt { get; set; }
     public string OpenedByName { get; set; } = string.Empty;
