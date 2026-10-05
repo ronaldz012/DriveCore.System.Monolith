@@ -28,6 +28,7 @@ public class ListClosures(ISalesDbContext context)
             .Select(c => new ClosureListDto
             {
                 Id = c.Id,
+                Number = c.Number,
                 OpenedAt = c.OpenAt,
                 ClosedAt = c.ClosedAt,
                 OpenedByName = c.OpenByName,

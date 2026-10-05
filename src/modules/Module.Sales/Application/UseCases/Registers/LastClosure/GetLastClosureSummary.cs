@@ -19,6 +19,7 @@ public class GetLastClosureSummary(
             .Select(c => new
             {
                 c.Id,
+                c.Number,
                 c.OpenAt,
                 c.ClosedAt,
                 TotalSales = c.Sales.Sum(s => s.TotalAmount),
@@ -48,6 +49,7 @@ public class GetLastClosureSummary(
         {
             HasData = true,
             ClosureId = closure.Id,
+            Number = closure.Number,
             OpenedAt = closure.OpenAt,
             ClosedAt = closure.ClosedAt,
             TotalSales = closure.TotalSales,

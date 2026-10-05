@@ -81,6 +81,7 @@ public class CreateReceptionUc(
                 .Select(r => new StockReceptionResultDto
                 {
                     Id = r.Id,
+                    Number = r.Number,
                     BranchId = r.BranchId,
                     ProviderId = r.ProviderId,
                     ProviderName = r.Provider.Name,

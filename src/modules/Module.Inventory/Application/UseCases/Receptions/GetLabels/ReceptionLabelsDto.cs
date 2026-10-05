@@ -5,6 +5,7 @@ namespace Module.Inventory.Application.UseCases.Receptions.GetLabels;
 public class ReceptionLabelsDto
 {
     public Guid ReceptionId { get; set; }
+    public int Number { get; set; }
     public DateTime ReceptionDate { get; set; }
     public List<ReceptionLabelItemDto> Items { get; set; } = new();
 }

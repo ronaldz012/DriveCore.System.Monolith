@@ -16,6 +16,7 @@ public class GetTodaySales(ISalesDbContext context)
             .Select(c => new
             {
                 c.Id,
+                c.Number,
                 c.OpeningBalance,
                 c.OpenAt,
                 c.OpenByName,
@@ -36,6 +37,7 @@ public class GetTodaySales(ISalesDbContext context)
         {
             IsOpen = true,
             ClosureId = closure.Id,
+            Number = closure.Number,
             OpeningBalance = closure.OpeningBalance,
             OpeningAt = closure.OpenAt,
             OpenedByName = closure.OpenByName

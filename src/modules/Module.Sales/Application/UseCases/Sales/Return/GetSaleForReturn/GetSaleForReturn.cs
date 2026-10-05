@@ -31,6 +31,7 @@ public class GetSaleForReturn(ISalesDbContext context)
         return new SaleForReturnDto
         {
             Id = sale.Id,
+            Number = sale.Number,
             CreatedAt = sale.CreatedAt,
             TotalAmount = sale.TotalAmount,
             SoldByName = sale.SoldByName,

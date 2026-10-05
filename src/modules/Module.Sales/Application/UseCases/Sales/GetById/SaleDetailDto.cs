@@ -5,6 +5,7 @@ namespace Module.Sales.Application.UseCases.Sales.GetById;
 public class SaleDetailDto
 {
     public Guid Id { get; set; }
+    public int Number { get; set; }
     public Guid BranchId { get; set; }
     public Guid SoldById { get; set; }
     public string SoldByName { get; set; } = string.Empty;
@@ -26,6 +27,7 @@ public class SaleDetailDto
 public class SaleRefundDto
 {
     public Guid Id { get; set; }
+    public int Number { get; set; }
     public DateTime CreatedAt { get; set; }
     public decimal TotalAmount { get; set; }
 }

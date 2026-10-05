@@ -5,6 +5,7 @@ namespace Module.Sales.Application.UseCases.Registers.GetById;
 public class ClosureDetailDto
 {
     public Guid Id { get; set; }
+    public int Number { get; set; }
     public Guid BranchId { get; set; }
     public DateTime OpenedAt { get; set; }
     public DateTime? ClosedAt { get; set; }
@@ -26,6 +27,7 @@ public class ClosureDetailDto
 public class ClosureSaleItemDto
 {
     public Guid Id { get; set; }
+    public int Number { get; set; }
     public DateTime CreatedAt { get; set; }
     public string SoldByName { get; set; } = string.Empty;
     public decimal TotalAmount { get; set; }

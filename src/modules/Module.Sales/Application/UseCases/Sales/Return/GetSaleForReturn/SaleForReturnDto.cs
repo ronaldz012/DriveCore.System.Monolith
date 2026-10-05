@@ -6,6 +6,7 @@ namespace Module.Sales.Application.UseCases.Sales.Return.GetSaleForReturn;
 public class SaleForReturnDto
 {
     public Guid Id { get; set; }
+    public int Number { get; set; }
     public DateTime CreatedAt { get; set; }
     public decimal TotalAmount { get; set; }
     public string SoldByName { get; set; } = string.Empty;

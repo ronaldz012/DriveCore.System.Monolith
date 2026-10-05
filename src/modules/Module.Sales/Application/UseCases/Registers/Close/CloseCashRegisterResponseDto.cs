@@ -3,6 +3,7 @@ namespace Module.Sales.Application.UseCases.Registers.Close;
 public class CloseCashRegisterResponseDto
 {
     public Guid Id { get; set; }
+    public int Number { get; set; }
     public decimal OpeningBalance { get; set; }
     public decimal CashSalesTotal { get; set; }
     public decimal OutflowsTotal { get; set; }

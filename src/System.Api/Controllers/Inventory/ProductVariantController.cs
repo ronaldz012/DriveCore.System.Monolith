@@ -45,6 +45,14 @@ namespace System.Api.Controllers.Inventory
             return await useCases.GetProductVariantByCode.Execute(actorResult.Value, request).ToValueOrProblemDetails();
         }
 
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchVariants([FromQuery] string request)
+        {
+            var actorResult = currentUser.GetActorContext();
+            if (!actorResult.IsSuccess)  return actorResult.ToValueOrProblemDetails();
+            return await useCases.SearchProductVariants.Execute(actorResult.Value, request).ToValueOrProblemDetails();
+        }
+
         [HttpGet("{id:guid}/details")]
         [RequireFeature("products", "read")]
         public async Task<IActionResult> GeProductVariantById([FromRoute] Guid id)

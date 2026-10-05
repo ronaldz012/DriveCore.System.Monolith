@@ -29,6 +29,7 @@ public class SearchSalesBySku(ISalesDbContext context)
             .Select(s => new SaleSkuSearchDto
             {
                 Id = s.Id,
+                Number = s.Number,
                 CreatedAt = s.CreatedAt,
                 TotalAmount = s.TotalAmount,
                 SoldByName = s.SoldByName,

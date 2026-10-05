@@ -41,6 +41,7 @@ public class ListStockTransfers(IInvDbContext context, IUserIntegrationService u
             .Select(st => new
             {
                 st.Id,
+                st.Number,
                 st.FromBranchId,
                 st.ToBranchId,
                 st.RequestedByUserId,
@@ -91,6 +92,7 @@ public class ListStockTransfers(IInvDbContext context, IUserIntegrationService u
             return new ListStockTransferDto
             {
                 Id = t.Id,
+                Number = t.Number,
                 Direction = isOutbound ? TransferDirection.Outbound : TransferDirection.Inbound,
                 CounterpartBranchName = branches.GetValueOrDefault(counterpartId) ?? "Unknown",
                 RequesterName = users.GetValueOrDefault(t.RequestedByUserId) ?? "Unknown",

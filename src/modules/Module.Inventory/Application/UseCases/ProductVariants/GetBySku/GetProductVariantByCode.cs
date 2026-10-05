@@ -28,7 +28,7 @@ public class GetProductVariantByCode(IInvDbContext context)
                 ProductName = pv.Product.Name,
                 ProductDescription = pv.Product.Description,
                 Gender = pv.Product.Gender,
-                BranchName = pv.Product.Brand.Name,
+                BrandName = pv.Product.Brand.Name,
                 CategoryName = pv.Product.Category.Name,
                 IsActive = pv.Product.IsActive,
             }
@@ -40,7 +40,7 @@ public class GetProductVariantByCode(IInvDbContext context)
             return GetProductVariantByCodeErrors.ProductInactive;
 
         result.DisplayName = ProductVariant.BuildDisplayName(
-            result.BranchName, result.CategoryName, result.ProductName, result.ColorName, result.Size);
+            result.BrandName, result.CategoryName, result.ProductName, result.ColorName, result.Size);
 
         return result;
     }
