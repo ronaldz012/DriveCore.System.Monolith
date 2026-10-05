@@ -21,7 +21,6 @@ public class ProductQueryDto : PaginationQueryDto
 {
     public string? Filter { get; set; }
     public Guid? CategoryId { get; set; }
-    public Guid? BrandId { get; set; }
     public Gender? Gender { get; set; }
     public bool? LowStock { get; set; }
     public bool? IncludeInactive { get; set; }

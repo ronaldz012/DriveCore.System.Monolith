@@ -11,12 +11,18 @@ public class GetProductsUc(IInvDbContext context)
     public async Task<Result<PagedResultDto<ListProductRequest>>> Execute(ActorContext ctx, ProductQueryDto queryDto)
     {
         var query = context.Products.AsQueryable();
-        if (!string.IsNullOrEmpty(queryDto.Filter))
+        if (!string.IsNullOrWhiteSpace(queryDto.Filter))
         {
-            var pattern = $"%{queryDto.Filter}%";
-            query = query.Where(x =>
-                EF.Functions.ILike(x.Name, pattern) ||
-                (x.InternalCode != null && EF.Functions.ILike(x.InternalCode, pattern)));
+            var words = queryDto.Filter.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var word in words)
+            {
+                var pattern = $"%{word}%";
+                query = query.Where(x =>
+                    EF.Functions.ILike(x.Name, pattern) ||
+                    (x.InternalCode != null && EF.Functions.ILike(x.InternalCode, pattern)) ||
+                    EF.Functions.ILike(x.Brand.Name, pattern));
+            }
         }
 
         if (queryDto.IncludeInactive != true)
@@ -28,8 +34,6 @@ public class GetProductsUc(IInvDbContext context)
         {
             query = query.Where(x => x.CategoryId == queryDto.CategoryId);
         }
-        if(queryDto.BrandId.HasValue)
-            query = query.Where(x => x.BrandId == queryDto.BrandId);
 
         if (queryDto.Gender.HasValue)
         {
