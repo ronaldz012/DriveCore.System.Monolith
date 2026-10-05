@@ -33,6 +33,7 @@ using Module.Inventory.Application.UseCases.ProductVariants.Delete;
 using Module.Inventory.Application.UseCases.ProductVariants.GetById;
 using Module.Inventory.Application.UseCases.ProductVariants.GetBySku;
 using Module.Inventory.Application.UseCases.ProductVariants.PatchStock;
+using Module.Inventory.Application.UseCases.ProductVariants.Search;
 using Module.Inventory.Application.UseCases.ProductVariants.Update;
 using Module.Inventory.Application.UseCases.Providers;
 using Module.Inventory.Application.UseCases.Providers.CreateProvider;
@@ -67,6 +68,7 @@ public  static class InvDependencyInjection
             .AddScoped<SearchProduct>()
             .AddScoped<ProductDetails>()
             .AddScoped<GetProductVariantByCode>()
+            .AddScoped<SearchProductVariants>()
             .AddScoped<UpdateProduct>()
             .AddScoped<DeleteProduct>()
             .AddScoped<UpdateProductStatus>();
