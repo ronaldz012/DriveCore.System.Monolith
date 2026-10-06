@@ -52,6 +52,7 @@ public class SearchProduct(IInvDbContext context)
                     Description = y.Description,
                     Sku = y.Sku,
                     Size = y.Size.Name,
+                    SizeOrder = y.Size.SortOrder,
                     SizeId = y.SizeId,
                     ColorId =  y.ColorId,
                     ColorName = y.Color.Name,
