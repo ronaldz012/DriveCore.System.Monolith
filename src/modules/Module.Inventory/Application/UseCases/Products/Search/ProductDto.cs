@@ -26,6 +26,7 @@ public class ProductVariantDto
     public string Sku { get; set; } = string.Empty;
 
     public string Size { get; set; } = string.Empty;
+    public int SizeOrder {get;set;}
     public Guid SizeId { get; set; }
     public Guid ColorId { get; set; }
     public string ColorName { get; set; } = string.Empty;
