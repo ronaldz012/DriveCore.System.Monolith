@@ -29,6 +29,8 @@ public class GetReception(IInvDbContext context)
                     Id = i.Id,
                     Sku = i.ProductVariant.Sku,
                     ProductVariantId = i.ProductVariantId,
+                    ProductId = i.ProductVariant.ProductId,
+                    BrandName = i.ProductVariant.Product.Brand.Name,
                     ProductName = i.ProductVariant.Product.Name,
                     VariantDescription = i.ProductVariant.Description,
                     Size = i.ProductVariant.Size.Name,

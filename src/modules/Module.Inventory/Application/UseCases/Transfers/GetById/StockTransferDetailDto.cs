@@ -21,6 +21,8 @@ public class StockTransferDetailDto
 public class StockTransferItemDetailDto
 {
     public Guid ProductVariantId { get; set; }
+    public Guid ProductId {get; set;}
+    public string BrandName {get;set;} = string.Empty;
     public string Sku { get; set; } = string.Empty;
     public string ProductName { get; set; } = string.Empty;
     public string VariantDescription { get; set; } = string.Empty;
