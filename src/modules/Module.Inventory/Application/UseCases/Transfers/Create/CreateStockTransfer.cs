@@ -9,7 +9,7 @@ namespace Module.Inventory.Application.UseCases.Transfers.Create;
 
 public class CreateStockTransfer(IInvDbContext context, IInventoryNumberGenerator numberGenerator)
 {
-    public async Task<Result<bool>> Execute(ActorContext ctx, CreateStockTransferDto dto)
+    public async Task<Result<Guid>> Execute(ActorContext ctx, CreateStockTransferDto dto)
     {
         var fromBranchId = ctx.BranchId;
 
@@ -70,7 +70,7 @@ public class CreateStockTransfer(IInvDbContext context, IInventoryNumberGenerato
             context.StockTransfers.Add(transfer);
             await context.SaveChangesAsync();
             await transaction.CommitAsync();
-            return true;
+            return transfer.Id;
         }
         catch
         {

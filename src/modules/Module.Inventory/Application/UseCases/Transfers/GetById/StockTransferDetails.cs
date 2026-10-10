@@ -13,9 +13,11 @@ public class StockTransferDetails(IInvDbContext context, IBranchService branchSe
     {
         var currentBranchIds = ctx.BranchIds[0];
         var transfer = await context.StockTransfers
+            .AsSplitQuery()
             .Include(st => st.Items)
                 .ThenInclude(i => i.ProductVariant)
                     .ThenInclude(pv => pv.Product)
+                    .ThenInclude(p => p.Brand)
             .Include(st => st.Items)
                 .ThenInclude(i => i.ProductVariant)
                     .ThenInclude(pv => pv.Color)
@@ -61,6 +63,8 @@ public class StockTransferDetails(IInvDbContext context, IBranchService branchSe
             Items = transfer.Items.Select(i => new StockTransferItemDetailDto
             {
                 ProductVariantId = i.ProductVariantId,
+                ProductId = i.ProductVariant.ProductId,
+                BrandName =i.ProductVariant.Product.Brand.Name,
                 ProductName = i.ProductVariant.Product.Name,
                 VariantDescription = i.ProductVariant.Description,
                 Sku = i.ProductVariant.Sku,
