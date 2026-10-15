@@ -12,9 +12,10 @@ public class ListProductRequest
     public string BrandName { get; set; } = string.Empty;    // Para el título en negrita
 
     // Resúmenes para la metadata secundaria
-    public int VariantsCount { get; set; }
     public decimal TotalStock { get; set; }
-    public decimal BasePrice { get; set; } // Puede ser el BasePrice o el Min(Price) de variantes
+    public decimal MinPrice { get; set; }
+    public decimal MaxPrice { get; set; }
+    public List<string> Colors { get; set; } = [];
     public bool IsActive { get; set; } = true;
 }
 public class ProductQueryDto : PaginationQueryDto

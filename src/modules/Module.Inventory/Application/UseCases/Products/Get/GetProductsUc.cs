@@ -93,10 +93,15 @@ public class GetProductsUc(IInvDbContext context)
                 Name = p.Name,
                 BrandName = p.Brand.Name,
                 CategoryName = p.Category.Name,
-                BasePrice = p.BasePrice,
                 InternalCode = p.InternalCode,
                 IsActive = p.IsActive,
-                VariantsCount = p.ProductVariants.Count,
+                MinPrice = p.ProductVariants.Min(v => (decimal?)v.Price) ?? 0m,
+                MaxPrice = p.ProductVariants.Max(v => (decimal?)v.Price) ?? 0m,
+                Colors = p.ProductVariants
+                    .Select(pv => pv.Color.Name)
+                    .Distinct()
+                    .OrderBy(name => name)
+                    .ToList(),
                 TotalStock = p.ProductVariants
                     .SelectMany(pv => pv.BranchInventories)
                     .Where(bi => ctx.BranchIds.Contains(bi.BranchId))
