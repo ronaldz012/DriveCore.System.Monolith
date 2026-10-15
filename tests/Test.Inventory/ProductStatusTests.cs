@@ -235,4 +235,89 @@ public class ProductStatusTests
         Assert.False(result.IsSuccess);
         Assert.Equal(UpdateProductStatusErrors.ProductNotFound, result.Error);
     }
+
+    private static async Task<Product> SeedProductWithVariants(
+        TestAppDbContext ctx,
+        string name,
+        string code,
+        (string ColorName, string SizeName, decimal Price)[] variants)
+    {
+        var product = Product.Create(name, "desc", CategoryId, BrandId, Gender.Unisex, code, TenantId, UserId, "Test User");
+        ctx.Products.Add(product);
+
+        foreach (var (colorName, sizeName, _) in variants)
+        {
+            var color = ctx.Colors.FirstOrDefault(c => c.Name == colorName);
+            if (color is null)
+            {
+                color = Color.Create(colorName, TenantId, UserId);
+                ctx.Colors.Add(color);
+            }
+
+            var size = ctx.Sizes.FirstOrDefault(s => s.Name == sizeName);
+            if (size is null)
+            {
+                size = new Size { Id = Guid.NewGuid(), Name = sizeName, SortOrder = ctx.Sizes.Count() + 1, CreatedBy = UserId, CreatedByName = "Test User" };
+                ctx.Sizes.Add(size);
+            }
+        }
+
+        await ctx.SaveChangesAsync();
+
+        var n = 1;
+        foreach (var (colorName, sizeName, price) in variants)
+        {
+            var color = ctx.Colors.First(c => c.Name == colorName);
+            var size = ctx.Sizes.First(s => s.Name == sizeName);
+            var variant = ProductVariant.Create(product.Id, color.Id, size.Id, price, $"{code}-{n++:000}", TenantId, UserId, "Test User");
+            ctx.ProductVariants.Add(variant);
+        }
+
+        await ctx.SaveChangesAsync();
+        return product;
+    }
+
+    [Fact]
+    public async Task GetProducts_ShouldReturnPriceRange_AndSortedDistinctColors()
+    {
+        using var ctx = CreateDbContext();
+        SeedCatalog(ctx);
+        var expected = await SeedProductWithVariants(ctx, "Zapatilla", "PRD-9", new[]
+        {
+            ("Verde", "42", 130m),
+            ("Azul", "42", 90m),
+            ("Azul", "40", 115m),
+        });
+
+        var sut = new GetProductsUc(ctx);
+        var result = await sut.Execute(CreateActorContext(), new ProductQueryDto { Page = 1, PageSize = 20 });
+
+        Assert.True(result.IsSuccess);
+        var item = Assert.Single(result.Value.Items);
+        Assert.Equal(expected.Id, item.Id);
+        Assert.Equal(90m, item.MinPrice);
+        Assert.Equal(130m, item.MaxPrice);
+        Assert.Equal(["Azul", "Verde"], item.Colors);
+    }
+
+    [Fact]
+    public async Task GetProducts_ShouldReturnZeroPricesAndNoColors_WhenProductHasNoVariants()
+    {
+        using var ctx = CreateDbContext();
+        SeedCatalog(ctx);
+
+        var product = Product.Create("Sin Variantes", "desc", CategoryId, BrandId, Gender.Unisex, "PRD-10", TenantId, UserId, "Test User");
+        ctx.Products.Add(product);
+        await ctx.SaveChangesAsync();
+
+        var sut = new GetProductsUc(ctx);
+        var result = await sut.Execute(CreateActorContext(), new ProductQueryDto { Page = 1, PageSize = 20 });
+
+        Assert.True(result.IsSuccess);
+        var item = Assert.Single(result.Value.Items);
+        Assert.Equal(product.Id, item.Id);
+        Assert.Equal(0m, item.MinPrice);
+        Assert.Equal(0m, item.MaxPrice);
+        Assert.Empty(item.Colors);
+    }
 }
