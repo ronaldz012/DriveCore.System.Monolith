@@ -113,12 +113,20 @@ public class CreateProductUc(IInvDbContext context, IProductCodeService codeServ
                 BrandName = saved.Brand.Name,
                 CategoryName = saved.Category.Name,
                 IsActive = saved.IsActive,
+                Gender = saved.Gender,
+                Description =saved.Description,
                 Variants = saved.ProductVariants.OrderBy(pv => pv.Color.Name).ThenBy(pv => pv.Size.SortOrder).ThenBy(pv => pv.Sku).Select(pv => new ProductVariantsCreated
                 {
-                    ProductVariantId = pv.Id,
+                    Id = pv.Id,
                     Sku = pv.Sku,
                     Size = pv.Size.Name,
-                    ColorName = pv.Color.Name
+                    SizeId = pv.SizeId,
+                    sizeOrder = pv.Size.SortOrder,
+                    ColorId = pv.ColorId,
+                    ColorName = pv.Color.Name,
+                    Price = pv.Price
+                    
+
                 }).ToList()
             };
         }
