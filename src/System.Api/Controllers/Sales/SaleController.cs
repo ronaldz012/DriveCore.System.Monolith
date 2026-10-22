@@ -43,7 +43,13 @@ namespace System.Api.Controllers.Sales
         {
             var actorResult = currentUser.GetActorContext();
             if (!actorResult.IsSuccess)  return actorResult.ToValueOrProblemDetails();
-            return await saleUseCases.GetSaleDetail.Execute(actorResult.Value, id).ToValueOrProblemDetails();
+
+            var marginResult = currentUser.HasPermission("sales", "margin");
+            if (!marginResult.IsSuccess) return marginResult.ToValueOrProblemDetails();
+
+            return await saleUseCases.GetSaleDetail
+                .Execute(actorResult.Value, id, marginResult.Value)
+                .ToValueOrProblemDetails();
         }
         [HttpGet("returns")]
         [RequireFeature("pos", "read")]

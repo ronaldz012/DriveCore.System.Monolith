@@ -70,12 +70,19 @@ public class RequireFeatureFilter(
             return;
         }
 
-        bool hasPermission = requestedBranches.All(branch =>
-            branch.Features.Any(f =>
-                f.Key == feature &&
-                (f.Permissions.Contains("*") || f.Permissions.Contains(permission))));
+        var permissionResult = sessionState.HasPermission(feature, permission);
+        if (!permissionResult.IsSuccess)
+        {
+            context.Result = new ObjectResult(new
+            {
+                StatusCode = StatusCodes.Status401Unauthorized,
+                Message = "No se pudo autenticar la sesión."
+            }) { StatusCode = StatusCodes.Status401Unauthorized };
+            return;
+        }
 
-        if (!hasPermission)
+        // Admins and "*" wildcards are resolved inside HasPermission.
+        if (!permissionResult.Value)
         {
             logger.LogWarning(
                 "Usuario {UserId} fue rechazado. Falta el permiso '{Permission}' en la Feature '{Feature}' para las Branches: {Branches}",

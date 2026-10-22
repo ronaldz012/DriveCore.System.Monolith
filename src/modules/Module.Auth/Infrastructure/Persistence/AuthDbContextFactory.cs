@@ -15,10 +15,13 @@ public class AuthDbContextFactory : IDesignTimeDbContextFactory<AuthDbContext>
         if (!Directory.Exists(basePath))
             basePath = currentDir;
 
+        // Design-time tooling uses the BASE appsettings.json only: the
+        // appsettings.Development.json override belongs to the running
+        // application, not to EF tooling ('dotnet ef' would otherwise
+        // silently target whatever database Development configures).
         var configuration = new ConfigurationBuilder()
             .SetBasePath(Path.GetFullPath(basePath))
             .AddJsonFile("appsettings.json", optional: false)
-            .AddJsonFile("appsettings.Development.json", optional: true)
             .Build();
 
         var connectionString = configuration.GetConnectionString("DefaultConnection")

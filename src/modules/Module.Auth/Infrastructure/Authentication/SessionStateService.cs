@@ -79,15 +79,7 @@ public class SessionStateService(
             return new Error(ErrorCode.Unauthorized, "Session is not hydrated");
 
         var user = _session.Session.User;
-
-        var branchHeader = httpContextAccessor.HttpContext?.Request.Headers["X-Branch-Id"].ToString();
-
-        var branchIds = string.IsNullOrWhiteSpace(branchHeader)
-            ? Array.Empty<Guid>()
-            : branchHeader.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                .Select(s => Guid.TryParse(s.Trim(), out var id) ? id : Guid.Empty)
-                .Where(id => id != Guid.Empty)
-                .ToArray();
+        var branchIds = ResolveRequestedBranchIds();
 
         var actor = new ActorContext(
             user.TenantId,
@@ -97,6 +89,48 @@ public class SessionStateService(
             branchIds);
 
         return actor;
+    }
+
+    public Result<bool> HasPermission(string feature, string permission)
+    {
+        if (_session is null)
+            return new Error(ErrorCode.Unauthorized, "Session is not hydrated");
+
+        var session = _session.Session;
+        if (session.User.IsAdmin) return true;
+
+        var branchIds = ResolveRequestedBranchIds();
+        if (branchIds.Count == 0)
+            return new Error(ErrorCode.BadRequest, "No se especificó ninguna sucursal.");
+
+        foreach (var branchId in branchIds)
+        {
+            var branch = session.Branches.FirstOrDefault(b => b.BranchId == branchId);
+            if (branch is null)
+                return new Error(ErrorCode.Forbidden, "Acceso denegado a una o más sucursales solicitadas.");
+
+            var allowed = branch.Features.Any(f =>
+                f.Key == feature &&
+                (f.Permissions.Contains("*") || f.Permissions.Contains(permission)));
+
+            if (!allowed)
+                return false;
+        }
+
+        return true;
+    }
+
+    private List<Guid> ResolveRequestedBranchIds()
+    {
+        var branchHeader = httpContextAccessor.HttpContext?.Request.Headers["X-Branch-Id"].ToString();
+
+        if (string.IsNullOrWhiteSpace(branchHeader))
+            return [];
+
+        return branchHeader.Split(',', StringSplitOptions.RemoveEmptyEntries)
+            .Select(s => Guid.TryParse(s.Trim(), out var id) ? id : Guid.Empty)
+            .Where(id => id != Guid.Empty)
+            .ToList();
     }
 
     public void Invalidate(string externalAuthId)

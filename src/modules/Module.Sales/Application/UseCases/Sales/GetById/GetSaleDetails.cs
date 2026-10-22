@@ -7,7 +7,7 @@ namespace Module.Sales.Application.UseCases.Sales.GetById;
 
 public class GetSaleDetail(ISalesDbContext context)
 {
-    public async Task<Result<SaleDetailDto>> Execute(ActorContext ctx, Guid saleId)
+    public async Task<Result<SaleDetailDto>> Execute(ActorContext ctx, Guid saleId, bool canSeeMargin)
     {
         var currentBranch = ctx.BranchIds[0];
 
@@ -38,8 +38,8 @@ public class GetSaleDetail(ISalesDbContext context)
                     ProductVariantId = si.ProductVariantId,
                     ProductDisplayName = si.ProductDisplayName,
                     ProductSku = si.ProductSku,
-                    UnitPrice = si.UnitPrice,
-                    UnitCost = si.UnitCost,
+                    UnitPrice = canSeeMargin ? si.UnitPrice : null,
+                    UnitCost = canSeeMargin ? si.UnitCost : null,
                     Quantity = si.Quantity,
                     DiscountAmount = si.DiscountAmount,
                     FinalPrice = si.FinalPrice,

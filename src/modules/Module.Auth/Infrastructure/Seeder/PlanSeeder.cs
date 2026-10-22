@@ -38,6 +38,7 @@ public class PlanSeeder(IAuthDbContext context) : IDataSeeder
                         new() { FeatureKey = "products",  Actions = ["read"] },
                         new() { FeatureKey = "transfers", Actions = ["read", "create", "update"] },
                         new() { FeatureKey = "pos",       Actions = ["read", "create"] },
+                        new() { FeatureKey = "sales",     Actions = ["read"] },
                         new() { FeatureKey = "closures",  Actions = ["create"] }
                     ]
                 },
@@ -62,7 +63,7 @@ public class PlanSeeder(IAuthDbContext context) : IDataSeeder
                         new() { FeatureKey = "transfers",  Actions = ["read", "create", "update", "delete"] },
                         new() { FeatureKey = "receptions", Actions = ["read", "create", "update", "delete"] },
                         new() { FeatureKey = "pos",        Actions = ["read", "create", "update"] },
-                        new() { FeatureKey = "sales",      Actions = ["read"] },
+                        new() { FeatureKey = "sales",      Actions = ["read", "margin"] },
                         new() { FeatureKey = "closures",   Actions = ["read", "create", "update"] }
                     ]
                 },

@@ -92,7 +92,8 @@ public class FeatureSeeder(IAuthDbContext context) : IDataSeeder
                 IsMenu = true,
                 CreatedAt   = DateTime.UtcNow,
                 AvailableActions = [
-                    new() { Key = "read", DisplayName = "Ver Ventas", Description = "Permite listar el historial de ventas realizadas." }
+                    new() { Key = "read", DisplayName = "Ver Ventas", Description = "Permite listar el historial de ventas realizadas." },
+                    new() { Key = "margin", DisplayName = "Ver Márgenes", Description = "Permite ver el precio y costo con margen en el detalle de ventas." }
                 ]
             },
             new()
