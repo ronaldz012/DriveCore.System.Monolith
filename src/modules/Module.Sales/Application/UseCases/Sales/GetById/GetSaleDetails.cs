@@ -38,7 +38,7 @@ public class GetSaleDetail(ISalesDbContext context)
                     ProductVariantId = si.ProductVariantId,
                     ProductDisplayName = si.ProductDisplayName,
                     ProductSku = si.ProductSku,
-                    UnitPrice = canSeeMargin ? si.UnitPrice : null,
+                    UnitPrice = si.UnitPrice,
                     UnitCost = canSeeMargin ? si.UnitCost : null,
                     Quantity = si.Quantity,
                     DiscountAmount = si.DiscountAmount,
