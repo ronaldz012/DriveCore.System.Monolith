@@ -29,8 +29,8 @@ public class ProductVariant: Params, IMustHaveTenant
     public ICollection<StockTransferItem> TransferItems { get; set; } = new List<StockTransferItem>();
 
     public static string BuildDisplayName(
-        string brandName, string categoryName, string productName, string colorName, string sizeName)
-        => $"{brandName} {categoryName} {productName} - {colorName} / {sizeName}";
+        string categoryName, string brandName, string productName, string colorName, string sizeName)
+        => $"{categoryName} {brandName} {productName} - {colorName} / {sizeName}";
 
     public static ProductVariant Create(Guid productId, Guid colorId, Guid sizeId, decimal price, string sku, Guid tenantId, Guid createdBy, string createdByName)
     {

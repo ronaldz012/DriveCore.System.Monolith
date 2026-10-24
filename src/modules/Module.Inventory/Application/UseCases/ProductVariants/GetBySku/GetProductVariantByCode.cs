@@ -40,7 +40,7 @@ public class GetProductVariantByCode(IInvDbContext context)
             return GetProductVariantByCodeErrors.ProductInactive;
 
         result.DisplayName = ProductVariant.BuildDisplayName(
-            result.BrandName, result.CategoryName, result.ProductName, result.ColorName, result.Size);
+            result.CategoryName, result.BrandName, result.ProductName, result.ColorName, result.Size);
 
         return result;
     }

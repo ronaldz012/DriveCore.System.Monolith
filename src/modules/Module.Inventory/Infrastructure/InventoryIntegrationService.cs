@@ -37,7 +37,7 @@ public class InventoryIntegrationService(IInvDbContext context) : IInventoryInte
             .Select(x => new ProductVariantStockDto(
                 x.Id,
                 x.Sku,
-                ProductVariant.BuildDisplayName(x.BrandName, x.CategoryName, x.ProductName, x.ColorName, x.SizeName),
+                ProductVariant.BuildDisplayName(x.CategoryName, x.BrandName, x.ProductName, x.ColorName, x.SizeName),
                 x.Price,
                 x.Stock,
                 x.IsActive,

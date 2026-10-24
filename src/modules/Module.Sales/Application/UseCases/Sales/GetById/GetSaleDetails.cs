@@ -2,6 +2,7 @@ using Common.Contracts.authentication;
 using Common.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Module.Sales.Application.Abstraction;
+using Module.Sales.Domain;
 
 namespace Module.Sales.Application.UseCases.Sales.GetById;
 
@@ -31,6 +32,7 @@ public class GetSaleDetail(ISalesDbContext context)
                 CreatedAt = s.CreatedAt,
                 OriginalSaleId = s.OriginalSaleId,
                 TotalItems = s.SaleItems.Sum(si => si.Quantity),
+                CanReturn = s.Type == SaleType.Sale && !s.Returns.Any(),
 
                 Items = s.SaleItems.Select(si => new SaleItemDetailDto
                 {
