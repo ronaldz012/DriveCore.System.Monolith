@@ -36,6 +36,7 @@ public class GetSaleForReturn(ISalesDbContext context)
             TotalAmount = sale.TotalAmount,
             SoldByName = sale.SoldByName,
             Type = sale.Type,
+            paymentMethod = sale.PaymentMethod,
             Items = sale.SaleItems.Select(si => new ReturnableItemDto
             {
                 SaleItemId = si.Id,
