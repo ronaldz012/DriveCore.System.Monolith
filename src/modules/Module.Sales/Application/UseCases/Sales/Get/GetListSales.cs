@@ -27,6 +27,33 @@ public class GetListSales(ISalesDbContext context)
         if (queryDto.HasReturn.HasValue)
             query = query.Where(s => s.Returns.Any() == queryDto.HasReturn.Value);
 
+        var filter = queryDto.Filter?.Trim();
+
+        if (!string.IsNullOrEmpty(filter))
+        {
+            var isNumber = filter.Length <= 9 && filter.All(char.IsAsciiDigit);
+
+            // Digits match the exact sale number or an exact numeric SKU.
+            if (isNumber && int.TryParse(filter, out var number))
+                query = query.Where(s =>
+                    s.Number == number ||
+                    s.SaleItems.Any(si => si.ProductSku == filter));
+            else
+            {
+                var words = filter.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (var word in words)
+                {
+                    var pattern = $"%{word}%";
+
+                    // Word must appear in any item's display name or SKU.
+                    query = query.Where(s => s.SaleItems.Any(si =>
+                        EF.Functions.ILike(si.ProductDisplayName, pattern) ||
+                        EF.Functions.ILike(si.ProductSku, pattern)));
+                }
+            }
+        }
+
         var totalCount = await query.CountAsync();
 
         var items = await query

@@ -29,4 +29,5 @@ public class SalesQueryDto : PaginationQueryDto
     public DateTime? DateTo { get; set; }
     public SaleType? Type { get; set; }
     public bool? HasReturn { get; set; }
+    public string? Filter { get; set; }
 }
