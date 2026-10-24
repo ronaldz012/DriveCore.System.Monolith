@@ -11,6 +11,7 @@ public class SaleForReturnDto
     public decimal TotalAmount { get; set; }
     public string SoldByName { get; set; } = string.Empty;
     public SaleType Type { get; set; }
+    public PaymentMethod paymentMethod {get; set;}
     public List<ReturnableItemDto> Items { get; set; } = new();
 }
 
