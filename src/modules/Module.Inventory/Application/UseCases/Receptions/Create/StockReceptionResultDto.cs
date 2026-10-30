@@ -1,3 +1,5 @@
+using Module.Inventory.Domain.Receptions;
+
 namespace Module.Inventory.Application.UseCases.Receptions.Create;
 
 public class StockReceptionResultDto
@@ -9,6 +11,7 @@ public class StockReceptionResultDto
     public string ProviderName { get; set; } = string.Empty;
     public DateTime ReceivedAt { get; set; }
     public string? Notes { get; set; }
+    public ReceptionStatus Status { get; set; }
     public List<StockReceptionItemResultDto> Items { get; set; } = new();
 }
 

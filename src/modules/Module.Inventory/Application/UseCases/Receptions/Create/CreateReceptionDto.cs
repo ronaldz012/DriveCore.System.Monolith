@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Module.Inventory.Domain.Receptions;
 
 namespace Module.Inventory.Application.UseCases.Receptions.Create;
 
@@ -8,6 +9,8 @@ public class CreateStockReceptionDto : IValidatableObject
     public Guid ProviderId { get; set; }
 
     public string? Notes { get; set; }
+
+    public bool SaveAsDraft { get; set; }
 
     [Required]
     [MinLength(1, ErrorMessage = "At least one item is required")]
@@ -21,6 +24,17 @@ public class CreateStockReceptionDto : IValidatableObject
 
         if (duplicate != null)
             yield return new ValidationResult("Duplicate variant items in request", [nameof(Items)]);
+
+        foreach (var item in Items)
+        {
+            if (item.UnitCost < 0)
+                yield return new ValidationResult("UnitCost cannot be negative", [nameof(Items)]);
+
+            if (!SaveAsDraft && item.UnitCost < StockReceptionItem.MinUnitCost)
+                yield return new ValidationResult(
+                    $"UnitCost must be at least {StockReceptionItem.MinUnitCost} for confirmed receptions",
+                    [nameof(Items)]);
+        }
     }
 }
 
@@ -32,6 +46,5 @@ public class CreateStockReceptionItemDto
     [Range(1, 999999999, ErrorMessage = "QuantityReceived must be greater than 0")]
     public int QuantityReceived { get; set; }
 
-    [Range(0.5, 999999999, ErrorMessage = "UnitCost must be at least 0.5")]
     public decimal UnitCost { get; set; }
 }

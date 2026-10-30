@@ -40,6 +40,7 @@ using Module.Inventory.Application.UseCases.Providers.CreateProvider;
 using Module.Inventory.Application.UseCases.Providers.GetProviders;
 using Module.Inventory.Application.UseCases.Providers.Update;
 using Module.Inventory.Application.UseCases.Receptions;
+using Module.Inventory.Application.UseCases.Receptions.Confirm;
 using Module.Inventory.Application.UseCases.Receptions.Create;
 using Module.Inventory.Application.UseCases.Receptions.Get;
 using Module.Inventory.Application.UseCases.Receptions.GetById;
@@ -95,6 +96,7 @@ public  static class InvDependencyInjection
         
         services.AddScoped<ReceptionUseCases>()
             .AddScoped<CreateReceptionUc>()
+            .AddScoped<ConfirmStockReceptionUc>()
             .AddScoped<ListReceptions>()
             .AddScoped<GetReception>()
             .AddScoped<ReceptionLabels>()
