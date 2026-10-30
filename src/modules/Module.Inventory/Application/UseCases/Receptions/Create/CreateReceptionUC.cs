@@ -4,7 +4,6 @@ using Common.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Module.Inventory.Application.Abstraction;
-using Module.Inventory.Domain.Inventory;
 using Module.Inventory.Domain.Receptions;
 
 namespace Module.Inventory.Application.UseCases.Receptions.Create;
@@ -50,52 +49,32 @@ public class CreateReceptionUc(
 
         try
         {
-            var reception = StockReception.Create(branchId, userId, userName, dto.Notes, dto.ProviderId);
-            var stockMovements = new List<StockMovement>();
+            var reception = StockReception.Create(
+                branchId, userId, userName, dto.Notes, dto.ProviderId,
+                dto.SaveAsDraft ? ReceptionStatus.Draft : ReceptionStatus.Confirmed);
+
             var variantMap = variants.ToDictionary(v => v.Id);
 
             foreach (var item in dto.Items)
             {
-                var variant = variantMap[item.ProductVariantId];
-                var stockBefore = variant.GetStockByBranch(branchId);
-                var stockAfter = stockBefore + item.QuantityReceived;
-
-                reception.AddExistingVariant(variant.Id, userId, userName, item.QuantityReceived, item.UnitCost);
-                variant.RegisterPurchase(item.QuantityReceived, item.UnitCost);
-                variant.AddQuantity(item.QuantityReceived, branchId, userId, userName);
-
-                stockMovements.Add(StockMovement.CreateReception(
-                    branchId, variant.Id, userId, userName, item.QuantityReceived, reception.Id, item.UnitCost, stockBefore, stockAfter));
+                reception.AddExistingVariant(
+                    variantMap[item.ProductVariantId].Id, userId, userName, item.QuantityReceived, item.UnitCost);
             }
+
+            // Drafts only persist the header and items: no stock, no movements.
+            if (!dto.SaveAsDraft)
+                context.StockMovements.AddRange(reception.Confirm(variants, branchId, userId, userName));
 
             reception.Number = await numberGenerator.NextAsync(context.Database, ctx.TenantId, InventoryCounterKey.Reception);
 
             context.StockReceptions.Add(reception);
-            context.StockMovements.AddRange(stockMovements);
 
             await context.SaveChangesAsync();
             await transaction.CommitAsync();
 
             var result = await context.StockReceptions
                 .Where(r => r.Id == reception.Id)
-                .Select(r => new StockReceptionResultDto
-                {
-                    Id = r.Id,
-                    Number = r.Number,
-                    BranchId = r.BranchId,
-                    ProviderId = r.ProviderId,
-                    ProviderName = r.Provider.Name,
-                    ReceivedAt = r.ReceivedAt,
-                    Notes = r.Notes,
-                    Items = r.Items.Select(i => new StockReceptionItemResultDto
-                    {
-                        ProductVariantId = i.ProductVariantId,
-                        ProductName = i.ProductVariant.Product.Name,
-                        VariantDescription = i.ProductVariant.Description,
-                        QuantityReceived = i.QuantityReceived,
-                        UnitCost = i.UnitCost
-                    }).ToList()
-                })
+                .ProjectToResult()
                 .FirstOrDefaultAsync();
 
             if (result == null)

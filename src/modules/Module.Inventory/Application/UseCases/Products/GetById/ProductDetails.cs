@@ -3,6 +3,7 @@ using Common.Contracts.branches;
 using Common.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Module.Inventory.Application.Abstraction;
+using Module.Inventory.Domain.Receptions;
 
 namespace Module.Inventory.Application.UseCases.Products.GetById;
 
@@ -12,39 +13,66 @@ public class ProductDetails(IInvDbContext context, IBranchService branchService)
     {
         var userBranches = ctx.BranchIds;
 
-        var result = await context.Products.Select(p => new ProductDetailDto
-        {
-            Id = p.Id,
-            Name = p.Name,
-            InternalCode = p.InternalCode,
-            Description = p.Description,
-            BasePrice = p.BasePrice,
-            Gender = p.Gender,
-            IsActive = p.IsActive,
-            CategoryId = p.CategoryId,
-            CategoryName = p.Category.Name,
-            BrandId = p.BrandId,
-            BrandName = p.Brand.Name,
-            Variants = p.ProductVariants.OrderBy(pv => pv.Color.Name).ThenBy(pv => pv.Size.SortOrder).ThenBy(pv => pv.Sku).Select(pv => new ProductVarianListDto
+        var result = await context.Products
+            .Where(p => p.Id == productId)
+            .Select(p => new ProductDetailDto
             {
-                Id = pv.Id,
-                Sku = pv.Sku,
-                Description = pv.Description,
-                Size = pv.Size.Name,
-                SizeId = pv.SizeId,
-                Color = pv.Color.Name,
-                ColorId = pv.ColorId,
-                Price = pv.Price,
-                AverageCost = pv.AverageCost,
-                BranchStocks = pv.BranchInventories
-                    .Where(bi => userBranches.Contains(bi.BranchId))
-                    .Select(bi => new BranchStockDto
+                Id = p.Id,
+                Name = p.Name,
+                InternalCode = p.InternalCode,
+                Description = p.Description,
+                BasePrice = p.BasePrice,
+                Gender = p.Gender,
+                IsActive = p.IsActive,
+                CategoryId = p.CategoryId,
+                CategoryName = p.Category.Name,
+                BrandId = p.BrandId,
+                BrandName = p.Brand.Name,
+                Variants = p.ProductVariants
+                    .OrderBy(pv => pv.Color.Name)
+                    .ThenBy(pv => pv.Size.SortOrder)
+                    .ThenBy(pv => pv.Sku)
+                    .Select(pv => new ProductVarianListDto
                     {
-                        BranchId = bi.BranchId,
-                        Stock = bi.Stock,
+                        Id = pv.Id,
+                        Sku = pv.Sku,
+                        Description = pv.Description,
+                        Size = pv.Size.Name,
+                        SizeId = pv.SizeId,
+                        Color = pv.Color.Name,
+                        ColorId = pv.ColorId,
+                        Price = pv.Price,
+                        AverageCost = pv.AverageCost,
+
+                        // Latest confirmed reception for this variant. Drafts and reverted receptions are
+                        // excluded because they never affected stock. ReceivedAt is rewritten on confirm,
+                        // so it reflects the real purchase order; Number breaks same-second ties.
+                        LastPurchaseCost = context.StockReceptionItems
+                            .Where(i => i.ProductVariantId == pv.Id
+                                     && i.StockReception.Status == ReceptionStatus.Confirmed)
+                            .OrderByDescending(i => i.StockReception.ReceivedAt)
+                            .ThenByDescending(i => i.StockReception.Number)
+                            .Select(i => (decimal?)i.UnitCost)
+                            .FirstOrDefault(),
+
+                        LastPurchaseAt = context.StockReceptionItems
+                            .Where(i => i.ProductVariantId == pv.Id
+                                     && i.StockReception.Status == ReceptionStatus.Confirmed)
+                            .OrderByDescending(i => i.StockReception.ReceivedAt)
+                            .ThenByDescending(i => i.StockReception.Number)
+                            .Select(i => (DateTime?)i.StockReception.ReceivedAt)
+                            .FirstOrDefault(),
+
+                        BranchStocks = pv.BranchInventories
+                            .Where(bi => userBranches.Contains(bi.BranchId))
+                            .Select(bi => new BranchStockDto
+                            {
+                                BranchId = bi.BranchId,
+                                Stock = bi.Stock,
+                            }).ToList()
                     }).ToList()
-            }).ToList()
-        }).FirstOrDefaultAsync(x => x.Id == productId);
+            })
+            .FirstOrDefaultAsync();
 
         if (result is null) return ProductDetailsErrors.ProductNotFound;
 

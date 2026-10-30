@@ -22,6 +22,16 @@ public class RevertStockReception(
             return loadResult.Error;
 
         var (reception, variants) = loadResult.Value;
+
+        // Drafts never moved stock: cancelling one needs no stock or contamination checks.
+        if (reception.Status == ReceptionStatus.Draft)
+            return new StockReceptionRevertCheckDto
+            {
+                ReceptionId = id,
+                CanRevert = true,
+                Reason = string.Empty
+            };
+
         var contaminated = await HasContaminatingMovementsAsync(reception);
         var blockReason = GetBlockReason(reception, variants, contaminated);
 
@@ -40,6 +50,15 @@ public class RevertStockReception(
             return loadResult.Error;
 
         var (reception, variants) = loadResult.Value;
+
+        // Drafts never moved stock: cancelling one only changes its status.
+        if (reception.Status == ReceptionStatus.Draft)
+        {
+            reception.Status = ReceptionStatus.Reverted;
+            await context.SaveChangesAsync();
+            return true;
+        }
+
         var contaminated = await HasContaminatingMovementsAsync(reception);
         var blockReason = GetBlockReason(reception, variants, contaminated);
         if (blockReason != RevertBlockReason.None)

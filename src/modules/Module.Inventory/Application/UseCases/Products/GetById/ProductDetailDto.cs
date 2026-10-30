@@ -28,6 +28,11 @@ public class ProductVarianListDto
     public string Description { get; set; } = string.Empty;
     public string Size { get; set; } = string.Empty;
     public decimal AverageCost {get;set;}
+
+    // Unit cost of the latest confirmed reception (null when the variant was never purchased).
+    public decimal? LastPurchaseCost { get; set; }
+    public DateTime? LastPurchaseAt { get; set; }
+
     public Guid SizeId { get; set; }
     public string Color { get; set; } = string.Empty;
     public Guid ColorId {get;set;}

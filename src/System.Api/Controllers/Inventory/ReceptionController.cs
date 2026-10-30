@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Module.Auth.Application.Abstraction;
 using Module.Inventory.Application.UseCases.Receptions;
+using Module.Inventory.Application.UseCases.Receptions.Confirm;
 using Module.Inventory.Application.UseCases.Receptions.Create;
 using Module.Inventory.Application.UseCases.Receptions.Get;
 
@@ -41,6 +42,15 @@ namespace System.Api.Controllers.Inventory
             var actorResult = currentUser.GetActorContext();
             if (!actorResult.IsSuccess)  return actorResult.ToValueOrProblemDetails();
             return await service.GetReception.Execute(actorResult.Value, id).ToValueOrProblemDetails();
+        }
+
+        [HttpPost("{id:guid}/confirm")]
+        [RequireFeature("receptions", "update")]
+        public async Task<IActionResult> Confirm([FromRoute] Guid id)
+        {
+            var actorResult = currentUser.GetActorContext();
+            if (!actorResult.IsSuccess)  return actorResult.ToValueOrProblemDetails();
+            return await service.ConfirmStockReceptionUc.Execute(actorResult.Value, id).ToValueOrProblemDetails();
         }
 
         [HttpGet("{id:guid}/labels")]
