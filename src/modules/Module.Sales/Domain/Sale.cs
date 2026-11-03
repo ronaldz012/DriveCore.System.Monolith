@@ -46,7 +46,7 @@ public class Sale : IMustHaveTenant, ICreatedAt, ICreatedBy, IUpdatedAt, IUpdate
         PaymentMethod paymentMethod,
         string? transactionCode,
         string? notes,
-        List<(Guid ProductVariantId, string ProductSku, string ProductDisplayName, decimal UnitPrice, int Quantity, decimal DiscountAmount, decimal UnitCost)> items)
+        List<(Guid? ProductVariantId, string ProductSku, string ProductDisplayName, decimal UnitPrice, int Quantity, decimal DiscountAmount, decimal? UnitCost)> items)
     {
         return CreateBase(branchId, soldById, soldByName, createdBy, createdByName, cashRegisterClosureId, paymentMethod, 
             DocumentType.Ticket, transactionCode, notes, null, items);
@@ -64,7 +64,7 @@ public class Sale : IMustHaveTenant, ICreatedAt, ICreatedBy, IUpdatedAt, IUpdate
         int? invoiceNumber,
         string? transactionCode,
         string? notes,
-        List<(Guid ProductVariantId, string ProductSku, string ProductDisplayName, decimal UnitPrice, int Quantity, decimal DiscountAmount, decimal UnitCost)> items)
+        List<(Guid? ProductVariantId, string ProductSku, string ProductDisplayName, decimal UnitPrice, int Quantity, decimal DiscountAmount, decimal? UnitCost)> items)
     {
         if (documentType == DocumentType.Ticket)
             throw new InvalidOperationException("Cannot create an invoice with document type 'Ticket'.");
@@ -89,7 +89,7 @@ public class Sale : IMustHaveTenant, ICreatedAt, ICreatedBy, IUpdatedAt, IUpdate
         string? transactionCode,
         string? notes,
         int? invoiceNumber,
-        List<(Guid ProductVariantId, string ProductSku, string ProductDisplayName, decimal UnitPrice, int Quantity, decimal DiscountAmount, decimal UnitCost)> items)
+        List<(Guid? ProductVariantId, string ProductSku, string ProductDisplayName, decimal UnitPrice, int Quantity, decimal DiscountAmount, decimal? UnitCost)> items)
     {
         if (items == null || !items.Any())
             throw new InvalidOperationException("Cannot create a sale without products.");
@@ -116,6 +116,9 @@ public class Sale : IMustHaveTenant, ICreatedAt, ICreatedBy, IUpdatedAt, IUpdate
         decimal total = 0;
         foreach (var item in items)
         {
+            if (item.ProductVariantId is null && string.IsNullOrWhiteSpace(item.ProductDisplayName))
+                throw new InvalidOperationException("A free sale item requires a display name.");
+
             var subtotal = (item.UnitPrice - item.DiscountAmount) * item.Quantity;
             sale.SaleItems.Add(new SaleItem
             {
@@ -150,7 +153,7 @@ public class Sale : IMustHaveTenant, ICreatedAt, ICreatedBy, IUpdatedAt, IUpdate
         string? transactionCode,
         string? notes,
         Guid originalSaleId,
-        List<(Guid ProductVariantId, string ProductSku, string ProductDisplayName, decimal UnitPrice, int Quantity, decimal DiscountAmount, decimal UnitCost, Guid OriginalSaleItemId)> items)
+        List<(Guid? ProductVariantId, string ProductSku, string ProductDisplayName, decimal UnitPrice, int Quantity, decimal DiscountAmount, decimal? UnitCost, Guid OriginalSaleItemId)> items)
     {
         if (items == null || !items.Any())
             throw new InvalidOperationException("Cannot create a return without products.");
@@ -177,6 +180,9 @@ public class Sale : IMustHaveTenant, ICreatedAt, ICreatedBy, IUpdatedAt, IUpdate
         decimal total = 0;
         foreach (var item in items)
         {
+            if (item.ProductVariantId is null && string.IsNullOrWhiteSpace(item.ProductDisplayName))
+                throw new InvalidOperationException("A free sale item requires a display name.");
+
             var subtotal = (item.UnitPrice - item.DiscountAmount) * item.Quantity;
             sale.SaleItems.Add(new SaleItem
             {

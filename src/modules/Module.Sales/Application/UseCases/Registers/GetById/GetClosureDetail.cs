@@ -108,7 +108,8 @@ public class GetClosureDetail(
     {
         var variantIds = closure.Sales
             .SelectMany(s => s.Items)
-            .Select(i => i.ProductVariantId)
+            .Where(i => i.ProductVariantId.HasValue)
+            .Select(i => i.ProductVariantId!.Value)
             .Distinct()
             .ToList();
 
