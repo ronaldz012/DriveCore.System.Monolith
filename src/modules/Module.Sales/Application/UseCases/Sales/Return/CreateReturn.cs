@@ -17,9 +17,10 @@ public class CreateReturn(
 {
     public async Task<Result<CreateReturnResponse>> Execute(ActorContext ctx, CreateReturnDto dto)
     {
+        // Tenant isolation comes from the global query filter; the use case enforces branch scope.
         var originalSale = await context.Sales
             .Include(s => s.SaleItems)
-            .FirstOrDefaultAsync(s => s.Id == dto.OriginalSaleId && s.TenantId == ctx.TenantId);
+            .FirstOrDefaultAsync(s => s.Id == dto.OriginalSaleId && s.BranchId == ctx.BranchId);
 
         if (originalSale == null)
             return ReturnErrors.OriginalSaleNotFound;
