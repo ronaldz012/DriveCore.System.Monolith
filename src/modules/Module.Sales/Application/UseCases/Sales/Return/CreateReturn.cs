@@ -77,18 +77,27 @@ public class CreateReturn(
 
             context.Sales.Add(returnSale);
 
-            var returns = dto.Items.Select(item =>
-            {
-                var originalItem = originalSale.SaleItems.First(i => i.Id == item.OriginalSaleItemId);
-                return new StockReturnDto(originalItem.ProductVariantId, item.Quantity, originalItem.UnitCost);
-            }).ToList();
+            var returns = dto.Items
+                .Select(item =>
+                {
+                    var originalItem = originalSale.SaleItems.First(i => i.Id == item.OriginalSaleItemId);
+                    return (OriginalItem: originalItem, item.Quantity);
+                })
+                .Where(x => x.OriginalItem.ProductVariantId.HasValue)
+                .Select(x => new StockReturnDto(
+                    x.OriginalItem.ProductVariantId!.Value, x.Quantity, x.OriginalItem.UnitCost ?? 0))
+                .ToList();
 
-            var returnResult = await inventoryService.ReturnStock(
-                returns, ctx.BranchId, ctx.UserId, ctx.FullName, returnSale.Id, saveChanges: false);
-            if (!returnResult.IsSuccess)
+            // Free items have no stock to restore; only catalog variants go back to inventory.
+            if (returns.Count > 0)
             {
-                await transaction.RollbackAsync();
-                return returnResult.Error;
+                var returnResult = await inventoryService.ReturnStock(
+                    returns, ctx.BranchId, ctx.UserId, ctx.FullName, returnSale.Id, saveChanges: false);
+                if (!returnResult.IsSuccess)
+                {
+                    await transaction.RollbackAsync();
+                    return returnResult.Error;
+                }
             }
 
             await context.SaveChangesAsync();

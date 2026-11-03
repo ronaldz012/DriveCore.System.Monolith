@@ -1170,7 +1170,7 @@ namespace System.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("ProductVariantId")
+                    b.Property<Guid?>("ProductVariantId")
                         .HasColumnType("uuid");
 
                     b.Property<int>("Quantity")
@@ -1182,7 +1182,7 @@ namespace System.Infrastructure.Migrations
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
 
-                    b.Property<decimal>("UnitCost")
+                    b.Property<decimal?>("UnitCost")
                         .HasColumnType("numeric");
 
                     b.Property<decimal>("UnitPrice")

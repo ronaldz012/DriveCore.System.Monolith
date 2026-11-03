@@ -35,7 +35,8 @@ public class GetLastClosureSummary(
             .AsNoTracking()
             .Where(s => s.CashRegisterClosureId == closure.Id && s.BranchId == ctx.BranchId)
             .SelectMany(s => s.SaleItems)
-            .Select(si => si.ProductVariantId)
+            .Where(si => si.ProductVariantId != null)
+            .Select(si => si.ProductVariantId!.Value)
             .Distinct()
             .ToListAsync();
 

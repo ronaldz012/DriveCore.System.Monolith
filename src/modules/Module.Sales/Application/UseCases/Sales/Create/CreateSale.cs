@@ -21,10 +21,11 @@ public class CreateSale(
         var userId = ctx.UserId;
         var userName = ctx.FullName;
 
-        var variantIds = dto.Items.Select(i => i.ProductVariantId).Distinct().ToList();
-
-        var stockResult = await inventoryService.GetVariantsWithStock(variantIds, branchId);
-        if (!stockResult.IsSuccess) return stockResult.Error;
+        var variantIds = dto.Items
+            .Where(i => i.ProductVariantId.HasValue && i.ProductVariantId != Guid.Empty)
+            .Select(i => i.ProductVariantId!.Value)
+            .Distinct()
+            .ToList();
 
         var cashClosure = await context.CashRegisterClosures
             .FirstOrDefaultAsync(c => c.BranchId == branchId && c.IsOpen);
@@ -32,12 +33,22 @@ public class CreateSale(
         if (cashClosure is null)
             return CreateSaleErrors.NoOpenCashRegister;
 
-        var variants = stockResult.Value;
-        if (variants.Count != variantIds.Count)
-            return CreateSaleErrors.ProductsNotFound;
+        // Free items (no variant id) skip catalog validation and stock deduction.
+        List<ProductVariantStockDto> variants = [];
 
-        if (variants.Any(v => !v.IsActive))
-            return CreateSaleErrors.ProductInactive;
+        if (variantIds.Count > 0)
+        {
+            var stockResult = await inventoryService.GetVariantsWithStock(variantIds, branchId);
+            if (!stockResult.IsSuccess) return stockResult.Error;
+
+            variants = stockResult.Value;
+
+            if (variants.Count != variantIds.Count)
+                return CreateSaleErrors.ProductsNotFound;
+
+            if (variants.Any(v => !v.IsActive))
+                return CreateSaleErrors.ProductInactive;
+        }
 
         await using var transaction = await context.Database.BeginTransactionAsync();
 
@@ -45,8 +56,15 @@ public class CreateSale(
         {
             var factoryItems = dto.Items.Select(itemDto =>
             {
+                if (itemDto.ProductVariantId is null)
+                {
+                    return ((Guid?)null, string.Empty, itemDto.Description!.Trim(),
+                        itemDto.UnitPrice!.Value, itemDto.Quantity, itemDto.DiscountAmount, (decimal?)null);
+                }
+
                 var variant = variants.First(v => v.Id == itemDto.ProductVariantId);
-                return (itemDto.ProductVariantId, variant.Sku, variant.DisplayName, variant.Price, itemDto.Quantity, itemDto.DiscountAmount, variant.AverageCost);
+                return (itemDto.ProductVariantId, variant.Sku, variant.DisplayName, variant.Price,
+                    itemDto.Quantity, itemDto.DiscountAmount, (decimal?)variant.AverageCost);
             }).ToList();
 
             Sale sale;
@@ -84,14 +102,18 @@ public class CreateSale(
             }
 
             var deductions = dto.Items
-                .Select(i => new StockDeductionDto(i.ProductVariantId, i.Quantity))
+                .Where(i => i.ProductVariantId.HasValue)
+                .Select(i => new StockDeductionDto(i.ProductVariantId!.Value, i.Quantity))
                 .ToList();
 
-            var deductResult = await inventoryService.DeductStock(deductions, branchId, userId, userName, sale.Id, saveChanges: false);
-            if (!deductResult.IsSuccess)
+            if (deductions.Count > 0)
             {
-                await transaction.RollbackAsync();
-                return deductResult.Error;
+                var deductResult = await inventoryService.DeductStock(deductions, branchId, userId, userName, sale.Id, saveChanges: false);
+                if (!deductResult.IsSuccess)
+                {
+                    await transaction.RollbackAsync();
+                    return deductResult.Error;
+                }
             }
 
 
