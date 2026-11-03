@@ -236,9 +236,39 @@ public class CreateReturnTests
     public async Task Execute_ShouldReturnError_WhenSaleBelongsToDifferentTenant()
     {
         var otherTenantId = Guid.Parse("00000000-0000-0000-0000-000000000099");
-        var tenantCtx = TestSalesDbContextFactory.CreateTenantContext(otherTenantId);
-        using var dbContext = TestSalesDbContextFactory.Create(tenantCtx);
-        SeedOriginalSale(dbContext, SaleType.Sale);
+        var dbName = $"SalesTest_{Guid.NewGuid()}";
+
+        // The sale is persisted under another tenant's context.
+        await using (var otherTenantDb = TestSalesDbContextFactory.Create(
+                         TestSalesDbContextFactory.CreateTenantContext(otherTenantId), dbName))
+        {
+            SeedOriginalSale(otherTenantDb, SaleType.Sale, tenantId: otherTenantId);
+        }
+
+        // The actor's context relies on the global query filter for tenant isolation.
+        await using var dbContext = TestSalesDbContextFactory.Create(
+            TestSalesDbContextFactory.CreateTenantContext(TenantId), dbName);
+
+        var sut = CreateSut(dbContext);
+
+        var result = await sut.Execute(CreateActorContext(), new CreateReturnDto
+        {
+            OriginalSaleId = OriginalSaleId,
+            Items = [new CreateReturnItemDto { OriginalSaleItemId = OriginalSaleItemId, Quantity = 1 }]
+        });
+
+        Assert.False(result.IsSuccess);
+        Assert.Equal(ReturnErrors.OriginalSaleNotFound, result.Error);
+    }
+
+    [Fact]
+    public async Task Execute_ShouldReturnError_WhenSaleBelongsToDifferentBranch()
+    {
+        var tenantCtx = TestSalesDbContextFactory.CreateTenantContext(TenantId);
+        await using var dbContext = TestSalesDbContextFactory.Create(tenantCtx);
+
+        SeedOriginalSale(dbContext, SaleType.Sale, branchId: Guid.NewGuid());
+        SeedOpenCashClosure(dbContext);
 
         var sut = CreateSut(dbContext);
 
@@ -349,12 +379,18 @@ public class CreateReturnTests
             new Mock<ILogger<CreateReturn>>().Object);
     }
 
-    private static void SeedOriginalSale(ISalesDbContext ctx, SaleType type)
+    private static void SeedOriginalSale(
+        ISalesDbContext ctx,
+        SaleType type,
+        Guid? tenantId = null,
+        Guid? branchId = null)
     {
+        var saleTenantId = tenantId ?? TenantId;
+
         ctx.Sales.Add(new Sale
         {
             Id = OriginalSaleId,
-            BranchId = BranchId,
+            BranchId = branchId ?? BranchId,
             SoldById = UserId,
             SoldByName = "Original Buyer",
             CreatedBy = UserId,
@@ -364,7 +400,7 @@ public class CreateReturnTests
             DocumentType = DocumentType.Ticket,
             Type = type,
             TotalAmount = 100m,
-            TenantId = TenantId,
+            TenantId = saleTenantId,
             SaleItems =
             [
                 new SaleItem
@@ -378,7 +414,7 @@ public class CreateReturnTests
                     UnitCost = 30m,
                     DiscountAmount = 0,
                     FinalPrice = 500m,
-                    TenantId = TenantId
+                    TenantId = saleTenantId
                 }
             ]
         });
