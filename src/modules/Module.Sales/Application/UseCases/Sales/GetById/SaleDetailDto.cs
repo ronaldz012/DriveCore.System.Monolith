@@ -19,10 +19,12 @@ public class SaleDetailDto
     public string? Notes { get; set; }
     public DateTime CreatedAt { get; set; }
     public Guid? OriginalSaleId { get; set; }
+    public int? OriginalSaleNumber { get; set; }
 
     public List<SaleItemDetailDto> Items { get; set; } = [];
     public List<SaleRefundDto> Returns { get; set; } = [];
     public bool CanReturn { get; set; }
+    public SaleReturnStatus ReturnStatus { get; set; }
 }
 
 public class SaleRefundDto

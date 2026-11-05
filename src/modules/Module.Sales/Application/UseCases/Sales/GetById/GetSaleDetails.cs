@@ -31,6 +31,7 @@ public class GetSaleDetail(ISalesDbContext context)
                 Notes = s.Notes,
                 CreatedAt = s.CreatedAt,
                 OriginalSaleId = s.OriginalSaleId,
+                OriginalSaleNumber = s.OriginalSale != null ? s.OriginalSale.Number : (int?)null,
                 TotalItems = s.SaleItems.Sum(si => si.Quantity),
                 CanReturn = s.Type == SaleType.Sale && !s.Returns.Any(),
 
@@ -60,6 +61,13 @@ public class GetSaleDetail(ISalesDbContext context)
 
         if (saleDetail == null)
             return new Error(ErrorCode.NotFound, "La venta no existe o no tiene permisos para verla.");
+
+        // Full = every sold unit came back; anything lower is a partial return.
+        saleDetail.ReturnStatus = saleDetail.Returns.Count == 0
+            ? SaleReturnStatus.None
+            : saleDetail.Items.All(i => i.ReturnedQuantity >= i.Quantity)
+                ? SaleReturnStatus.Full
+                : SaleReturnStatus.Partial;
 
         return saleDetail;
     }
