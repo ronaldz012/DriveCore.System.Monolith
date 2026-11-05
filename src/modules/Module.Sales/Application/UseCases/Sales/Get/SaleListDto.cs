@@ -15,11 +15,13 @@ public class SaleListDto
     public int TotalDistinctItems { get; set; }
     public SaleType Type { get; set; }
     public Guid? OriginalSaleId { get; set; }
+    public int? OriginalSaleNumber { get; set; }
     public PaymentMethod PaymentMethod { get; set; }
     public DocumentType DocumentType { get; set; } 
     public int? InvoiceNumber { get; set; }
     public string? TransactionCode { get; set; }
     public bool HasReturn { get; set; }
+    public SaleReturnStatus ReturnStatus { get; set; }
     public decimal ReturnedAmount { get; set; }
 }
 
@@ -28,6 +30,12 @@ public class SalesQueryDto : PaginationQueryDto
     public DateTime? DateFrom { get; set; }
     public DateTime? DateTo { get; set; }
     public SaleType? Type { get; set; }
+
+    // Legacy flag kept for backward compatibility; maps to ReturnStatus (true = Partial + Full).
     public bool? HasReturn { get; set; }
+
+    // Takes precedence over HasReturn when both are sent.
+    public SaleReturnStatus? ReturnStatus { get; set; }
+
     public string? Filter { get; set; }
 }

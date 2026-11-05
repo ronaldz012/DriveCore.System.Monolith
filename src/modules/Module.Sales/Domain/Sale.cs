@@ -219,6 +219,13 @@ public enum SaleType
     Return
 }
 
+public enum SaleReturnStatus
+{
+    None,    // No return registered
+    Partial, // Some units were returned
+    Full     // Every sold unit was returned
+}
+
 public enum DocumentType
 {
     Ticket,         // Solo boleta

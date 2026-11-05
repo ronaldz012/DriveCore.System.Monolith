@@ -72,10 +72,19 @@ public class GetClosureDetail(
                         PaymentMethod = s.PaymentMethod,
                         DocumentType = s.DocumentType,
                         Type = s.Type,
+                        OriginalSaleId = s.OriginalSaleId,
+                        OriginalSaleNumber = s.OriginalSale != null ? s.OriginalSale.Number : (int?)null,
                         InvoiceNumber = s.InvoiceNumber,
                         TransactionCode = s.TransactionCode,
                         ItemsCount = s.SaleItems.Sum(si => si.Quantity),
                         HasReturn = s.Returns.Any(),
+                        // Full = every sold unit came back; anything lower is a partial return.
+                        ReturnStatus = !s.Returns.Any()
+                            ? SaleReturnStatus.None
+                            : s.SaleItems.SelectMany(si => si.ChildReturns).Sum(cr => -cr.Quantity) >=
+                              s.SaleItems.Sum(si => si.Quantity)
+                                ? SaleReturnStatus.Full
+                                : SaleReturnStatus.Partial,
                         CanReturn = s.Type == SaleType.Sale && !s.Returns.Any(),
                         CantReturnReason = s.Type == SaleType.Return ? "IS_RETURN" : s.Returns.Any() ? "ALREADY_REFUNDED" : null,
                         Items = s.SaleItems.Select(si => new ClosureSaleItemDetailDto

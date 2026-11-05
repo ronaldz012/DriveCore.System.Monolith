@@ -2,6 +2,7 @@ using Common.Contracts.authentication;
 using Common.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Module.Sales.Application.Abstraction;
+using Module.Sales.Domain;
 
 namespace Module.Sales.Application.UseCases.Sales.Get;
 
@@ -24,7 +25,10 @@ public class GetListSales(ISalesDbContext context)
         if (queryDto.DateTo.HasValue)
             query = query.Where(s => s.CreatedAt <= queryDto.DateTo.Value);
 
-        if (queryDto.HasReturn.HasValue)
+        if (queryDto.ReturnStatus.HasValue)
+            query = ApplyReturnStatusFilter(query, queryDto.ReturnStatus.Value);
+        else if (queryDto.HasReturn.HasValue)
+            // Legacy flag: true = any return (Partial or Full).
             query = query.Where(s => s.Returns.Any() == queryDto.HasReturn.Value);
 
         var filter = queryDto.Filter?.Trim();
@@ -33,55 +37,72 @@ public class GetListSales(ISalesDbContext context)
         {
             var isNumber = filter.Length <= 9 && filter.All(char.IsAsciiDigit);
 
-            // Digits match the exact sale number or an exact numeric SKU.
             if (isNumber && int.TryParse(filter, out var number))
-                query = query.Where(s =>
+            {
+                // Exact sale number or exact SKU first; fall back to text search so
+                // numeric product names (e.g. "32193") stay reachable.
+                var exactMatch = query.Where(s =>
                     s.Number == number ||
                     s.SaleItems.Any(si => si.ProductSku == filter));
+
+                query = await exactMatch.AnyAsync()
+                    ? exactMatch
+                    : ApplyTextFilter(query, filter);
+            }
             else
             {
-                var words = filter.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-                foreach (var word in words)
-                {
-                    var pattern = $"%{word}%";
-
-                    // Word must appear in any item's display name or SKU.
-                    query = query.Where(s => s.SaleItems.Any(si =>
-                        EF.Functions.ILike(si.ProductDisplayName, pattern) ||
-                        EF.Functions.ILike(si.ProductSku, pattern)));
-                }
+                query = ApplyTextFilter(query, filter);
             }
         }
 
         var totalCount = await query.CountAsync();
 
-        var items = await query
+        var rows = await query
             .OrderByDescending(s => s.CreatedAt)
             .ApplyPagination(queryDto)
-            .Select(s => new SaleListDto
+            .Select(s => new
             {
-                Id = s.Id,
-                Number = s.Number,
-                CreatedAt = s.CreatedAt,
-                TotalAmount = s.TotalAmount,
-                SoldByName = s.SoldByName,
-                FirstItemDisplayName = s.SaleItems
-                    .OrderBy(si => si.Id)
-                    .Select(si => si.ProductDisplayName)
-                    .FirstOrDefault() ?? "",
-                TotalQuantity = s.SaleItems.Sum(si => Math.Abs(si.Quantity)),
-                TotalDistinctItems = s.SaleItems.Count,
-                Type = s.Type,
-                OriginalSaleId = s.OriginalSaleId,
-                PaymentMethod = s.PaymentMethod,
-                DocumentType = s.DocumentType,
-                InvoiceNumber = s.InvoiceNumber,
-                TransactionCode = s.TransactionCode,
-                HasReturn = s.Returns.Any(),
-                ReturnedAmount = s.Returns.Sum(r => r.TotalAmount),
+                Sale = new SaleListDto
+                {
+                    Id = s.Id,
+                    Number = s.Number,
+                    CreatedAt = s.CreatedAt,
+                    TotalAmount = s.TotalAmount,
+                    SoldByName = s.SoldByName,
+                    FirstItemDisplayName = s.SaleItems
+                        .OrderBy(si => si.Id)
+                        .Select(si => si.ProductDisplayName)
+                        .FirstOrDefault() ?? "",
+                    TotalQuantity = s.SaleItems.Sum(si => Math.Abs(si.Quantity)),
+                    TotalDistinctItems = s.SaleItems.Count,
+                    Type = s.Type,
+                    OriginalSaleId = s.OriginalSaleId,
+                    OriginalSaleNumber = s.OriginalSale != null ? s.OriginalSale.Number : (int?)null,
+                    PaymentMethod = s.PaymentMethod,
+                    DocumentType = s.DocumentType,
+                    InvoiceNumber = s.InvoiceNumber,
+                    TransactionCode = s.TransactionCode,
+                    HasReturn = s.Returns.Any(),
+                    // Return documents store negative totals; expose the refunded metric as positive.
+                    ReturnedAmount = Math.Abs(s.Returns.Sum(r => r.TotalAmount)),
+                },
+                ReturnedQuantity = s.SaleItems
+                    .SelectMany(si => si.ChildReturns)
+                    .Sum(cr => -cr.Quantity)
             })
             .ToListAsync();
+
+        var items = rows.Select(row =>
+        {
+            // Full = every sold unit came back; anything lower is a partial return.
+            row.Sale.ReturnStatus = !row.Sale.HasReturn
+                ? SaleReturnStatus.None
+                : row.ReturnedQuantity >= row.Sale.TotalQuantity
+                    ? SaleReturnStatus.Full
+                    : SaleReturnStatus.Partial;
+
+            return row.Sale;
+        }).ToList();
 
         return new PagedResultDto<SaleListDto>
         {
@@ -91,4 +112,35 @@ public class GetListSales(ISalesDbContext context)
             Page = queryDto.Page
         };
     }
+
+    private static IQueryable<Sale> ApplyTextFilter(IQueryable<Sale> query, string filter)
+    {
+        var words = filter.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+        foreach (var word in words)
+        {
+            var pattern = $"%{word}%";
+
+            // Word must appear in any item's display name or SKU.
+            query = query.Where(s => s.SaleItems.Any(si =>
+                EF.Functions.ILike(si.ProductDisplayName, pattern) ||
+                EF.Functions.ILike(si.ProductSku, pattern)));
+        }
+
+        return query;
+    }
+
+    private static IQueryable<Sale> ApplyReturnStatusFilter(IQueryable<Sale> query, SaleReturnStatus status) => status switch
+    {
+        SaleReturnStatus.None => query.Where(s => !s.Returns.Any()),
+        SaleReturnStatus.Partial => query.Where(s =>
+            s.Returns.Any() &&
+            s.SaleItems.SelectMany(si => si.ChildReturns).Sum(cr => -cr.Quantity) <
+            s.SaleItems.Sum(si => si.Quantity)),
+        SaleReturnStatus.Full => query.Where(s =>
+            s.Returns.Any() &&
+            s.SaleItems.SelectMany(si => si.ChildReturns).Sum(cr => -cr.Quantity) >=
+            s.SaleItems.Sum(si => si.Quantity)),
+        _ => query
+    };
 }

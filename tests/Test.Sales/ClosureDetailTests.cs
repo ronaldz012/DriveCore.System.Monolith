@@ -265,14 +265,120 @@
             }
         }
 
+        [Fact]
+        public async Task Execute_ShouldSetReturnStatus_ForEachSale()
+        {
+            var dbName = $"ClosureTest_{Guid.NewGuid()}";
+            var tenantCtx = TestSalesDbContextFactory.CreateTenantContext(TenantId);
+            Guid closureId;
+            Guid untouchedId;
+            Guid partialId;
+            Guid fullId;
+
+            using (var db = TestSalesDbContextFactory.Create(tenantCtx, dbName))
+            {
+                var closure = CashRegisterClosure.Open(BranchId, 500m, UserId, "Test User");
+                closureId = closure.Id;
+                db.CashRegisterClosures.Add(closure);
+                await db.SaveChangesAsync();
+
+                var untouched = CreateSale(closure.Id, PaymentMethod.Cash, 50m, quantity: 1, number: 10);
+                var partial = CreateSale(closure.Id, PaymentMethod.Cash, 100m, quantity: 2, number: 11);
+                var full = CreateSale(closure.Id, PaymentMethod.Cash, 100m, quantity: 2, number: 12);
+                untouchedId = untouched.Id;
+                partialId = partial.Id;
+                fullId = full.Id;
+
+                db.Sales.AddRange(untouched, partial, full);
+                await db.SaveChangesAsync();
+
+                db.Sales.Add(CreateReturn(closure.Id, partial, returnedQuantity: 1, number: 20));
+                db.Sales.Add(CreateReturn(closure.Id, full, returnedQuantity: 2, number: 21));
+                await db.SaveChangesAsync();
+            }
+
+            using (var db = TestSalesDbContextFactory.Create(tenantCtx, dbName))
+            {
+                var inventoryMock = new Mock<IInventoryIntegrationService>();
+                inventoryMock.Setup(s => s.GetVariantsWithStock(It.IsAny<List<Guid>>(), It.IsAny<Guid>()))
+                    .ReturnsAsync(new List<ProductVariantStockDto>());
+
+                var sut = new GetClosureDetail(db, inventoryMock.Object);
+                var result = await sut.Execute(CreateActorContext(), closureId);
+
+                Assert.True(result.IsSuccess, result.Error?.Message);
+                var byId = result.Value!.Sales.ToDictionary(s => s.Id);
+
+                Assert.Equal(SaleReturnStatus.None, byId[untouchedId].ReturnStatus);
+                Assert.Equal(SaleReturnStatus.Partial, byId[partialId].ReturnStatus);
+                Assert.Equal(SaleReturnStatus.Full, byId[fullId].ReturnStatus);
+
+                // HasReturn stays consistent with the new status.
+                Assert.False(byId[untouchedId].HasReturn);
+                Assert.True(byId[partialId].HasReturn);
+                Assert.True(byId[fullId].HasReturn);
+            }
+        }
+
+        [Fact]
+        public async Task Execute_ShouldPopulateOriginalSaleIdentity_OnReturnRows()
+        {
+            var dbName = $"ClosureTest_{Guid.NewGuid()}";
+            var tenantCtx = TestSalesDbContextFactory.CreateTenantContext(TenantId);
+            Guid closureId;
+            Guid saleId;
+            Guid returnId;
+
+            using (var db = TestSalesDbContextFactory.Create(tenantCtx, dbName))
+            {
+                var closure = CashRegisterClosure.Open(BranchId, 500m, UserId, "Test User");
+                closureId = closure.Id;
+                db.CashRegisterClosures.Add(closure);
+                await db.SaveChangesAsync();
+
+                var sale = CreateSale(closure.Id, PaymentMethod.Cash, 100m, quantity: 1, number: 42);
+                saleId = sale.Id;
+                db.Sales.Add(sale);
+                await db.SaveChangesAsync();
+
+                var ret = CreateReturn(closure.Id, sale, returnedQuantity: 1, number: 43);
+                returnId = ret.Id;
+                db.Sales.Add(ret);
+                await db.SaveChangesAsync();
+            }
+
+            using (var db = TestSalesDbContextFactory.Create(tenantCtx, dbName))
+            {
+                var inventoryMock = new Mock<IInventoryIntegrationService>();
+                inventoryMock.Setup(s => s.GetVariantsWithStock(It.IsAny<List<Guid>>(), It.IsAny<Guid>()))
+                    .ReturnsAsync(new List<ProductVariantStockDto>());
+
+                var sut = new GetClosureDetail(db, inventoryMock.Object);
+                var result = await sut.Execute(CreateActorContext(), closureId);
+
+                Assert.True(result.IsSuccess, result.Error?.Message);
+                var byId = result.Value!.Sales.ToDictionary(s => s.Id);
+
+                Assert.Equal(saleId, byId[returnId].OriginalSaleId);
+                Assert.Equal(42, byId[returnId].OriginalSaleNumber);
+                Assert.Equal(SaleReturnStatus.None, byId[returnId].ReturnStatus);
+
+                // A plain sale has no original sale reference.
+                Assert.Null(byId[saleId].OriginalSaleId);
+                Assert.Null(byId[saleId].OriginalSaleNumber);
+                Assert.Equal(SaleReturnStatus.Full, byId[saleId].ReturnStatus);
+            }
+        }
+
         private static ActorContext CreateActorContext()
             => new(TenantId, UserId, "Test User", BranchId, [BranchId]);
 
-        private static Sale CreateSale(Guid closureId, PaymentMethod payment, decimal total)
+        private static Sale CreateSale(Guid closureId, PaymentMethod payment, decimal total, int quantity = 1, int number = 0)
         {
             var sale = new Sale
             {
                 Id = Guid.NewGuid(),
+                Number = number,
                 BranchId = BranchId,
                 SoldById = UserId,
                 SoldByName = "Test User",
@@ -289,18 +395,62 @@
                 [
                     new SaleItem
                     {
+                        Id = Guid.NewGuid(),
                         ProductVariantId = Guid.NewGuid(),
                         ProductSku = "SKU-TEST",
                         ProductDisplayName = "Test Product",
-                        Quantity = 1,
+                        Quantity = quantity,
                         UnitPrice = total,
                         UnitCost = 10m,
                         DiscountAmount = 0,
-                        FinalPrice = total,
+                        FinalPrice = total * quantity,
                         TenantId = TenantId
                     }
                 ]
             };
             return sale;
+        }
+
+        private static Sale CreateReturn(Guid closureId, Sale original, int returnedQuantity, int number)
+        {
+            var originalItem = original.SaleItems.First();
+            var returnId = Guid.NewGuid();
+
+            return new Sale
+            {
+                Id = returnId,
+                Number = number,
+                BranchId = BranchId,
+                SoldById = UserId,
+                SoldByName = "Test User",
+                CreatedBy = UserId,
+                CreatedByName = "Test User",
+                CashRegisterClosureId = closureId,
+                PaymentMethod = PaymentMethod.Cash,
+                DocumentType = DocumentType.Ticket,
+                Type = SaleType.Return,
+                OriginalSaleId = original.Id,
+                TotalAmount = -originalItem.UnitPrice * returnedQuantity,
+                TenantId = TenantId,
+                CreatedAt = DateTime.UtcNow,
+                SaleItems =
+                [
+                    new SaleItem
+                    {
+                        Id = Guid.NewGuid(),
+                        SaleId = returnId,
+                        OriginalSaleItemId = originalItem.Id,
+                        ProductVariantId = originalItem.ProductVariantId,
+                        ProductSku = originalItem.ProductSku,
+                        ProductDisplayName = originalItem.ProductDisplayName,
+                        Quantity = -returnedQuantity,
+                        UnitPrice = originalItem.UnitPrice,
+                        UnitCost = originalItem.UnitCost,
+                        DiscountAmount = 0,
+                        FinalPrice = -originalItem.UnitPrice * returnedQuantity,
+                        TenantId = TenantId
+                    }
+                ]
+            };
         }
     }

@@ -34,10 +34,13 @@ public class ClosureSaleItemDto
     public PaymentMethod PaymentMethod { get; set; }
     public DocumentType DocumentType { get; set; }
     public SaleType Type { get; set; }
+    public Guid? OriginalSaleId { get; set; }
+    public int? OriginalSaleNumber { get; set; }
     public int? InvoiceNumber { get; set; }
     public string? TransactionCode { get; set; }
     public int ItemsCount { get; set; }
     public bool HasReturn { get; set; }
+    public SaleReturnStatus ReturnStatus { get; set; }
     public bool CanReturn { get; set; }
     public string? CantReturnReason { get; set; } //ALREADY_REFUNDED | IS_RETURN | null
     public List<ClosureSaleItemDetailDto> Items { get; set; } = [];
