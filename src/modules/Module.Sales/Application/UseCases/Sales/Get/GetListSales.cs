@@ -19,6 +19,9 @@ public class GetListSales(ISalesDbContext context)
         if (queryDto.Type.HasValue)
             query = query.Where(s => s.Type == queryDto.Type.Value);
 
+        if (queryDto.SoldById.HasValue)
+            query = query.Where(s => s.SoldById == queryDto.SoldById.Value);
+
         if (queryDto.DateFrom.HasValue)
             query = query.Where(s => s.CreatedAt >= queryDto.DateFrom.Value);
 

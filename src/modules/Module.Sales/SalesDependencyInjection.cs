@@ -34,6 +34,7 @@ public static class SalesDependencyInjection
                         .AddScoped<CreateSale>()
                         .AddScoped<GetListSales>()
                         .AddScoped<GetSaleDetail>()
+                        .AddScoped<ListSellers>()
                         .AddScoped<CreateReturn>()
                         .AddScoped<ListReturns>()
                         .AddScoped<SearchSalesBySku>()

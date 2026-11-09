@@ -12,6 +12,7 @@ public record SaleUseCases(
     CreateSale CreateSale,
     GetListSales GetListSales,
     GetSaleDetail GetSaleDetail,
+    ListSellers ListSellers,
     CreateReturn CreateReturn,
     ListReturns ListReturns,
     SearchSalesBySku SearchSalesBySku,

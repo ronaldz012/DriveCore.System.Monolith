@@ -6,6 +6,12 @@ using Module.Sales.Domain;
 
 namespace Module.Sales.Application.UseCases.Sales.Search;
 
+/// <summary>
+/// DEPRECATED: superseded by <c>GetListSales</c> when the <c>filter</c> query param is used
+/// (sale number, SKU or product display name).
+/// Kept temporarily for backward compatibility with the current frontend.
+/// Do not add new features here; remove once clients move to GET /api/Sale?filter=.
+/// </summary>
 public class SearchSalesBySku(ISalesDbContext context)
 {
     public async Task<Result<SkuSearchResponseDto>> Execute(ActorContext ctx, SkuSearchQueryDto queryDto)

@@ -68,8 +68,21 @@ namespace System.Api.Controllers.Sales
             dto.OriginalSaleId = id;
             return await saleUseCases.CreateReturn.Execute(actorResult.Value, dto).ToValueOrProblemDetails();
         }
+        [HttpGet("sellers")]
+        [RequireFeature("sales", "read")]
+        public async Task<IActionResult> GetSellers()
+        {
+            var actorResult = currentUser.GetActorContext();
+            if (!actorResult.IsSuccess)  return actorResult.ToValueOrProblemDetails();
+            return await saleUseCases.ListSellers.Execute(actorResult.Value).ToValueOrProblemDetails();
+        }
+        /// <summary>
+        /// Search sales by SKU (recent sales without returns).
+        /// </summary>
+        /// <remarks>DEPRECATED: use GET /api/Sale?filter={sku} instead. This endpoint will be removed in a later phase.</remarks>
         [HttpGet("search-by-sku")]
         [RequireFeature("pos", "read")]
+        [Obsolete("Deprecated: use GET /api/Sale?filter= instead.")]
         public async Task<IActionResult> SearchBySku([FromQuery] SkuSearchQueryDto queryDto)
         {
             var actorResult = currentUser.GetActorContext();

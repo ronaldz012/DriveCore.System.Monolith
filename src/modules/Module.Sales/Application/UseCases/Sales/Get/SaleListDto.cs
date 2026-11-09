@@ -31,6 +31,9 @@ public class SalesQueryDto : PaginationQueryDto
     public DateTime? DateTo { get; set; }
     public SaleType? Type { get; set; }
 
+    // Filter by the seller who registered the sale.
+    public Guid? SoldById { get; set; }
+
     // Legacy flag kept for backward compatibility; maps to ReturnStatus (true = Partial + Full).
     public bool? HasReturn { get; set; }
 
