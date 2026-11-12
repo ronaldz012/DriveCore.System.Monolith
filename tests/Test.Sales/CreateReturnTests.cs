@@ -219,6 +219,7 @@ public class CreateReturnTests
         });
 
         Assert.True(result.IsSuccess);
+        Assert.Equal(-200m, result.Value!.TotalRefundAmount);
 
         var saved = await dbContext.Sales.Include(s => s.SaleItems).FirstAsync(s => s.Type == SaleType.Return);
         Assert.True(saved.TotalAmount < 0, $"TotalAmount should be negative, was {saved.TotalAmount}");

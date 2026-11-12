@@ -137,7 +137,8 @@ namespace System.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<decimal>("Quantity")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
 
                     b.Property<Guid?>("ReferenceId")
                         .HasColumnType("uuid");
@@ -158,7 +159,8 @@ namespace System.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<decimal>("UnitCost")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -426,7 +428,8 @@ namespace System.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<decimal>("BasePrice")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
 
                     b.Property<Guid>("BrandId")
                         .HasColumnType("uuid");
@@ -519,7 +522,8 @@ namespace System.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<decimal>("AverageCost")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
 
                     b.Property<Guid>("ColorId")
                         .HasColumnType("uuid");
@@ -548,7 +552,8 @@ namespace System.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
 
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
@@ -748,7 +753,8 @@ namespace System.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<decimal>("UnitCost")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -949,13 +955,16 @@ namespace System.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<decimal>("OpeningBalance")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
 
                     b.Property<decimal>("RealCountedAmount")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
 
                     b.Property<decimal>("SystemSalesAmount")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
 
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
@@ -989,7 +998,8 @@ namespace System.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<decimal>("Amount")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
 
                     b.Property<Guid>("CashRegisterClosureId")
                         .HasColumnType("uuid");
@@ -1099,7 +1109,8 @@ namespace System.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<decimal>("TotalAmount")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
 
                     b.Property<string>("TransactionCode")
                         .HasColumnType("text");
@@ -1154,10 +1165,12 @@ namespace System.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<decimal>("DiscountAmount")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
 
                     b.Property<decimal>("FinalPrice")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
 
                     b.Property<Guid?>("OriginalSaleItemId")
                         .HasColumnType("uuid");
@@ -1183,10 +1196,12 @@ namespace System.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<decimal?>("UnitCost")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
 
                     b.Property<decimal>("UnitPrice")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");

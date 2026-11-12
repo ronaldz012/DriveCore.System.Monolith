@@ -162,7 +162,7 @@ public class InventoryIntegrationServiceTests
         variant.AddQuantity(3, BranchId, UserId, "Test User");
         await ctx.SaveChangesAsync();
         var afterPurchase = await ctx.ProductVariants.SingleAsync(pv => pv.Id == VariantId);
-        Assert.Equal(85m / 7m, afterPurchase.AverageCost, precision: 5);
+        Assert.Equal(12.1429m, afterPurchase.AverageCost); // 85/7 rounded to 4 decimals
         Assert.Equal(7, afterPurchase.BranchInventories.Sum(bi => bi.Stock));
 
         // devolucion 1 @ costo historico 10 (de la venta original)

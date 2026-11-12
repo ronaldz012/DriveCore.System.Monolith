@@ -86,6 +86,26 @@ public class GetListSalesTests
     }
 
     [Fact]
+    public async Task Execute_ShouldFilterBySeller_WhenSoldByIdProvided()
+    {
+        var tenantCtx = TestSalesDbContextFactory.CreateTenantContext(TenantId);
+        using var dbContext = TestSalesDbContextFactory.Create(tenantCtx);
+        var mine = BuildSale(number: 1);
+        var otherSeller = BuildSale(number: 2);
+        otherSeller.SoldById = Guid.NewGuid();
+        otherSeller.SoldByName = "Other Seller";
+        dbContext.Sales.AddRange(mine, otherSeller);
+        await dbContext.SaveChangesAsync();
+
+        var sut = new GetListSales(dbContext);
+
+        var result = await sut.Execute(CreateActorContext(), new SalesQueryDto { SoldById = mine.SoldById });
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(mine.Number, Assert.Single(result.Value!.Items).Number);
+    }
+
+    [Fact]
     public async Task Execute_ShouldMatchSaleByNumber_WhenFilterIsNumeric()
     {
         var tenantCtx = TestSalesDbContextFactory.CreateTenantContext(TenantId);

@@ -107,7 +107,8 @@ public class CreateReturn(
             return new CreateReturnResponse(
                 returnSale.Id,
                 $"RET-{returnSale.Id.ToString()[..8].ToUpper()}",
-                Math.Abs(returnSale.TotalAmount));
+                // Return documents keep their sign (negative) so callers can net amounts directly.
+                returnSale.TotalAmount);
         }
         catch (Exception ex)
         {

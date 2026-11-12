@@ -74,7 +74,9 @@ public class ProductVariant: Params, IMustHaveTenant
         var totalStock = BranchInventories.Sum(bi => bi.Stock);
         var totalValue = AverageCost * totalStock + unitCost * quantity;
         var newTotal = totalStock + quantity;
-        AverageCost = newTotal == 0 ? 0 : totalValue / newTotal;
+        // Round to the stored scale (numeric(18,4)): a raw division can produce 28+
+        // significant digits, which overflows .NET decimal when PostgreSQL returns it.
+        AverageCost = newTotal == 0 ? 0 : Math.Round(totalValue / newTotal, 4, MidpointRounding.AwayFromZero);
     }
 
     public void RevertPurchase(int quantity, decimal originalUnitCost)
@@ -91,7 +93,7 @@ public class ProductVariant: Params, IMustHaveTenant
         var revertedValue = originalUnitCost * quantity;
         var newValue = currentValue - revertedValue;
         if (newValue < 0) newValue = 0;
-        AverageCost = newValue / newStock;
+        AverageCost = Math.Round(newValue / newStock, 4, MidpointRounding.AwayFromZero);
     }
 
 

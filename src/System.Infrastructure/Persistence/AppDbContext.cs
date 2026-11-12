@@ -40,9 +40,17 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantConnect
     public DbSet<StockTransferItem> StockTransferItems { get; set; }
     public DbSet<DocumentCounter> DocumentCounters { get; set; }
 
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        // Every decimal column is stored as numeric(18,4). PostgreSQL rounds on write,
+        // so values can never exceed the precision .NET decimal can read back.
+        configurationBuilder.Properties<decimal>().HavePrecision(18, 4);
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
         SalesEntityConfiguration.Apply(modelBuilder);
         InventoryEntityConfiguration.Apply(modelBuilder);
         DocumentCounterConfiguration.Apply(modelBuilder);

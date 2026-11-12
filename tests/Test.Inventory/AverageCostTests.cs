@@ -158,8 +158,8 @@ public class AverageCostTests
         });
         Assert.True(c.IsSuccess);
 
-        // Promedio con A+B+C = (10*10 + 10*50 + 10*10)/30 = 23.33
-        Assert.Equal(700m / 30m, await GetAverageCost(ctx, VariantA));
+        // Promedio con A+B+C = (10*10 + 10*50 + 10*10)/30 = 23.3333 (rounded to 4 decimals)
+        Assert.Equal(23.3333m, await GetAverageCost(ctx, VariantA));
 
         var revertSut = new RevertStockReception(ctx, NullLogger<RevertStockReception>.Instance);
         var revert = await revertSut.Execute(actor, b.Value!.Id);
