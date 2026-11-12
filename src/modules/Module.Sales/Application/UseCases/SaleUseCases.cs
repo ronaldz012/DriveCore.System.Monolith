@@ -5,6 +5,7 @@ using Module.Sales.Application.UseCases.Sales.Return;
 using Module.Sales.Application.UseCases.Sales.Return.GetSaleForReturn;
 using Module.Sales.Application.UseCases.Sales.Return.List;
 using Module.Sales.Application.UseCases.Sales.Search;
+using Module.Sales.Application.UseCases.Sales.Stats;
 
 namespace Module.Sales.Application.UseCases;
 
@@ -13,6 +14,7 @@ public record SaleUseCases(
     GetListSales GetListSales,
     GetSaleDetail GetSaleDetail,
     ListSellers ListSellers,
+    GetSalesStats GetSalesStats,
     CreateReturn CreateReturn,
     ListReturns ListReturns,
     SearchSalesBySku SearchSalesBySku,

@@ -38,6 +38,13 @@ public class AuthDbContext(DbContextOptions<AuthDbContext> options, ITenantConne
     public DbSet<TenantDataBase> TenantDatabases { get; set; }
     public DbSet<RoleFeaturePermission> RoleFeaturePermissions { get; set; }
 
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        // Every decimal column is stored as numeric(18,4). PostgreSQL rounds on write,
+        // so values can never exceed the precision .NET decimal can read back.
+        configurationBuilder.Properties<decimal>().HavePrecision(18, 4);
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

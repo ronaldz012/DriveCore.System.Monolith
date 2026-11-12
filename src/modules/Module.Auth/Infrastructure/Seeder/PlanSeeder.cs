@@ -63,7 +63,7 @@ public class PlanSeeder(IAuthDbContext context) : IDataSeeder
                         new() { FeatureKey = "transfers",  Actions = ["read", "create", "update", "delete"] },
                         new() { FeatureKey = "receptions", Actions = ["read", "create", "update", "delete"] },
                         new() { FeatureKey = "pos",        Actions = ["read", "create", "update"] },
-                        new() { FeatureKey = "sales",      Actions = ["read", "margin"] },
+                        new() { FeatureKey = "sales",      Actions = ["read", "readAll", "margin"] },
                         new() { FeatureKey = "closures",   Actions = ["read", "create", "update"] }
                     ]
                 },

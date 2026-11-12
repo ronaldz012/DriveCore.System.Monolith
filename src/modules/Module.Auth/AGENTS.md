@@ -174,7 +174,7 @@ Unique index on (RoleId, FeatureKey).
 | `transfers` | Inventory | ✅ | read, create, update, delete |
 | `receptions` | Inventory | ✅ | read, create, update, delete |
 | `pos` | Sales | ✅ | read (POS access), create (Process sale), update (Modify cart) |
-| `sales` | Sales | ✅ | read (View), refund, void_invoice, export |
+| `sales` | Sales | ✅ | read (View), readAll (all sellers' stats), margin (UnitPrice/UnitCost) |
 | `closures` | Sales | ✅ | read (View), export |
 
 ### Plan "Basic"
@@ -188,7 +188,7 @@ Unique index on (RoleId, FeatureKey).
 - `products:read/create/update`, `receptions:read/create/update/delete`, `transfers:read/create/update/delete`
 
 #### Role "Supervisor"
-- All features with full CRUD + `sales:refund/void_invoice/export` + `closures:read/export`
+- All features with full CRUD + `sales:read/readAll/margin` + `closures:read/create/update`
 
 ### Default Tenant
 - DisplayName: "default", Owner: admin@drivecore.com / admin / "1234"
