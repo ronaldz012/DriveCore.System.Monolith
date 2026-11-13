@@ -42,6 +42,7 @@ using Module.Inventory.Application.UseCases.Providers.Update;
 using Module.Inventory.Application.UseCases.Receptions;
 using Module.Inventory.Application.UseCases.Receptions.Confirm;
 using Module.Inventory.Application.UseCases.Receptions.Create;
+using Module.Inventory.Application.UseCases.Receptions.Edit;
 using Module.Inventory.Application.UseCases.Receptions.Get;
 using Module.Inventory.Application.UseCases.Receptions.GetById;
 using Module.Inventory.Application.UseCases.Receptions.GetLabels;
@@ -97,6 +98,9 @@ public  static class InvDependencyInjection
         services.AddScoped<ReceptionUseCases>()
             .AddScoped<CreateReceptionUc>()
             .AddScoped<ConfirmStockReceptionUc>()
+            .AddScoped<AddItemsToDraftUc>()
+            .AddScoped<UpdateDraftUc>()
+            .AddScoped<DeleteDraftUc>()
             .AddScoped<ListReceptions>()
             .AddScoped<GetReception>()
             .AddScoped<ReceptionLabels>()

@@ -7,6 +7,7 @@ using Module.Auth.Application.Abstraction;
 using Module.Inventory.Application.UseCases.Receptions;
 using Module.Inventory.Application.UseCases.Receptions.Confirm;
 using Module.Inventory.Application.UseCases.Receptions.Create;
+using Module.Inventory.Application.UseCases.Receptions.Edit;
 using Module.Inventory.Application.UseCases.Receptions.Get;
 
 namespace System.Api.Controllers.Inventory
@@ -51,6 +52,33 @@ namespace System.Api.Controllers.Inventory
             var actorResult = currentUser.GetActorContext();
             if (!actorResult.IsSuccess)  return actorResult.ToValueOrProblemDetails();
             return await service.ConfirmStockReceptionUc.Execute(actorResult.Value, id).ToValueOrProblemDetails();
+        }
+
+        [HttpPost("{id:guid}/items")]
+        [RequireFeature("receptions", "update")]
+        public async Task<IActionResult> AddDraftItems([FromRoute] Guid id, [FromBody] AddDraftItemsDto dto)
+        {
+            var actorResult = currentUser.GetActorContext();
+            if (!actorResult.IsSuccess)  return actorResult.ToValueOrProblemDetails();
+            return await service.AddItemsToDraftUc.Execute(actorResult.Value, id, dto).ToValueOrProblemDetails();
+        }
+
+        [HttpPut("{id:guid}")]
+        [RequireFeature("receptions", "update")]
+        public async Task<IActionResult> UpdateDraft([FromRoute] Guid id, [FromBody] UpdateDraftDto dto)
+        {
+            var actorResult = currentUser.GetActorContext();
+            if (!actorResult.IsSuccess)  return actorResult.ToValueOrProblemDetails();
+            return await service.UpdateDraftUc.Execute(actorResult.Value, id, dto).ToValueOrProblemDetails();
+        }
+
+        [HttpDelete("{id:guid}")]
+        [RequireFeature("receptions", "delete")]
+        public async Task<IActionResult> DeleteDraft([FromRoute] Guid id)
+        {
+            var actorResult = currentUser.GetActorContext();
+            if (!actorResult.IsSuccess)  return actorResult.ToValueOrProblemDetails();
+            return await service.DeleteDraftUc.Execute(actorResult.Value, id).ToValueOrProblemDetails();
         }
 
         [HttpGet("{id:guid}/labels")]
