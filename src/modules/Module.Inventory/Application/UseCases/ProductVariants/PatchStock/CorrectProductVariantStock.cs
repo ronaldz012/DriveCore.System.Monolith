@@ -26,10 +26,8 @@ public class CorrectProductVariantStock(IInvDbContext context)
             var previousStock = existingInventory?.Stock ?? 0;
             var delta = request.Stock - previousStock;
 
-            if (delta > 0)
-                return CorrectProductVariantStockErrors.SurplusNotAllowed;
-
-            // Se valida el movimiento primero (CreateAdjustment exige Notes); si falla, no se muta stock
+            // Se valida el movimiento primero (CreateAdjustment exige Notes); si falla, no se muta stock.
+            // Positive and negative corrections are both allowed; the adjustment keeps the audit trail.
             var movement = delta != 0
                 ? StockMovement.CreateAdjustment(
                     currentBranch,
