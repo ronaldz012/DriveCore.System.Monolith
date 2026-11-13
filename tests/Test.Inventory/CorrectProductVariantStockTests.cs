@@ -155,7 +155,7 @@ public class CorrectProductVariantStockTests
     }
 
     [Fact]
-    public async Task Execute_ShouldReturnError_WhenStockIncreased()
+    public async Task Execute_ShouldCreatePositiveAdjustment_WhenIncreasing()
     {
         using var ctx = CreateDbContext();
         await SeedVariant(ctx, 10);
@@ -163,9 +163,16 @@ public class CorrectProductVariantStockTests
 
         var result = await sut.Execute(CreateActorContext(), new UpdateProductVariantStockDto { Stock = 15, Notes = "Excedente" }, VariantId);
 
-        Assert.False(result.IsSuccess);
-        Assert.Equal(CorrectProductVariantStockErrors.SurplusNotAllowed, result.Error);
-        Assert.Equal(10, (await ctx.BranchInventories.SingleAsync(bi => bi.ProductVariantId == VariantId)).Stock);
-        Assert.Empty(await ctx.StockMovements.ToListAsync());
+        Assert.True(result.IsSuccess, $"Expected success but got: {result.Error?.Code} - {result.Error?.Message}");
+
+        var inventory = await ctx.BranchInventories.SingleAsync(bi => bi.ProductVariantId == VariantId);
+        Assert.Equal(15, inventory.Stock);
+
+        var movement = await ctx.StockMovements.SingleAsync();
+        Assert.Equal(MovementType.Adjustment, movement.MovementType);
+        Assert.Equal(5m, movement.Quantity);
+        Assert.Equal(10, movement.StockBefore);
+        Assert.Equal(15, movement.StockAfter);
+        Assert.Equal(5m, await MovementSum(ctx));
     }
 }
