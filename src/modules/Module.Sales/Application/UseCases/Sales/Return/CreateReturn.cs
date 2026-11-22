@@ -54,6 +54,13 @@ public class CreateReturn(
 
         try
         {
+            // The refund split is chosen by the seller; the backend only validates it.
+            // The dominant method is derived from the refund tenders, never inherited.
+            var dominantMethod = dto.Payments
+                .OrderByDescending(p => p.Amount)
+                .First()
+                .Method;
+
             var returnSale = Sale.CreateReturn(
                 branchId: ctx.BranchId,
                 soldById: ctx.UserId,
@@ -61,7 +68,7 @@ public class CreateReturn(
                 createdBy: ctx.UserId,
                 createdByName: ctx.FullName,
                 cashRegisterClosureId: openClosure.Id,
-                paymentMethod: originalSale.PaymentMethod,
+                paymentMethod: dominantMethod,
                 documentType: originalSale.DocumentType,
                 transactionCode: null,
                 notes: $"Devolución de venta {dto.OriginalSaleId}",
@@ -76,7 +83,17 @@ public class CreateReturn(
 
             returnSale.Number = await numberGenerator.NextAsync(context.Database, ctx.TenantId, SalesCounterKey.Sale);
 
+            // Request amounts are positive ("money handed back"); stored lines are negative.
+            if (dto.Payments.Sum(p => p.Amount) != Math.Abs(returnSale.TotalAmount))
+            {
+                await transaction.RollbackAsync();
+                return ReturnErrors.RefundAmountMismatch;
+            }
+
             context.Sales.Add(returnSale);
+
+            foreach (var payment in dto.Payments)
+                returnSale.AddPayment(payment.Method, -payment.Amount, ctx.UserId, ctx.FullName);
 
             var returns = dto.Items
                 .Select(item =>

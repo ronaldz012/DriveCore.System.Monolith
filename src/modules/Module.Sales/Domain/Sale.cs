@@ -11,6 +11,12 @@ public class Sale : IMustHaveTenant, ICreatedAt, ICreatedBy, IUpdatedAt, IUpdate
     public string SoldByName { get; set; } = string.Empty;
     public Guid CashRegisterClosureId { get; set; } 
     public int Number { get; set; }
+
+    /// <summary>
+    /// DEPRECATED as a data source: dominant tender (largest payment line), kept
+    /// denormalized for legacy GETs (lists, closures and stats until they read Payments).
+    /// Write flows MUST read Payments instead. Do not use this field in new code paths.
+    /// </summary>
     public PaymentMethod PaymentMethod { get; set; }
     public string? TransactionCode { get; set; }
     public decimal TotalAmount { get; set; }
@@ -31,10 +37,31 @@ public class Sale : IMustHaveTenant, ICreatedAt, ICreatedBy, IUpdatedAt, IUpdate
     public string? DeletedByName { get; set; }
 
     public ICollection<SaleItem> SaleItems { get; set; } = new List<SaleItem>();
+    public ICollection<SalePayment> Payments { get; set; } = new List<SalePayment>();
     public CashRegisterClosure CashRegisterClosure { get; set; } = null!;
 
     public Sale? OriginalSale { get; set; }
     public ICollection<Sale> Returns { get; set; } = new List<Sale>();
+
+    /// <summary>
+    /// Adds one payment tender. Sales keep positive amounts, returns negative.
+    /// One tender per method (unique index backs this) — the guard is a last resort
+    /// against programming bugs, application layer validates first.
+    /// </summary>
+    public void AddPayment(PaymentMethod method, decimal amount, Guid userId, string userName)
+    {
+        if (Payments.Any(p => p.Method == method))
+            throw new InvalidOperationException($"Duplicate payment method {method} for sale {Id}");
+
+        Payments.Add(new SalePayment
+        {
+            SaleId = Id,
+            Method = method,
+            Amount = amount,
+            CreatedBy = userId,
+            CreatedByName = userName
+        });
+    }
 
     public static Sale CreateSaleWithTicket(
         Guid branchId,

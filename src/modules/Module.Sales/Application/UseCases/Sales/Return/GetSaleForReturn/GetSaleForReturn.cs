@@ -2,6 +2,7 @@ using Common.Contracts.authentication;
 using Common.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Module.Sales.Application.Abstraction;
+using Module.Sales.Application.UseCases.Sales.GetById;
 using Module.Sales.Domain;
 
 namespace Module.Sales.Application.UseCases.Sales.Return.GetSaleForReturn;
@@ -15,6 +16,7 @@ public class GetSaleForReturn(ISalesDbContext context)
         var sale = await context.Sales
             .AsNoTracking()
             .Include(s => s.SaleItems)
+            .Include(s => s.Payments)
             .FirstOrDefaultAsync(s => s.Id == saleId && s.BranchId == currentBranch);
 
         if (sale == null)
@@ -36,7 +38,11 @@ public class GetSaleForReturn(ISalesDbContext context)
             TotalAmount = sale.TotalAmount,
             SoldByName = sale.SoldByName,
             Type = sale.Type,
-            paymentMethod = sale.PaymentMethod,
+            Payments = sale.Payments.Select(p => new SalePaymentDto
+            {
+                Method = p.Method,
+                Amount = p.Amount
+            }).ToList(),
             Items = sale.SaleItems.Select(si => new ReturnableItemDto
             {
                 SaleItemId = si.Id,

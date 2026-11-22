@@ -11,7 +11,6 @@ public class SaleDetailDto
     public string SoldByName { get; set; } = string.Empty;
     public SaleType Type { get; set; }
     public DocumentType DocumentType { get; set; }
-    public PaymentMethod PaymentMethod { get; set; }
     public string? TransactionCode { get; set; }
     public decimal TotalAmount { get; set; }
     public int TotalItems { get; set; }
@@ -23,8 +22,15 @@ public class SaleDetailDto
 
     public List<SaleItemDetailDto> Items { get; set; } = [];
     public List<SaleRefundDto> Returns { get; set; } = [];
+    public List<SalePaymentDto> Payments { get; set; } = [];
     public bool CanReturn { get; set; }
     public SaleReturnStatus ReturnStatus { get; set; }
+}
+
+public class SalePaymentDto
+{
+    public PaymentMethod Method { get; set; }
+    public decimal Amount { get; set; }
 }
 
 public class SaleRefundDto

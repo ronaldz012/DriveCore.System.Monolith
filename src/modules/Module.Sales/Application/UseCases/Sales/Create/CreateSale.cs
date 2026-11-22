@@ -67,6 +67,12 @@ public class CreateSale(
                     itemDto.Quantity, itemDto.DiscountAmount, (decimal?)variant.AverageCost);
             }).ToList();
 
+            // The dominant method is derived from the tenders, never declared by the client.
+            var dominantMethod = dto.Payments
+                .OrderByDescending(p => p.Amount)
+                .First()
+                .Method;
+
             Sale sale;
             if (dto.DocumentType == DocumentType.Ticket)
             {
@@ -77,7 +83,7 @@ public class CreateSale(
                     userId,
                     userName,
                     cashClosure.Id,
-                    dto.PaymentMethod,
+                    dominantMethod,
                     dto.TransactionCode,
                     dto.Notes,
                     factoryItems
@@ -92,14 +98,21 @@ public class CreateSale(
                     userId,
                     userName,
                     cashClosure.Id,
-                    dto.PaymentMethod,
-                    dto.DocumentType, 
+                    dominantMethod,
+                    dto.DocumentType,
                     dto.InvoiceNumber,
                     dto.TransactionCode,
                     dto.Notes,
                     factoryItems
                 );
             }
+
+            // The total is resolved server-side (catalog prices); the tenders must cover it exactly.
+            if (dto.Payments.Sum(p => p.Amount) != sale.TotalAmount)
+                return CreateSaleErrors.PaymentAmountMismatch;
+
+            foreach (var payment in dto.Payments)
+                sale.AddPayment(payment.Method, payment.Amount, userId, userName);
 
             var deductions = dto.Items
                 .Where(i => i.ProductVariantId.HasValue)

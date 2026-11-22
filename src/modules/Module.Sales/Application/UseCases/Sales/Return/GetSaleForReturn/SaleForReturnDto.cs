@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+using Module.Sales.Application.UseCases.Sales.GetById;
 using Module.Sales.Domain;
 
 namespace Module.Sales.Application.UseCases.Sales.Return.GetSaleForReturn;
@@ -11,7 +11,10 @@ public class SaleForReturnDto
     public decimal TotalAmount { get; set; }
     public string SoldByName { get; set; } = string.Empty;
     public SaleType Type { get; set; }
-    public PaymentMethod paymentMethod {get; set;}
+
+    // Original tenders: the UI pre-fills the refund suggestion from these.
+    public List<SalePaymentDto> Payments { get; set; } = [];
+
     public List<ReturnableItemDto> Items { get; set; } = new();
 }
 

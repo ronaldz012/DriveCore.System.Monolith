@@ -13,12 +13,25 @@ public static class SalesEntityConfiguration
                 .WithOne(i => i.Sale)
                 .HasForeignKey(i => i.SaleId);
 
+            entity.HasMany(s => s.Payments)
+                .WithOne(p => p.Sale)
+                .HasForeignKey(p => p.SaleId);
+
+
             entity.HasOne(s => s.OriginalSale)
                 .WithMany(s => s.Returns)
                 .HasForeignKey(s => s.OriginalSaleId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             entity.HasIndex(e => new { e.TenantId, e.Number })
+                .IsUnique();
+        });
+        builder.Entity<SalePayment>(entity =>
+        {
+            // One line per (Sale, Method): the database rejects duplicate tenders
+            // no matter who writes them (API, SQL, seeds). TenantId goes first per
+            // the multi-tenant index convention.
+            entity.HasIndex(e => new { e.TenantId, e.SaleId, e.Method })
                 .IsUnique();
         });
         builder.Entity<SaleItem>(entity =>

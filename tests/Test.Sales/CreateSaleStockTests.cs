@@ -81,7 +81,7 @@ public class CreateSaleStockTests
     {
         return new CreateSaleDto
         {
-            PaymentMethod = PaymentMethod.Cash,
+            Payments = [new CreateSalePaymentDto { Method = PaymentMethod.Cash, Amount = 100m * quantity }],
             DocumentType = DocumentType.Ticket,
             Items = [new CreateSaleItemDto { ProductVariantId = VariantId, Quantity = quantity }]
         };

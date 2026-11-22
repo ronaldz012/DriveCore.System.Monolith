@@ -1221,6 +1221,54 @@ namespace System.Infrastructure.Migrations
                     b.ToTable("SaleItems");
                 });
 
+            modelBuilder.Entity("Module.Sales.Domain.SalePayment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Method")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("SaleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("UpdatedByName")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SaleId");
+
+                    b.HasIndex("TenantId", "SaleId", "Method")
+                        .IsUnique();
+
+                    b.ToTable("SalePayments");
+                });
+
             modelBuilder.Entity("Module.Inventory.Domain.Inventory.BranchInventory", b =>
                 {
                     b.HasOne("Module.Inventory.Domain.Products.ProductVariant", "ProductVariant")
@@ -1389,6 +1437,17 @@ namespace System.Infrastructure.Migrations
                     b.Navigation("Sale");
                 });
 
+            modelBuilder.Entity("Module.Sales.Domain.SalePayment", b =>
+                {
+                    b.HasOne("Module.Sales.Domain.Sale", "Sale")
+                        .WithMany("Payments")
+                        .HasForeignKey("SaleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Sale");
+                });
+
             modelBuilder.Entity("Module.Inventory.Domain.Organization.Provider", b =>
                 {
                     b.Navigation("StockReceptions");
@@ -1451,6 +1510,8 @@ namespace System.Infrastructure.Migrations
 
             modelBuilder.Entity("Module.Sales.Domain.Sale", b =>
                 {
+                    b.Navigation("Payments");
+
                     b.Navigation("Returns");
 
                     b.Navigation("SaleItems");

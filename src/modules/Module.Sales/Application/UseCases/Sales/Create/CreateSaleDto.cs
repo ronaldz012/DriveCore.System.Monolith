@@ -5,7 +5,6 @@ namespace Module.Sales.Application.UseCases.Sales.Create;
 
 public class CreateSaleDto : IValidatableObject
 {
-    public PaymentMethod PaymentMethod { get; set; }
     public int? InvoiceNumber { get; set; }
     public DocumentType DocumentType { get; set; }
     public string? TransactionCode { get; set; }
@@ -13,6 +12,12 @@ public class CreateSaleDto : IValidatableObject
 
     // Lista de productos a vender
     public List<CreateSaleItemDto> Items { get; set; } = new();
+
+    // Payment tenders; their sum must equal the sale total (validated in the use case,
+    // since the total comes from catalog prices resolved server-side).
+    [Required]
+    [MinLength(1, ErrorMessage = "At least one payment is required")]
+    public List<CreateSalePaymentDto> Payments { get; set; } = new();
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
@@ -55,6 +60,14 @@ public class CreateSaleDto : IValidatableObject
                 yield return new ValidationResult($"Items[{i}] cannot mix ProductVariantId with Description/UnitPrice", [nameof(Items)]);
             }
         }
+
+        // One tender per payment method per sale (backed by a unique DB index).
+        var duplicateMethod = Payments
+            .GroupBy(p => p.Method)
+            .FirstOrDefault(g => g.Count() > 1);
+
+        if (duplicateMethod != null)
+            yield return new ValidationResult("Duplicate payment method in request", [nameof(Payments)]);
     }
 }
 
@@ -66,4 +79,13 @@ public class CreateSaleItemDto
     public decimal? UnitPrice { get; set; }
     public int Quantity { get; set; }
     public decimal DiscountAmount { get; set; }
+}
+
+public class CreateSalePaymentDto
+{
+    [Required]
+    public PaymentMethod Method { get; set; }
+
+    [Range(0.01, 999999999999, ErrorMessage = "Payment amount must be greater than 0")]
+    public decimal Amount { get; set; }
 }
