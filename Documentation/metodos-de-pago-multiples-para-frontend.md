@@ -143,6 +143,54 @@ GET /api/Sale/{id}/details
 
 ---
 
+# Componente de pago — modal compartido (lo usan el Paso 4 y el Paso 5)
+
+## Layout
+
+```
+DESKTOP (≈60/40)                          CELULAR (una columna)
+┌──────────────────┬──────────────┐        ┌──────────────┐
+│ LISTA (60%)      │ PAGO (40%)   │        │ lista arriba │
+│ items + cant.    │ total         │        │ pago abajo   │
+│ (scroll propio)  │ [Efectivo]   │        │ [confirmar]  │ ← sticky abajo
+│                  │ [QR]         │        └──────────────┘
+│                  │ ☐ pagos sep. │
+│                  │ [confirmar]  │ ← fijo, nunca scrollea
+└──────────────────┴──────────────┘
+```
+
+El panel de pago no scrollea: total, métodos y confirmar siempre visibles.
+
+## Reglas de estado
+
+| Situación | Comportamiento |
+|---|---|
+| Sin nada seleccionado | sección de pago **inerte** (fantasma), confirmar deshabilitado |
+| El total cambia y el pago **no fue tocado** (sigue siendo la sugerencia) | recomputar la sugerencia **en silencio** |
+| El total cambia y el pago **fue editado a mano** | **reset a la sugerencia nueva** + aviso sutil ("el monto cambió — revisa cómo se devuelve") |
+| `sum(payments) != total` | confirmar deshabilitado (nunca enviar algo que el backend rebota) |
+
+**La intención del usuario sobrevive solo si sigue siendo válida** — la elección manual hecha
+contra un total viejo se descarta; mantenerla en silencio es cómo nacen los errores de caja.
+
+## Sugerencias (prellenado)
+
+| Caso | Sugerencia |
+|---|---|
+| POS (crear venta) | sin sugerencia de split: un tender con el total; el vendedor elige método |
+| Devolución **total** | **espejo exacto** de los tenders originales (`details → payments[]`) |
+| Devolución **parcial** | un solo tender: método dominante original por el monto completo; el vendedor ajusta o tilda "pagos separado" |
+
+Nunca sugerencia proporcional (regla de diseño del backend).
+
+## Reutilización
+
+Mismo componente en POS y devoluciones: en ambos se envían montos **positivos** (el backend
+niega el signo al guardar devoluciones). La única diferencia es la fuente del total y de la
+sugerencia (carrito vs. `details`).
+
+---
+
 # ETAPA B — Escrituras (recién cuando la Etapa A esté aplicada)
 
 ## Paso 4 — POS: crear venta con `payments[]`
@@ -184,7 +232,8 @@ Split (mismo contrato):
 ### Tareas del frontend
 
 - [ ] Payload sin `paymentMethod`; total del carrito como `amount` del tender.
-- [ ] (Opcional) UI de split: segundo tender, confirmar deshabilitado hasta cerrar la suma.
+- [ ] Usar el **componente de pago compartido** (sección anterior): botones de método,
+      checkbox "pagos separado", confirmar deshabilitado hasta cerrar la suma.
 
 ### Criterio de aceptación
 
@@ -195,12 +244,26 @@ Split (mismo contrato):
 
 ## Paso 5 — Devoluciones: elegir cómo se devuelve
 
+> **Sin endpoint dedicado:** `GET /api/Sale/{id}/returnable` fue **eliminado del backend**.
+> La pantalla de devolución se alimenta de **`GET /api/Sale/{id}/details`** (Paso 2), que ya
+> trae todo lo necesario — incluida la sugerencia de reembolso.
+
+### Mapeo de datos (details → pantalla de devolución)
+
+| Necesito | En `GET /{id}/details` |
+|---|---|
+| Nº de venta que se manipula | `number` |
+| Sugerencia de reembolso | `payments[]` |
+| Ítems devolvibles | `items[]` → `id` (= `originalSaleItemId` del POST) |
+| Cantidad devolvible por ítem | `items[].quantity − items[].returnedQuantity` |
+| Precio/descuento para el monto exacto | `items[].unitPrice`, `items[].discountAmount` |
+| ¿Se puede devolver? | `canReturn` (false si ya tiene devolución) · estado en `returnStatus` |
+
 ### Archivos backend para revisión
 
 | Archivo | Qué revisar |
 |---|---|
-| `src/modules/Module.Sales/Application/UseCases/Sales/Return/GetSaleForReturn.cs` | expone `payments[]` originales (la sugerencia) |
-| `src/modules/Module.Sales/Application/UseCases/Sales/Return/SaleForReturnDto.cs` | ❌ `paymentMethod` · ✅ `payments[]` · ítems con `discountAmount` (para el monto exacto) |
+| `src/modules/Module.Sales/Application/UseCases/Sales/GetById/GetSaleDetails.cs` | fuente de datos (Paso 2) |
 | `src/modules/Module.Sales/Application/UseCases/Sales/Return/CreateReturnDto.cs` | `payments[]` requerido; montos positivos; sin duplicados |
 | `src/modules/Module.Sales/Application/UseCases/Sales/Return/CreateReturn.cs` | valida `sum == reembolso`; niega signos al persistir |
 | `src/modules/Module.Sales/Application/UseCases/Sales/Return/ReturnErrors.cs` | error `RefundAmountMismatch` (400) |
@@ -208,21 +271,22 @@ Split (mismo contrato):
 ### Contrato
 
 ```jsonc
-GET /api/Sale/{id}/returnable
-{
-  "totalAmount": 135.00,
-  "payments": [ { "method": 1, "amount": 85.00 }, { "method": 0, "amount": 50.00 } ],  // sugerencia
-  "items": [ { "saleItemId": "…", "unitPrice": 100.00, "discountAmount": 0, "quantity": 1, "returnableQuantity": 1 } ]
-}
-
 POST /api/Sale/{id}/returns
 {
-  "items":    [ { "originalSaleItemId": "…", "quantity": 1 } ],
-  "payments": [ { "method": 0, "amount": 100.00 } ]        // positivos; SIEMPRE requerido
+  "items":    [ { "originalSaleItemId": "…", "quantity": 1 } ],   // = items[].id del details
+  "payments": [ { "method": 0, "amount": 100.00 } ]              // positivos; SIEMPRE requerido
 }
 ```
 
 **Monto exacto a reembolsar:** `Σ (unitPrice − discountAmount) × quantityDevuelta` por ítem.
+
+### Header de la pantalla (obligatorio)
+
+- [ ] **`#number` visible y prominente** — es el documento que se está manipulando; sin él
+      el vendedor no sabe qué venta está devolviendo.
+- [ ] Layout **chunky** tipo detalle de venta (cards), no el listado viejo: fecha
+      (`createdAt`), vendedor (`soldByName`), total (`totalAmount`) y chips de los tenders
+      originales (`payments[]`).
 
 ### Errores a manejar
 
@@ -232,8 +296,9 @@ POST /api/Sale/{id}/returns
 
 ### Tareas del frontend
 
+- [ ] Alimentar la pantalla desde `details`; gating con `canReturn`.
 - [ ] Mostrar reembolso exacto con `(unitPrice − discount) × qty`.
-- [ ] Precargar la sugerencia desde `returnable → payments[]` (editable).
+- [ ] Precargar la sugerencia desde `payments[]` (editable) — ver reglas del componente de pago.
 - [ ] Permitir 1 o 2 métodos; confirmar deshabilitado hasta cerrar la suma.
 - [ ] Enviar `payments[]` siempre.
 
@@ -241,6 +306,7 @@ POST /api/Sale/{id}/returns
 
 - Devolución total de venta split con espejo exacto → cierre netea a 0 por método.
 - Reembolso en otro método (efectivo aunque pagó QR) → el cierre refleja el elegido.
+- El número de venta está visible durante toda la operación.
 
 ---
 
@@ -248,8 +314,9 @@ POST /api/Sale/{id}/returns
 
 - **Exchange (cambio de mercadería)** y **multi-devolución por venta**: pospuestos; ver
   `Documentation/cambio-de-mercaderia-para-frontend.md`.
-- `GET /api/Sale/search-by-sku` y `GET /api/Sale/returns`: **eliminados del backend**.
-  El listado general (`GET /api/Sale?filter=…&type=…`) cubre ambos casos.
+- `GET /api/Sale/search-by-sku`, `GET /api/Sale/returns` y `GET /api/Sale/{id}/returnable`:
+  **eliminados del backend**. El listado general cubre los dos primeros; la pantalla de
+  devolución se alimenta de `GET /{id}/details` (Paso 5).
 - **Drop de la columna DB `Sales.PaymentMethod`**: pospuesto hasta que todo esto esté
   estable en producción (hoy la API ya no la expone; la columna solo se mantiene poblada
   internamente).

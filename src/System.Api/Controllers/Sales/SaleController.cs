@@ -10,7 +10,6 @@ using Module.Sales.Application.UseCases;
 using Module.Sales.Application.UseCases.Sales.Create;
 using Module.Sales.Application.UseCases.Sales.Get;
 using Module.Sales.Application.UseCases.Sales.Return;
-using Module.Sales.Application.UseCases.Sales.Return.GetSaleForReturn;
 using Module.Sales.Application.UseCases.Sales.Stats;
 
 namespace System.Api.Controllers.Sales
@@ -99,14 +98,6 @@ namespace System.Api.Controllers.Sales
             return await saleUseCases.GetSalesStats
                 .Execute(actorResult.Value, query, canSeeMargin, includeSellerBreakdown)
                 .ToValueOrProblemDetails();
-        }
-        [HttpGet("{saleId:guid}/returnable")]
-        [RequireFeature("pos", "create")]
-        public async Task<IActionResult> GetSaleForReturn([FromRoute] Guid saleId)
-        {
-            var actorResult = currentUser.GetActorContext();
-            if (!actorResult.IsSuccess)  return actorResult.ToValueOrProblemDetails();
-            return await saleUseCases.GetSaleForReturn.Execute(actorResult.Value, saleId).ToValueOrProblemDetails();
         }
     }
 }
