@@ -12,6 +12,7 @@ public class CloseCashRegister(ISalesDbContext context)
     {
         var closure = await context.CashRegisterClosures
             .Include(c => c.Sales)
+                .ThenInclude(s => s.Payments)
             .Include(c => c.Movements)
             .FirstOrDefaultAsync(c => c.BranchId == ctx.BranchId && c.IsOpen);
 
@@ -22,9 +23,11 @@ public class CloseCashRegister(ISalesDbContext context)
 
         await context.SaveChangesAsync();
 
+        // By tenders, so split sales count only their cash line.
         var cashSalesTotal = closure.Sales
-            .Where(s => s.PaymentMethod == PaymentMethod.Cash)
-            .Sum(s => s.TotalAmount);
+            .SelectMany(s => s.Payments)
+            .Where(p => p.Method == PaymentMethod.Cash)
+            .Sum(p => p.Amount);
 
         var outflowsTotal = closure.Movements
             .Where(m => m.Type == CashRegisterMovementType.Outflow)

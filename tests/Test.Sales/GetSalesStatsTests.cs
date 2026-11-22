@@ -315,7 +315,6 @@ public class GetSalesStatsTests
             CreatedBy = soldById,
             CreatedByName = soldByName,
             CashRegisterClosureId = CashClosureId,
-            PaymentMethod = PaymentMethod.Cash,
             DocumentType = DocumentType.Ticket,
             Type = type,
             OriginalSaleId = originalSaleId,

@@ -11,7 +11,14 @@ public class Sale : IMustHaveTenant, ICreatedAt, ICreatedBy, IUpdatedAt, IUpdate
     public string SoldByName { get; set; } = string.Empty;
     public Guid CashRegisterClosureId { get; set; } 
     public int Number { get; set; }
+
+    /// <summary>
+    /// LEGACY (write-only): dominant tender, kept ONLY to populate the DB column until it is
+    /// safe to drop it (the column is NOT NULL). NOBODY reads this — every consumer must use
+    /// Payments. Do not reference this property in new code.
+    /// </summary>
     public PaymentMethod PaymentMethod { get; set; }
+
     public string? TransactionCode { get; set; }
     public decimal TotalAmount { get; set; }
     public int? InvoiceNumber { get; set; }
@@ -31,10 +38,31 @@ public class Sale : IMustHaveTenant, ICreatedAt, ICreatedBy, IUpdatedAt, IUpdate
     public string? DeletedByName { get; set; }
 
     public ICollection<SaleItem> SaleItems { get; set; } = new List<SaleItem>();
+    public ICollection<SalePayment> Payments { get; set; } = new List<SalePayment>();
     public CashRegisterClosure CashRegisterClosure { get; set; } = null!;
 
     public Sale? OriginalSale { get; set; }
     public ICollection<Sale> Returns { get; set; } = new List<Sale>();
+
+    /// <summary>
+    /// Adds one payment tender. Sales keep positive amounts, returns negative.
+    /// One tender per method (unique index backs this) — the guard is a last resort
+    /// against programming bugs, application layer validates first.
+    /// </summary>
+    public void AddPayment(PaymentMethod method, decimal amount, Guid userId, string userName)
+    {
+        if (Payments.Any(p => p.Method == method))
+            throw new InvalidOperationException($"Duplicate payment method {method} for sale {Id}");
+
+        Payments.Add(new SalePayment
+        {
+            SaleId = Id,
+            Method = method,
+            Amount = amount,
+            CreatedBy = userId,
+            CreatedByName = userName
+        });
+    }
 
     public static Sale CreateSaleWithTicket(
         Guid branchId,
@@ -43,12 +71,11 @@ public class Sale : IMustHaveTenant, ICreatedAt, ICreatedBy, IUpdatedAt, IUpdate
         Guid createdBy,
         string createdByName,
         Guid cashRegisterClosureId,
-        PaymentMethod paymentMethod,
         string? transactionCode,
         string? notes,
         List<(Guid? ProductVariantId, string ProductSku, string ProductDisplayName, decimal UnitPrice, int Quantity, decimal DiscountAmount, decimal? UnitCost)> items)
     {
-        return CreateBase(branchId, soldById, soldByName, createdBy, createdByName, cashRegisterClosureId, paymentMethod, 
+        return CreateBase(branchId, soldById, soldByName, createdBy, createdByName, cashRegisterClosureId,
             DocumentType.Ticket, transactionCode, notes, null, items);
     }
 
@@ -59,7 +86,6 @@ public class Sale : IMustHaveTenant, ICreatedAt, ICreatedBy, IUpdatedAt, IUpdate
         Guid createdBy,
         string createdByName,
         Guid cashRegisterClosureId,
-        PaymentMethod paymentMethod,
         DocumentType documentType, 
         int? invoiceNumber,
         string? transactionCode,
@@ -72,7 +98,7 @@ public class Sale : IMustHaveTenant, ICreatedAt, ICreatedBy, IUpdatedAt, IUpdate
         if (documentType == DocumentType.Invoice && (!invoiceNumber.HasValue || invoiceNumber <= 0))
             throw new InvalidOperationException("Invoice number is required for completed invoices.");
 
-        return CreateBase(branchId, soldById, soldByName, createdBy, createdByName, cashRegisterClosureId, paymentMethod, 
+        return CreateBase(branchId, soldById, soldByName, createdBy, createdByName, cashRegisterClosureId,
             documentType, transactionCode, notes, invoiceNumber, items);
     }
 
@@ -84,7 +110,6 @@ public class Sale : IMustHaveTenant, ICreatedAt, ICreatedBy, IUpdatedAt, IUpdate
         Guid createdBy,
         string createdByName,
         Guid cashRegisterClosureId,
-        PaymentMethod paymentMethod,
         DocumentType documentType,
         string? transactionCode,
         string? notes,
@@ -102,7 +127,6 @@ public class Sale : IMustHaveTenant, ICreatedAt, ICreatedBy, IUpdatedAt, IUpdate
             SoldById = soldById,
             SoldByName = soldByName,
             CashRegisterClosureId = cashRegisterClosureId,
-            PaymentMethod = paymentMethod,
             DocumentType = documentType,
             Type = SaleType.Sale, 
             TransactionCode = transactionCode,
@@ -148,7 +172,6 @@ public class Sale : IMustHaveTenant, ICreatedAt, ICreatedBy, IUpdatedAt, IUpdate
         Guid createdBy,
         string createdByName,
         Guid cashRegisterClosureId,
-        PaymentMethod paymentMethod,
         DocumentType documentType,
         string? transactionCode,
         string? notes,
@@ -166,7 +189,6 @@ public class Sale : IMustHaveTenant, ICreatedAt, ICreatedBy, IUpdatedAt, IUpdate
             SoldById = soldById,
             SoldByName = soldByName,
             CashRegisterClosureId = cashRegisterClosureId,
-            PaymentMethod = paymentMethod,
             DocumentType = documentType,
             Type = SaleType.Return,
             OriginalSaleId = originalSaleId,

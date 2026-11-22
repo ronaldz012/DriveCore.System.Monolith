@@ -3,6 +3,7 @@ using Common.Contracts.inventory;
 using Common.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Module.Sales.Application.Abstraction;
+using Module.Sales.Application.UseCases.Sales.GetById;
 using Module.Sales.Domain;
 
 namespace Module.Sales.Application.UseCases.Registers.GetById;
@@ -57,8 +58,15 @@ public class GetClosureDetail(
                 RealCountedAmount = c.RealCountedAmount,
                 Difference = c.RealCountedAmount - c.SystemSalesAmount,
                 TotalSales = c.Sales.Sum(s => s.TotalAmount),
-                CashSales = c.Sales.Where(s => s.PaymentMethod == PaymentMethod.Cash).Sum(s => s.TotalAmount),
-                QrSales = c.Sales.Where(s => s.PaymentMethod == PaymentMethod.QrCode).Sum(s => s.TotalAmount),
+                // By tenders: split sales contribute each method's own line.
+                CashSales = c.Sales
+                    .SelectMany(s => s.Payments)
+                    .Where(p => p.Method == PaymentMethod.Cash)
+                    .Sum(p => p.Amount),
+                QrSales = c.Sales
+                    .SelectMany(s => s.Payments)
+                    .Where(p => p.Method == PaymentMethod.QrCode)
+                    .Sum(p => p.Amount),
                 TotalExpenses = c.Movements.Where(m => m.Type == CashRegisterMovementType.Outflow).Sum(m => m.Amount),
                 Sales = c.Sales
                     .OrderByDescending(s => s.CreatedAt)
@@ -69,7 +77,11 @@ public class GetClosureDetail(
                         CreatedAt = s.CreatedAt,
                         SoldByName = s.SoldByName,
                         TotalAmount = s.TotalAmount,
-                        PaymentMethod = s.PaymentMethod,
+                        Payments = s.Payments.Select(p => new SalePaymentDto
+                        {
+                            Method = p.Method,
+                            Amount = p.Amount
+                        }).ToList(),
                         DocumentType = s.DocumentType,
                         Type = s.Type,
                         OriginalSaleId = s.OriginalSaleId,

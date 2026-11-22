@@ -9,6 +9,7 @@ public interface ISalesDbContext
 {
     public DbSet<Sale> Sales { get; set; }
     public DbSet<SaleItem> SaleItems { get; set; }
+    public DbSet<SalePayment> SalePayments { get; set; }
     public DbSet<CashRegisterClosure> CashRegisterClosures { get; set; }
     public DbSet<CashRegisterMovement> CashRegisterMovements { get; set; }
 

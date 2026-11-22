@@ -156,7 +156,8 @@ public class CreateReturnTests
         var result = await sut.Execute(CreateActorContext(), new CreateReturnDto
         {
             OriginalSaleId = OriginalSaleId,
-            Items = [new CreateReturnItemDto { OriginalSaleItemId = OriginalSaleItemId, Quantity = 1 }]
+            Items = [new CreateReturnItemDto { OriginalSaleItemId = OriginalSaleItemId, Quantity = 1 }],
+            Payments = [new CreateReturnPaymentDto { Method = PaymentMethod.Cash, Amount = 100m }]
         });
 
         Assert.False(result.IsSuccess);
@@ -181,7 +182,8 @@ public class CreateReturnTests
         var result = await sut.Execute(CreateActorContext(), new CreateReturnDto
         {
             OriginalSaleId = OriginalSaleId,
-            Items = [new CreateReturnItemDto { OriginalSaleItemId = OriginalSaleItemId, Quantity = 2 }]
+            Items = [new CreateReturnItemDto { OriginalSaleItemId = OriginalSaleItemId, Quantity = 2 }],
+            Payments = [new CreateReturnPaymentDto { Method = PaymentMethod.Cash, Amount = 200m }]
         });
 
         Assert.True(result.IsSuccess, $"Expected success but got: {result.Error?.Code} - {result.Error?.Message}");
@@ -215,7 +217,8 @@ public class CreateReturnTests
         var result = await sut.Execute(CreateActorContext(), new CreateReturnDto
         {
             OriginalSaleId = OriginalSaleId,
-            Items = [new CreateReturnItemDto { OriginalSaleItemId = OriginalSaleItemId, Quantity = 2 }]
+            Items = [new CreateReturnItemDto { OriginalSaleItemId = OriginalSaleItemId, Quantity = 2 }],
+            Payments = [new CreateReturnPaymentDto { Method = PaymentMethod.Cash, Amount = 200m }]
         });
 
         Assert.True(result.IsSuccess);
@@ -231,6 +234,12 @@ public class CreateReturnTests
         // Sum checks
         Assert.Equal(-200m, saved.TotalAmount); // 2 * 100 = 200 -> -200
         Assert.Equal(-200m, saved.SaleItems.First().FinalPrice);
+
+        // Refund tenders come from the request (positive) and are stored negative;
+        // the return's dominant method is derived from them, never inherited.
+        var payment = Assert.Single(saved.Payments);
+        Assert.Equal(PaymentMethod.Cash, payment.Method);
+        Assert.Equal(-200m, payment.Amount);
     }
 
     [Fact]
@@ -350,7 +359,8 @@ public class CreateReturnTests
         var result = await sut.Execute(CreateActorContext(), new CreateReturnDto
         {
             OriginalSaleId = OriginalSaleId,
-            Items = [new CreateReturnItemDto { OriginalSaleItemId = OriginalSaleItemId, Quantity = 2 }]
+            Items = [new CreateReturnItemDto { OriginalSaleItemId = OriginalSaleItemId, Quantity = 2 }],
+            Payments = [new CreateReturnPaymentDto { Method = PaymentMethod.Cash, Amount = 200m }]
         });
 
         Assert.True(result.IsSuccess, $"Expected success but got: {result.Error?.Code} - {result.Error?.Message}");
@@ -397,7 +407,6 @@ public class CreateReturnTests
             CreatedBy = UserId,
             CreatedByName = "Original Buyer",
             CashRegisterClosureId = CashClosureId,
-            PaymentMethod = PaymentMethod.Cash,
             DocumentType = DocumentType.Ticket,
             Type = type,
             TotalAmount = 100m,
@@ -433,7 +442,6 @@ public class CreateReturnTests
             CreatedBy = UserId,
             CreatedByName = "Original Buyer",
             CashRegisterClosureId = CashClosureId,
-            PaymentMethod = PaymentMethod.Cash,
             DocumentType = DocumentType.Ticket,
             Type = SaleType.Return,
             OriginalSaleId = OriginalSaleId,

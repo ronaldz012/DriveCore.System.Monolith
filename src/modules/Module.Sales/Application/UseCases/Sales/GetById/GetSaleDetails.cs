@@ -24,7 +24,6 @@ public class GetSaleDetail(ISalesDbContext context)
                 SoldByName = s.SoldByName,
                 Type = s.Type,
                 DocumentType = s.DocumentType,
-                PaymentMethod = s.PaymentMethod,
                 TransactionCode = s.TransactionCode,
                 TotalAmount = s.TotalAmount,
                 InvoiceNumber = s.InvoiceNumber,
@@ -55,6 +54,12 @@ public class GetSaleDetail(ISalesDbContext context)
                     Number = r.Number,
                     CreatedAt = r.CreatedAt,
                     TotalAmount = r.TotalAmount
+                }).ToList(),
+
+                Payments = s.Payments.Select(p => new SalePaymentDto
+                {
+                    Method = p.Method,
+                    Amount = p.Amount
                 }).ToList()
             })
             .FirstOrDefaultAsync();

@@ -34,7 +34,7 @@ public class CreateSaleTests
 
         var result = await sut.Execute(CreateActorContext(), new CreateSaleDto
         {
-            PaymentMethod = PaymentMethod.Cash,
+            Payments = [new CreateSalePaymentDto { Method = PaymentMethod.Cash, Amount = 100m }],
             DocumentType = DocumentType.Ticket,
             Items = [new CreateSaleItemDto { ProductVariantId = VariantId, Quantity = 1 }]
         });
@@ -61,7 +61,7 @@ public class CreateSaleTests
 
         var result = await sut.Execute(CreateActorContext(), new CreateSaleDto
         {
-            PaymentMethod = PaymentMethod.Cash,
+            Payments = [new CreateSalePaymentDto { Method = PaymentMethod.Cash, Amount = 100m }],
             DocumentType = DocumentType.Ticket,
             Items = [new CreateSaleItemDto { ProductVariantId = VariantId, Quantity = 1 }]
         });
@@ -88,7 +88,7 @@ public class CreateSaleTests
 
         var result = await sut.Execute(CreateActorContext(), new CreateSaleDto
         {
-            PaymentMethod = PaymentMethod.Cash,
+            Payments = [new CreateSalePaymentDto { Method = PaymentMethod.Cash, Amount = 100m }],
             DocumentType = DocumentType.Ticket,
             Items = [new CreateSaleItemDto { ProductVariantId = VariantId, Quantity = 1 }]
         });
@@ -119,7 +119,7 @@ public class CreateSaleTests
 
         var result = await sut.Execute(CreateActorContext(), new CreateSaleDto
         {
-            PaymentMethod = PaymentMethod.Cash,
+            Payments = [new CreateSalePaymentDto { Method = PaymentMethod.Cash, Amount = 100m }],
             DocumentType = DocumentType.Ticket,
             Items = [new CreateSaleItemDto { ProductVariantId = VariantId, Quantity = 1 }]
         });
@@ -146,7 +146,7 @@ public class CreateSaleTests
 
         var result = await sut.Execute(CreateActorContext(), new CreateSaleDto
         {
-            PaymentMethod = PaymentMethod.Cash,
+            Payments = [new CreateSalePaymentDto { Method = PaymentMethod.Cash, Amount = 100m }],
             DocumentType = DocumentType.Ticket,
             Items = [new CreateSaleItemDto { ProductVariantId = VariantId, Quantity = 1 }]
         });
@@ -176,7 +176,7 @@ public class CreateSaleTests
 
         var result = await sut.Execute(CreateActorContext(), new CreateSaleDto
         {
-            PaymentMethod = PaymentMethod.Cash,
+            Payments = [new CreateSalePaymentDto { Method = PaymentMethod.Cash, Amount = 200m }],
             DocumentType = DocumentType.Ticket,
             TransactionCode = null,
             Notes = "Test sale",
@@ -197,6 +197,84 @@ public class CreateSaleTests
         var savedItem = saved.SaleItems.First();
         Assert.Equal("SKU-001", savedItem.ProductSku);
         Assert.Equal("Test Product - Negro / 42", savedItem.ProductDisplayName);
+
+        // One tender covering the exact total, dominant method derived from it.
+        var payment = Assert.Single(saved.Payments);
+        Assert.Equal(PaymentMethod.Cash, payment.Method);
+        Assert.Equal(200m, payment.Amount);
+    }
+
+    [Fact]
+    public async Task Execute_ShouldCreateSplitPayments_AndDeriveDominantMethod()
+    {
+        var tenantCtx = TestSalesDbContextFactory.CreateTenantContext(TenantId);
+        using var dbContext = TestSalesDbContextFactory.Create(tenantCtx);
+        SeedOpenCashClosure(dbContext);
+
+        var inventoryMock = new Mock<IInventoryIntegrationService>();
+        inventoryMock
+            .Setup(s => s.GetVariantsWithStock(It.IsAny<List<Guid>>(), BranchId))
+            .ReturnsAsync(new List<ProductVariantStockDto>
+            {
+                new(VariantId, "SKU-001", "Test Product - Negro / 42", 100m, 10, true, 30m)
+            });
+        inventoryMock
+            .Setup(s => s.DeductStock(It.IsAny<List<StockDeductionDto>>(), BranchId, UserId, It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<bool>()))
+            .ReturnsAsync(true);
+
+        var sut = CreateSut(dbContext, inventoryMock.Object);
+
+        // Total 100 (1 x 100): paid 60 QR + 40 cash -> dominant is QR.
+        var result = await sut.Execute(CreateActorContext(), new CreateSaleDto
+        {
+            Payments =
+            [
+                new CreateSalePaymentDto { Method = PaymentMethod.QrCode, Amount = 60m },
+                new CreateSalePaymentDto { Method = PaymentMethod.Cash, Amount = 40m }
+            ],
+            DocumentType = DocumentType.Ticket,
+            Items = [new CreateSaleItemDto { ProductVariantId = VariantId, Quantity = 1 }]
+        });
+
+        Assert.True(result.IsSuccess, $"Expected success but got: {result.Error?.Code} - {result.Error?.Message}");
+
+        var saved = await dbContext.Sales.FirstOrDefaultAsync();
+        Assert.NotNull(saved);
+        Assert.Equal(2, saved.Payments.Count);
+        Assert.Equal(60m, saved.Payments.Single(p => p.Method == PaymentMethod.QrCode).Amount);
+        Assert.Equal(40m, saved.Payments.Single(p => p.Method == PaymentMethod.Cash).Amount);
+        Assert.Equal(100m, saved.Payments.Sum(p => p.Amount));
+    }
+
+    [Fact]
+    public async Task Execute_ShouldReturnError_WhenPaymentsDoNotMatchTotal()
+    {
+        var tenantCtx = TestSalesDbContextFactory.CreateTenantContext(TenantId);
+        using var dbContext = TestSalesDbContextFactory.Create(tenantCtx);
+        SeedOpenCashClosure(dbContext);
+
+        var inventoryMock = new Mock<IInventoryIntegrationService>();
+        inventoryMock
+            .Setup(s => s.GetVariantsWithStock(It.IsAny<List<Guid>>(), BranchId))
+            .ReturnsAsync(new List<ProductVariantStockDto>
+            {
+                new(VariantId, "SKU-001", "Test Product - Negro / 42", 100m, 10, true, 30m)
+            });
+
+        var sut = CreateSut(dbContext, inventoryMock.Object);
+
+        // Sale total is 100 but the tender only covers 60.
+        var result = await sut.Execute(CreateActorContext(), new CreateSaleDto
+        {
+            Payments = [new CreateSalePaymentDto { Method = PaymentMethod.QrCode, Amount = 60m }],
+            DocumentType = DocumentType.Ticket,
+            Items = [new CreateSaleItemDto { ProductVariantId = VariantId, Quantity = 1 }]
+        });
+
+        Assert.False(result.IsSuccess);
+        Assert.Equal(CreateSaleErrors.PaymentAmountMismatch, result.Error);
+        Assert.Empty(await dbContext.Sales.ToListAsync());
+        Assert.Empty(await dbContext.SalePayments.ToListAsync());
     }
 
     private static ActorContext CreateActorContext()

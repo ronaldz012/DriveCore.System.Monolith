@@ -1,4 +1,5 @@
 using Common.Utilities;
+using Module.Sales.Application.UseCases.Sales.GetById;
 using Module.Sales.Domain;
 
 namespace Module.Sales.Application.UseCases.Sales.Get;
@@ -16,8 +17,8 @@ public class SaleListDto
     public SaleType Type { get; set; }
     public Guid? OriginalSaleId { get; set; }
     public int? OriginalSaleNumber { get; set; }
-    public PaymentMethod PaymentMethod { get; set; }
-    public DocumentType DocumentType { get; set; } 
+    public List<SalePaymentDto> Payments { get; set; } = [];
+    public DocumentType DocumentType { get; set; }
     public int? InvoiceNumber { get; set; }
     public string? TransactionCode { get; set; }
     public bool HasReturn { get; set; }

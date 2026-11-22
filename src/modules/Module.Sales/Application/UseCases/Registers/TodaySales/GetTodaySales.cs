@@ -23,9 +23,9 @@ public class GetTodaySales(ISalesDbContext context)
                 Sales = c.Sales.Select(s => new
                 {
                     s.TotalAmount,
-                    s.PaymentMethod,
                     s.DocumentType,
-                    ItemsCount = s.SaleItems.Sum(si => si.Quantity)
+                    ItemsCount = s.SaleItems.Sum(si => si.Quantity),
+                    Payments = s.Payments.Select(p => new { p.Method, p.Amount }).ToList()
                 }).ToList()
             })
             .FirstOrDefaultAsync();
@@ -48,10 +48,15 @@ public class GetTodaySales(ISalesDbContext context)
             dto.SalesCount++;
             dto.TotalAmount += sale.TotalAmount;
             dto.TotalItems += sale.ItemsCount;
-            dto.CashAmount += sale.PaymentMethod == PaymentMethod.Cash ? sale.TotalAmount : 0;
-            dto.QrCodeAmount += sale.PaymentMethod == PaymentMethod.QrCode ? sale.TotalAmount : 0;
             dto.TicketCount += sale.DocumentType == DocumentType.Ticket ? 1 : 0;
             dto.InvoiceCount += sale.DocumentType == DocumentType.Invoice ? 1 : 0;
+
+            // By tenders: split sales contribute each method's own line.
+            foreach (var payment in sale.Payments)
+            {
+                if (payment.Method == PaymentMethod.Cash) dto.CashAmount += payment.Amount;
+                else if (payment.Method == PaymentMethod.QrCode) dto.QrCodeAmount += payment.Amount;
+            }
         }
 
         dto.AverageTicket = dto.SalesCount > 0 ? dto.TotalAmount / dto.SalesCount : 0;

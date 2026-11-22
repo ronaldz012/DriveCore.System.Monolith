@@ -61,7 +61,6 @@ public class CreateReturn(
                 createdBy: ctx.UserId,
                 createdByName: ctx.FullName,
                 cashRegisterClosureId: openClosure.Id,
-                paymentMethod: originalSale.PaymentMethod,
                 documentType: originalSale.DocumentType,
                 transactionCode: null,
                 notes: $"Devolución de venta {dto.OriginalSaleId}",
@@ -76,7 +75,24 @@ public class CreateReturn(
 
             returnSale.Number = await numberGenerator.NextAsync(context.Database, ctx.TenantId, SalesCounterKey.Sale);
 
+            // LEGACY write-only column (NOT NULL): dominant refund tender, populated until the
+            // column can be dropped. Not read by any code path.
+            returnSale.PaymentMethod = dto.Payments
+                .OrderByDescending(keySelector: p => p.Amount)
+                .First()
+                .Method;
+
+            // Request amounts are positive ("money handed back"); stored lines are negative.
+            if (dto.Payments.Sum(p => p.Amount) != Math.Abs(returnSale.TotalAmount))
+            {
+                await transaction.RollbackAsync();
+                return ReturnErrors.RefundAmountMismatch;
+            }
+
             context.Sales.Add(returnSale);
+
+            foreach (var payment in dto.Payments)
+                returnSale.AddPayment(payment.Method, -payment.Amount, ctx.UserId, ctx.FullName);
 
             var returns = dto.Items
                 .Select(item =>

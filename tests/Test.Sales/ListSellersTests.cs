@@ -78,7 +78,6 @@ public class ListSellersTests
             CreatedBy = soldById,
             CreatedByName = soldByName,
             CashRegisterClosureId = CashClosureId,
-            PaymentMethod = PaymentMethod.Cash,
             DocumentType = DocumentType.Ticket,
             Type = SaleType.Sale,
             TotalAmount = 100m,

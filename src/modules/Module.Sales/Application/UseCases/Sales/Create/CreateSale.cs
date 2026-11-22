@@ -77,7 +77,6 @@ public class CreateSale(
                     userId,
                     userName,
                     cashClosure.Id,
-                    dto.PaymentMethod,
                     dto.TransactionCode,
                     dto.Notes,
                     factoryItems
@@ -92,14 +91,27 @@ public class CreateSale(
                     userId,
                     userName,
                     cashClosure.Id,
-                    dto.PaymentMethod,
-                    dto.DocumentType, 
+                    dto.DocumentType,
                     dto.InvoiceNumber,
                     dto.TransactionCode,
                     dto.Notes,
                     factoryItems
                 );
             }
+
+            // LEGACY write-only column (NOT NULL): keeps the dominant method populated
+            // until the column can be dropped. Not read by any code path.
+            sale.PaymentMethod = dto.Payments
+                .OrderByDescending(p => p.Amount)
+                .First()
+                .Method;
+
+            // The total is resolved server-side (catalog prices); the tenders must cover it exactly.
+            if (dto.Payments.Sum(p => p.Amount) != sale.TotalAmount)
+                return CreateSaleErrors.PaymentAmountMismatch;
+
+            foreach (var payment in dto.Payments)
+                sale.AddPayment(payment.Method, payment.Amount, userId, userName);
 
             var deductions = dto.Items
                 .Where(i => i.ProductVariantId.HasValue)
