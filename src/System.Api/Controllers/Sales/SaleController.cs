@@ -11,8 +11,6 @@ using Module.Sales.Application.UseCases.Sales.Create;
 using Module.Sales.Application.UseCases.Sales.Get;
 using Module.Sales.Application.UseCases.Sales.Return;
 using Module.Sales.Application.UseCases.Sales.Return.GetSaleForReturn;
-using Module.Sales.Application.UseCases.Sales.Return.List;
-using Module.Sales.Application.UseCases.Sales.Search;
 using Module.Sales.Application.UseCases.Sales.Stats;
 
 namespace System.Api.Controllers.Sales
@@ -52,14 +50,6 @@ namespace System.Api.Controllers.Sales
             return await saleUseCases.GetSaleDetail
                 .Execute(actorResult.Value, id, marginResult.Value)
                 .ToValueOrProblemDetails();
-        }
-        [HttpGet("returns")]
-        [RequireFeature("pos", "read")]
-        public async Task<IActionResult> GetReturns([FromQuery] ReturnsQueryDto queryDto)
-        {
-            var actorResult = currentUser.GetActorContext();
-            if (!actorResult.IsSuccess)  return actorResult.ToValueOrProblemDetails();
-            return await saleUseCases.ListReturns.Execute(actorResult.Value, queryDto).ToValueOrProblemDetails();
         }
         [HttpPost("{id:guid}/returns")]
         [RequireFeature("pos", "create")]
@@ -109,19 +99,6 @@ namespace System.Api.Controllers.Sales
             return await saleUseCases.GetSalesStats
                 .Execute(actorResult.Value, query, canSeeMargin, includeSellerBreakdown)
                 .ToValueOrProblemDetails();
-        }
-        /// <summary>
-        /// Search sales by SKU (recent sales without returns).
-        /// </summary>
-        /// <remarks>DEPRECATED: use GET /api/Sale?filter={sku} instead. This endpoint will be removed in a later phase.</remarks>
-        [HttpGet("search-by-sku")]
-        [RequireFeature("pos", "read")]
-        [Obsolete("Deprecated: use GET /api/Sale?filter= instead.")]
-        public async Task<IActionResult> SearchBySku([FromQuery] SkuSearchQueryDto queryDto)
-        {
-            var actorResult = currentUser.GetActorContext();
-            if (!actorResult.IsSuccess)  return actorResult.ToValueOrProblemDetails();
-            return await saleUseCases.SearchSalesBySku.Execute(actorResult.Value, queryDto).ToValueOrProblemDetails();
         }
         [HttpGet("{saleId:guid}/returnable")]
         [RequireFeature("pos", "create")]

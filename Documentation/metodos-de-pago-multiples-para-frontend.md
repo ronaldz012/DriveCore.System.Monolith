@@ -75,6 +75,9 @@ GET /api/Sale
 
 - Ventas viejas (1 línea por el backfill) se listan igual que antes.
 - Una venta split muestra ambos métodos; nada referencia `paymentMethod`.
+- **Las devoluciones también se listan por aquí** (`type: 1` / `returnStatus`): sus
+  `payments[]` vienen con montos **negativos** — el listado exclusivo de devoluciones
+  (`GET /api/Sale/returns`) fue **eliminado del backend**.
 
 ---
 
@@ -108,38 +111,7 @@ GET /api/Sale/{id}/details
 
 ---
 
-## Paso 3 — Listado de devoluciones: `payments[]`
-
-### Archivos backend para revisión
-
-| Archivo | Qué revisar |
-|---|---|
-| `src/modules/Module.Sales/Application/UseCases/Sales/Return/List/ReturnListDto.cs` | ❌ `paymentMethod` eliminado · ✅ `payments[]` |
-| `src/modules/Module.Sales/Application/UseCases/Sales/Return/List/ListReturns.cs` | proyección de las líneas |
-
-### Contrato
-
-```jsonc
-GET /api/Sale/returns
-{
-  "items": [
-    {
-      "number": 45,
-      "totalAmount": -100.00,
-      "payments": [ { "method": 0, "amount": -100.00 } ],   // negativas
-      "originalSaleId": "…"
-    }
-  ]
-}
-```
-
-### Tareas del frontend
-
-- [ ] Mostrar el/los métodos del reembolso desde `payments[]` (montos ya negativos).
-
----
-
-## Paso 4 — Cierres de caja: filas con `payments[]`, totales sin cambios
+## Paso 3 — Cierres de caja: filas con `payments[]`, totales sin cambios
 
 ### Archivos backend para revisión
 
@@ -173,7 +145,7 @@ GET /api/Sale/returns
 
 # ETAPA B — Escrituras (recién cuando la Etapa A esté aplicada)
 
-## Paso 5 — POS: crear venta con `payments[]`
+## Paso 4 — POS: crear venta con `payments[]`
 
 ### Archivos backend para revisión
 
@@ -221,7 +193,7 @@ Split (mismo contrato):
 
 ---
 
-## Paso 6 — Devoluciones: elegir cómo se devuelve
+## Paso 5 — Devoluciones: elegir cómo se devuelve
 
 ### Archivos backend para revisión
 
@@ -276,7 +248,8 @@ POST /api/Sale/{id}/returns
 
 - **Exchange (cambio de mercadería)** y **multi-devolución por venta**: pospuestos; ver
   `Documentation/cambio-de-mercaderia-para-frontend.md`.
-- `GET /api/Sale/search-by-sku`: deprecado, se eliminará más adelante.
+- `GET /api/Sale/search-by-sku` y `GET /api/Sale/returns`: **eliminados del backend**.
+  El listado general (`GET /api/Sale?filter=…&type=…`) cubre ambos casos.
 - **Drop de la columna DB `Sales.PaymentMethod`**: pospuesto hasta que todo esto esté
   estable en producción (hoy la API ya no la expone; la columna solo se mantiene poblada
   internamente).
@@ -285,8 +258,8 @@ POST /api/Sale/{id}/returns
 
 # Checklist de deploy conjunto
 
-1. [ ] Etapa A (pasos 1–4) aprobada y aplicada.
-2. [ ] Etapa B (pasos 5–6) aprobada y aplicada.
+1. [ ] Etapa A (pasos 1–3) aprobada y aplicada.
+2. [ ] Etapa B (pasos 4–5) aprobada y aplicada.
 3. [ ] Migración `20261122014653_AddSalePayments` aplicada en la DB de **producción**
        (local ya aplicada y verificada: montos 1:1 con las ventas existentes).
 4. [ ] `appsettings.json` → connection strings de producción.

@@ -18,8 +18,6 @@ using Module.Sales.Application.UseCases.Sales.Get;
 using Module.Sales.Application.UseCases.Sales.GetById;
 using Module.Sales.Application.UseCases.Sales.Return;
 using Module.Sales.Application.UseCases.Sales.Return.GetSaleForReturn;
-using Module.Sales.Application.UseCases.Sales.Return.List;
-using Module.Sales.Application.UseCases.Sales.Search;
 using Module.Sales.Application.UseCases.Sales.Stats;
 using Module.Sales.Infrastructure;
 using Module.Sales.Infrastructure.Services;
@@ -38,8 +36,6 @@ public static class SalesDependencyInjection
                         .AddScoped<ListSellers>()
                         .AddScoped<GetSalesStats>()
                         .AddScoped<CreateReturn>()
-                        .AddScoped<ListReturns>()
-                        .AddScoped<SearchSalesBySku>()
                         .AddScoped<GetSaleForReturn>()
                         .AddScoped<RegisterUseCases>()
                         .AddScoped<OpenCashRegister>()
