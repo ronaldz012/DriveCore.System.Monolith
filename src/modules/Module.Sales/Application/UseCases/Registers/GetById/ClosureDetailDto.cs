@@ -1,3 +1,4 @@
+using Module.Sales.Application.UseCases.Sales.GetById;
 using Module.Sales.Domain;
 
 namespace Module.Sales.Application.UseCases.Registers.GetById;
@@ -31,7 +32,7 @@ public class ClosureSaleItemDto
     public DateTime CreatedAt { get; set; }
     public string SoldByName { get; set; } = string.Empty;
     public decimal TotalAmount { get; set; }
-    public PaymentMethod PaymentMethod { get; set; }
+    public List<SalePaymentDto> Payments { get; set; } = [];
     public DocumentType DocumentType { get; set; }
     public SaleType Type { get; set; }
     public Guid? OriginalSaleId { get; set; }

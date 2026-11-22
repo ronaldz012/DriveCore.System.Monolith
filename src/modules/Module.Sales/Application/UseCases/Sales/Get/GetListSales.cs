@@ -2,6 +2,7 @@ using Common.Contracts.authentication;
 using Common.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Module.Sales.Application.Abstraction;
+using Module.Sales.Application.UseCases.Sales.GetById;
 using Module.Sales.Domain;
 
 namespace Module.Sales.Application.UseCases.Sales.Get;
@@ -81,7 +82,11 @@ public class GetListSales(ISalesDbContext context)
                     Type = s.Type,
                     OriginalSaleId = s.OriginalSaleId,
                     OriginalSaleNumber = s.OriginalSale != null ? s.OriginalSale.Number : (int?)null,
-                    PaymentMethod = s.PaymentMethod,
+                    Payments = s.Payments.Select(p => new SalePaymentDto
+                    {
+                        Method = p.Method,
+                        Amount = p.Amount
+                    }).ToList(),
                     DocumentType = s.DocumentType,
                     InvoiceNumber = s.InvoiceNumber,
                     TransactionCode = s.TransactionCode,

@@ -50,7 +50,8 @@ public class GetSaleForReturn(ISalesDbContext context)
                 ProductSku = si.ProductSku,
                 Quantity = si.Quantity,
                 ReturnableQuantity = si.Quantity,
-                UnitPrice = si.UnitPrice
+                UnitPrice = si.UnitPrice,
+                DiscountAmount = si.DiscountAmount
             }).ToList()
         };
     }

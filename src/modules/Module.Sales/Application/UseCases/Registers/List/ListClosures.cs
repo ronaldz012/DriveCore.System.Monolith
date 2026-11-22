@@ -35,7 +35,10 @@ public class ListClosures(ISalesDbContext context)
                 ClosedByName = c.CloseByName,
                 OpeningBalance = c.OpeningBalance,
                 TotalSales = c.Sales.Sum(s => s.TotalAmount),
-                CashSales = c.Sales.Where(s => s.PaymentMethod == PaymentMethod.Cash).Sum(s => s.TotalAmount),
+                CashSales = c.Sales
+                    .SelectMany(s => s.Payments)
+                    .Where(p => p.Method == PaymentMethod.Cash)
+                    .Sum(p => p.Amount),
                 TotalExpenses = c.Movements.Where(m => m.Type == CashRegisterMovementType.Outflow).Sum(m => m.Amount),
                 SystemSalesAmount = c.SystemSalesAmount,
                 RealCountedAmount = c.RealCountedAmount,

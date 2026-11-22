@@ -36,7 +36,7 @@ namespace System.Infrastructure.Migrations
 
                     b.HasKey("TenantId", "CounterKey");
 
-                    b.ToTable("DocumentCounters");
+                    b.ToTable("DocumentCounters", (string)null);
                 });
 
             modelBuilder.Entity("Module.Inventory.Domain.Inventory.BranchInventory", b =>
@@ -95,7 +95,7 @@ namespace System.Infrastructure.Migrations
                     b.HasIndex("TenantId", "BranchId", "ProductVariantId")
                         .IsUnique();
 
-                    b.ToTable("BranchInventories");
+                    b.ToTable("BranchInventories", (string)null);
                 });
 
             modelBuilder.Entity("Module.Inventory.Domain.Inventory.StockMovement", b =>
@@ -180,7 +180,7 @@ namespace System.Infrastructure.Migrations
 
                     b.HasIndex("StockTransferId");
 
-                    b.ToTable("StockMovements");
+                    b.ToTable("StockMovements", (string)null);
                 });
 
             modelBuilder.Entity("Module.Inventory.Domain.Organization.Provider", b =>
@@ -244,7 +244,7 @@ namespace System.Infrastructure.Migrations
                     b.HasIndex("TenantId", "Name")
                         .IsUnique();
 
-                    b.ToTable("Providers");
+                    b.ToTable("Providers", (string)null);
                 });
 
             modelBuilder.Entity("Module.Inventory.Domain.Products.Brand", b =>
@@ -310,7 +310,7 @@ namespace System.Infrastructure.Migrations
                     b.HasIndex("TenantId", "Prefix")
                         .IsUnique();
 
-                    b.ToTable("Brands");
+                    b.ToTable("Brands", (string)null);
                 });
 
             modelBuilder.Entity("Module.Inventory.Domain.Products.Category", b =>
@@ -366,7 +366,7 @@ namespace System.Infrastructure.Migrations
                     b.HasIndex("TenantId", "Name")
                         .IsUnique();
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("Module.Inventory.Domain.Products.Color", b =>
@@ -418,7 +418,7 @@ namespace System.Infrastructure.Migrations
                     b.HasIndex("TenantId", "Name")
                         .IsUnique();
 
-                    b.ToTable("Colors");
+                    b.ToTable("Colors", (string)null);
                 });
 
             modelBuilder.Entity("Module.Inventory.Domain.Products.Product", b =>
@@ -512,7 +512,7 @@ namespace System.Infrastructure.Migrations
                         .IsUnique()
                         .HasFilter("\"DeletedAt\" IS NULL");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("Module.Inventory.Domain.Products.ProductVariant", b =>
@@ -592,7 +592,7 @@ namespace System.Infrastructure.Migrations
                         .IsUnique()
                         .HasFilter("\"DeletedAt\" IS NULL");
 
-                    b.ToTable("ProductVariants");
+                    b.ToTable("ProductVariants", (string)null);
                 });
 
             modelBuilder.Entity("Module.Inventory.Domain.Products.Size", b =>
@@ -647,7 +647,7 @@ namespace System.Infrastructure.Migrations
                     b.HasIndex("TenantId", "Name")
                         .IsUnique();
 
-                    b.ToTable("Sizes");
+                    b.ToTable("Sizes", (string)null);
                 });
 
             modelBuilder.Entity("Module.Inventory.Domain.Receptions.StockReception", b =>
@@ -712,7 +712,7 @@ namespace System.Infrastructure.Migrations
                     b.HasIndex("TenantId", "Number")
                         .IsUnique();
 
-                    b.ToTable("StockReceptions");
+                    b.ToTable("StockReceptions", (string)null);
                 });
 
             modelBuilder.Entity("Module.Inventory.Domain.Receptions.StockReceptionItem", b =>
@@ -771,7 +771,7 @@ namespace System.Infrastructure.Migrations
 
                     b.HasIndex("StockReceptionId");
 
-                    b.ToTable("StockReceptionItems");
+                    b.ToTable("StockReceptionItems", (string)null);
                 });
 
             modelBuilder.Entity("Module.Inventory.Domain.Transfers.StockTransfer", b =>
@@ -840,7 +840,7 @@ namespace System.Infrastructure.Migrations
                     b.HasIndex("TenantId", "Number")
                         .IsUnique();
 
-                    b.ToTable("StockTransfers");
+                    b.ToTable("StockTransfers", (string)null);
                 });
 
             modelBuilder.Entity("Module.Inventory.Domain.Transfers.StockTransferItem", b =>
@@ -898,7 +898,7 @@ namespace System.Infrastructure.Migrations
 
                     b.HasIndex("StockTransferId");
 
-                    b.ToTable("StockTransferItems");
+                    b.ToTable("StockTransferItems", (string)null);
                 });
 
             modelBuilder.Entity("Module.Sales.Domain.CashRegisterClosure", b =>
@@ -988,7 +988,7 @@ namespace System.Infrastructure.Migrations
                     b.HasIndex("TenantId", "Number")
                         .IsUnique();
 
-                    b.ToTable("CashRegisterClosures");
+                    b.ToTable("CashRegisterClosures", (string)null);
                 });
 
             modelBuilder.Entity("Module.Sales.Domain.CashRegisterMovement", b =>
@@ -1046,7 +1046,7 @@ namespace System.Infrastructure.Migrations
 
                     b.HasIndex("CashRegisterClosureId");
 
-                    b.ToTable("CashRegisterMovements");
+                    b.ToTable("CashRegisterMovements", (string)null);
                 });
 
             modelBuilder.Entity("Module.Sales.Domain.Sale", b =>
@@ -1136,7 +1136,7 @@ namespace System.Infrastructure.Migrations
                     b.HasIndex("TenantId", "Number")
                         .IsUnique();
 
-                    b.ToTable("Sales");
+                    b.ToTable("Sales", (string)null);
                 });
 
             modelBuilder.Entity("Module.Sales.Domain.SaleItem", b =>
@@ -1218,7 +1218,7 @@ namespace System.Infrastructure.Migrations
 
                     b.HasIndex("SaleId");
 
-                    b.ToTable("SaleItems");
+                    b.ToTable("SaleItems", (string)null);
                 });
 
             modelBuilder.Entity("Module.Sales.Domain.SalePayment", b =>
@@ -1266,7 +1266,7 @@ namespace System.Infrastructure.Migrations
                     b.HasIndex("TenantId", "SaleId", "Method")
                         .IsUnique();
 
-                    b.ToTable("SalePayments");
+                    b.ToTable("SalePayments", (string)null);
                 });
 
             modelBuilder.Entity("Module.Inventory.Domain.Inventory.BranchInventory", b =>

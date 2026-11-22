@@ -240,7 +240,6 @@ public class CreateReturnTests
         var payment = Assert.Single(saved.Payments);
         Assert.Equal(PaymentMethod.Cash, payment.Method);
         Assert.Equal(-200m, payment.Amount);
-        Assert.Equal(PaymentMethod.Cash, saved.PaymentMethod);
     }
 
     [Fact]
@@ -408,7 +407,6 @@ public class CreateReturnTests
             CreatedBy = UserId,
             CreatedByName = "Original Buyer",
             CashRegisterClosureId = CashClosureId,
-            PaymentMethod = PaymentMethod.Cash,
             DocumentType = DocumentType.Ticket,
             Type = type,
             TotalAmount = 100m,
@@ -444,7 +442,6 @@ public class CreateReturnTests
             CreatedBy = UserId,
             CreatedByName = "Original Buyer",
             CashRegisterClosureId = CashClosureId,
-            PaymentMethod = PaymentMethod.Cash,
             DocumentType = DocumentType.Ticket,
             Type = SaleType.Return,
             OriginalSaleId = OriginalSaleId,

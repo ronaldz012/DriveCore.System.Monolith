@@ -26,4 +26,6 @@ public class ReturnableItemDto
     public int Quantity { get; set; }
     public int ReturnableQuantity { get; set; }
     public decimal UnitPrice { get; set; }
+    // Needed by the UI to compute the exact refund: (unitPrice - discount) * qty.
+    public decimal DiscountAmount { get; set; }
 }

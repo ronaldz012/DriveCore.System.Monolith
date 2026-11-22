@@ -97,13 +97,17 @@ public class GetSalesStats(ISalesDbContext context)
             .OrderBy(x => x.Date)
             .ToListAsync();
 
+        // Payment breakdown by tenders: the unique (Sale, Method) index guarantees
+        // one line per method per sale, so counting lines equals counting sales
+        // with that tender. Return lines net their amounts.
         var byPayment = await scoped
-            .GroupBy(s => s.PaymentMethod)
+            .SelectMany(s => s.Payments.Select(p => new { p.Method, p.Amount, s.Type }))
+            .GroupBy(x => x.Method)
             .Select(g => new
             {
                 Method = g.Key,
-                SalesCount = g.Count(s => s.Type == SaleType.Sale),
-                Amount = g.Sum(s => s.TotalAmount)
+                SalesCount = g.Count(x => x.Type == SaleType.Sale),
+                Amount = g.Sum(x => x.Amount)
             })
             .ToListAsync();
 

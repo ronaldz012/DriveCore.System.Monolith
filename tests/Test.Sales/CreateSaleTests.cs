@@ -202,7 +202,6 @@ public class CreateSaleTests
         var payment = Assert.Single(saved.Payments);
         Assert.Equal(PaymentMethod.Cash, payment.Method);
         Assert.Equal(200m, payment.Amount);
-        Assert.Equal(PaymentMethod.Cash, saved.PaymentMethod);
     }
 
     [Fact]
@@ -241,7 +240,6 @@ public class CreateSaleTests
 
         var saved = await dbContext.Sales.FirstOrDefaultAsync();
         Assert.NotNull(saved);
-        Assert.Equal(PaymentMethod.QrCode, saved.PaymentMethod); // derived, not declared
         Assert.Equal(2, saved.Payments.Count);
         Assert.Equal(60m, saved.Payments.Single(p => p.Method == PaymentMethod.QrCode).Amount);
         Assert.Equal(40m, saved.Payments.Single(p => p.Method == PaymentMethod.Cash).Amount);

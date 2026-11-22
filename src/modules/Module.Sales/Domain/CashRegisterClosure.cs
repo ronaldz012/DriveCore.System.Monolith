@@ -63,9 +63,12 @@ public class CashRegisterClosure : IMustHaveTenant, ICreatedAt, ICreatedBy, IUpd
         if (!IsOpen)
             throw new InvalidOperationException("Cash register is already closed.");
 
+        // Cash total comes from the payment tenders, not the denormalized dominant method:
+        // split sales (e.g. half QR, half cash) contribute their cash line only.
         var cashSalesTotal = Sales
-            .Where(s => s.PaymentMethod == PaymentMethod.Cash)
-            .Sum(s => s.TotalAmount);
+            .SelectMany(s => s.Payments)
+            .Where(p => p.Method == PaymentMethod.Cash)
+            .Sum(p => p.Amount);
 
         var outflowsTotal = Movements
             .Where(m => m.Type == CashRegisterMovementType.Outflow)

@@ -1,4 +1,5 @@
 using Common.Utilities;
+using Module.Sales.Application.UseCases.Sales.GetById;
 using Module.Sales.Domain;
 
 namespace Module.Sales.Application.UseCases.Sales.Return.List;
@@ -12,7 +13,7 @@ public class ReturnListDto
     public string SoldByName { get; set; } = string.Empty;
     public string FirstItemDisplayName { get; set; } = string.Empty;
     public int TotalQuantity { get; set; }
-    public PaymentMethod PaymentMethod { get; set; }
+    public List<SalePaymentDto> Payments { get; set; } = [];
     public Guid? OriginalSaleId { get; set; }
     public string? Notes { get; set; }
 }

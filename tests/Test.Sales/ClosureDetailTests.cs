@@ -184,7 +184,6 @@
                     CreatedBy = UserId,
                     CreatedByName = "Test User",
                     CashRegisterClosureId = closure.Id,
-                    PaymentMethod = PaymentMethod.Cash,
                     DocumentType = DocumentType.Ticket,
                     Type = SaleType.Return,
                     OriginalSaleId = saleId,
@@ -238,7 +237,6 @@
                     CreatedBy = UserId,
                     CreatedByName = "Test User",
                     CashRegisterClosureId = closure.Id,
-                    PaymentMethod = PaymentMethod.Cash,
                     DocumentType = DocumentType.Ticket,
                     Type = SaleType.Return,
                     OriginalSaleId = saleId,
@@ -385,7 +383,6 @@
                 CreatedBy = UserId,
                 CreatedByName = "Test User",
                 CashRegisterClosureId = closureId,
-                PaymentMethod = payment,
                 DocumentType = DocumentType.Ticket,
                 Type = SaleType.Sale,
                 TotalAmount = total,
@@ -408,6 +405,19 @@
                     }
                 ]
             };
+
+            // Every document carries its payment tenders (one line per method).
+            sale.Payments.Add(new SalePayment
+            {
+                Id = Guid.NewGuid(),
+                SaleId = sale.Id,
+                Method = payment,
+                Amount = total,
+                CreatedBy = UserId,
+                CreatedByName = "Test User",
+                TenantId = TenantId
+            });
+
             return sale;
         }
 
@@ -426,7 +436,6 @@
                 CreatedBy = UserId,
                 CreatedByName = "Test User",
                 CashRegisterClosureId = closureId,
-                PaymentMethod = PaymentMethod.Cash,
                 DocumentType = DocumentType.Ticket,
                 Type = SaleType.Return,
                 OriginalSaleId = original.Id,

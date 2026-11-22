@@ -2,6 +2,7 @@ using Common.Contracts.authentication;
 using Common.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Module.Sales.Application.Abstraction;
+using Module.Sales.Application.UseCases.Sales.GetById;
 using Module.Sales.Domain;
 
 namespace Module.Sales.Application.UseCases.Sales.Return.List;
@@ -39,7 +40,11 @@ public class ListReturns(ISalesDbContext context)
                     .Select(si => si.ProductDisplayName)
                     .FirstOrDefault() ?? "",
                 TotalQuantity = s.SaleItems.Sum(si => Math.Abs(si.Quantity)),
-                PaymentMethod = s.PaymentMethod,
+                Payments = s.Payments.Select(p => new SalePaymentDto
+                {
+                    Method = p.Method,
+                    Amount = p.Amount
+                }).ToList(),
                 OriginalSaleId = s.OriginalSaleId,
                 Notes = s.Notes,
             })

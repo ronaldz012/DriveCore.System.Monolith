@@ -67,12 +67,6 @@ public class CreateSale(
                     itemDto.Quantity, itemDto.DiscountAmount, (decimal?)variant.AverageCost);
             }).ToList();
 
-            // The dominant method is derived from the tenders, never declared by the client.
-            var dominantMethod = dto.Payments
-                .OrderByDescending(p => p.Amount)
-                .First()
-                .Method;
-
             Sale sale;
             if (dto.DocumentType == DocumentType.Ticket)
             {
@@ -83,7 +77,6 @@ public class CreateSale(
                     userId,
                     userName,
                     cashClosure.Id,
-                    dominantMethod,
                     dto.TransactionCode,
                     dto.Notes,
                     factoryItems
@@ -98,7 +91,6 @@ public class CreateSale(
                     userId,
                     userName,
                     cashClosure.Id,
-                    dominantMethod,
                     dto.DocumentType,
                     dto.InvoiceNumber,
                     dto.TransactionCode,
@@ -106,6 +98,13 @@ public class CreateSale(
                     factoryItems
                 );
             }
+
+            // LEGACY write-only column (NOT NULL): keeps the dominant method populated
+            // until the column can be dropped. Not read by any code path.
+            sale.PaymentMethod = dto.Payments
+                .OrderByDescending(p => p.Amount)
+                .First()
+                .Method;
 
             // The total is resolved server-side (catalog prices); the tenders must cover it exactly.
             if (dto.Payments.Sum(p => p.Amount) != sale.TotalAmount)
