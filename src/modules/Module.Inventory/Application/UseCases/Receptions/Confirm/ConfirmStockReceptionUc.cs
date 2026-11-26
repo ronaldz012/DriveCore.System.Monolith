@@ -26,6 +26,10 @@ public class ConfirmStockReceptionUc(
         if (reception.Status != ReceptionStatus.Draft)
             return ConfirmStockReceptionErrors.NotDraft;
 
+        // A draft can be created/edited empty; it cannot be confirmed without items.
+        if (reception.Items.Count == 0)
+            return ConfirmStockReceptionErrors.NoItems;
+
         if (!reception.HasAllUnitCosts())
             return ConfirmStockReceptionErrors.MissingUnitCosts;
 

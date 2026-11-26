@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Module.Inventory.Application.Abstraction;
 using Module.Inventory.Application.UseCases.Receptions.Create;
+using Module.Inventory.Domain.Products;
 using Module.Inventory.Domain.Receptions;
 
 namespace Module.Inventory.Application.UseCases.Receptions.Edit;
@@ -37,10 +38,12 @@ public class UpdateDraftUc(
 
         var variantIds = dto.Items.Select(x => x.ProductVariantId).Distinct().ToList();
 
-        var variants = await context.ProductVariants
-            .Include(v => v.Product)
-            .Where(v => variantIds.Contains(v.Id))
-            .ToListAsync();
+        List<ProductVariant> variants = variantIds.Count == 0
+            ? []
+            : await context.ProductVariants
+                .Include(v => v.Product)
+                .Where(v => variantIds.Contains(v.Id))
+                .ToListAsync();
 
         if (variants.Count != variantIds.Count)
             return EditDraftErrors.VariantsNotFound;

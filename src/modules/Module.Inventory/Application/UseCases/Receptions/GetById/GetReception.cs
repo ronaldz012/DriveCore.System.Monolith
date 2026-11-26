@@ -34,7 +34,11 @@ public class GetReception(IInvDbContext context)
                     ProductName = i.ProductVariant.Product.Name,
                     VariantDescription = i.ProductVariant.Description,
                     Size = i.ProductVariant.Size.Name,
+                    SizeOrder = i.ProductVariant.Size.SortOrder,
+                    Price = i.ProductVariant.Price,
+                    SizeId = i.ProductVariant.SizeId,
                     Color = i.ProductVariant.Color.Name,
+                    ColorId = i.ProductVariant.ColorId,
                     QuantityReceived = i.QuantityReceived,
                     UnitCost = i.UnitCost,
                     Subtotal = i.UnitCost * i.QuantityReceived

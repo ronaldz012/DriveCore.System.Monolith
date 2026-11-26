@@ -4,6 +4,7 @@ using Common.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Module.Inventory.Application.Abstraction;
+using Module.Inventory.Domain.Products;
 using Module.Inventory.Domain.Receptions;
 
 namespace Module.Inventory.Application.UseCases.Receptions.Create;
@@ -19,13 +20,19 @@ public class CreateReceptionUc(
         var branchId = ctx.BranchId;
         var userName = ctx.FullName;
 
+        // Drafts may be created header-only; confirmed receptions must carry items.
+        if (!dto.SaveAsDraft && dto.Items.Count == 0)
+            return CreateReceptionErrors.ItemsRequired;
+
         var variantIds = dto.Items.Select(x => x.ProductVariantId).ToList();
 
-        var variants = await context.ProductVariants
-            .Include(x => x.BranchInventories)
-            .Include(x => x.Product)
-            .Where(x => variantIds.Contains(x.Id))
-            .ToListAsync();
+        List<ProductVariant> variants = variantIds.Count == 0
+            ? []
+            : await context.ProductVariants
+                .Include(x => x.BranchInventories)
+                .Include(x => x.Product)
+                .Where(x => variantIds.Contains(x.Id))
+                .ToListAsync();
 
         var missingIds = variantIds.Except(variants.Select(x => x.Id)).ToList();
         if (missingIds.Count != 0)
