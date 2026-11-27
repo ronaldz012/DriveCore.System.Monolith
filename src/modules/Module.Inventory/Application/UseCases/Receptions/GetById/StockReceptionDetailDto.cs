@@ -24,8 +24,14 @@ public class StockReceptionItemDetailDto
     public string BrandName {get;set;} = string.Empty;
     public required string Sku {get;set;} = string.Empty;
     public string ProductName { get; set; } = string.Empty;
+    public decimal Price {get;set;}
     public string VariantDescription { get; set; } = string.Empty;
+    public Guid SizeId {get;set;} 
+
     public string Size { get; set; } = string.Empty;
+    public int SizeOrder {get;set;}
+    public Guid ColorId {get;set;} 
+
     public string Color { get; set; } = string.Empty;
     public int QuantityReceived { get; set; }
     public decimal UnitCost { get; set; }

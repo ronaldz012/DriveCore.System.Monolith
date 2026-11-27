@@ -12,12 +12,16 @@ public class CreateStockReceptionDto : IValidatableObject
 
     public bool SaveAsDraft { get; set; }
 
+    // Empty is allowed only for drafts (header-only reception). Required still guards a JSON null.
     [Required]
-    [MinLength(1, ErrorMessage = "At least one item is required")]
     public List<CreateStockReceptionItemDto> Items { get; set; } = new();
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
+        if (!SaveAsDraft && Items.Count == 0)
+            yield return new ValidationResult(
+                "At least one item is required for confirmed receptions", [nameof(Items)]);
+
         var duplicate = Items
             .GroupBy(x => x.ProductVariantId)
             .FirstOrDefault(g => g.Count() > 1);

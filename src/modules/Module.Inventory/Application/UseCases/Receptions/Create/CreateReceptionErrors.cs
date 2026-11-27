@@ -4,6 +4,7 @@ namespace Module.Inventory.Application.UseCases.Receptions.Create;
 
 public static class CreateReceptionErrors
 {
+    public static readonly Error ItemsRequired = new(ErrorCode.ValidationError, "At least one item is required to confirm a reception");
     public static readonly Error VariantsNotFound = new(ErrorCode.NotFound, "One or more variants not found");
     public static readonly Error ProviderNotFound = new(ErrorCode.NotFound, "Provider not found");
     public static readonly Error ProviderInactive = new(ErrorCode.Conflict, "Provider is deactivated");

@@ -34,8 +34,8 @@ public class UpdateDraftDto : IValidatableObject
 
     public string? Notes { get; set; }
 
+    // Empty is allowed: a draft can be saved header-only (all items removed).
     [Required]
-    [MinLength(1, ErrorMessage = "At least one item is required")]
     public List<DraftItemDto> Items { get; set; } = new();
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
