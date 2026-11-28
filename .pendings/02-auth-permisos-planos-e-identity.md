@@ -54,6 +54,12 @@ public static class Permissions
 ```
 
 - **El estándar de facto** (Casbin, K8s): `resource.action`.
+- **2 niveles, SIN capa de módulo**: los feature keys ya son únicos a nivel global
+  ("products", "pos", "sales") — el prefijo de módulo sería redundancia. El módulo queda
+  como **metadato de `Feature`** (menú del front + filtro Warehouse del
+  `BranchFeatureKeysResolver`), nunca en el string. Colisión futura ("reports" en dos
+  módulos) → se califica el feature key (`inv_reports`), no se agrega capa a todos.
+  Se conservan los feature keys actuales → `AllowedFeatureKeys` y `[RequireFeature]` intactos.
 - Display names en la constante, no en DB. Un endpoint serializa el catálogo para el front.
 - Integridad: los use cases validan contra `Permissions.All` — sin FK que obligue a migrar
   el catálogo con cada acción nueva.
